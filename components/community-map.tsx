@@ -8,11 +8,18 @@ import {
   Marker,
 } from "@vis.gl/react-google-maps"
 
-import { libraries } from "@/lib/libraries"
+import { libraries, type Library } from "@/lib/libraries"
 
 type SelectedLibrary = (typeof libraries)[number] | null
 
-export function CommunityMap() {
+type CommunityMapProps = {
+  onUploadPhoto: (library: Library) => void
+}
+
+export function CommunityMap({
+  onUploadPhoto,
+}: CommunityMapProps) {
+
   const [selectedLibrary, setSelectedLibrary] =
     useState<SelectedLibrary>(null)
 
@@ -88,6 +95,7 @@ export function CommunityMap() {
 
                 <button
                   type="button"
+                  onClick={() => onUploadPhoto(selectedLibrary)}
                   className="mt-3 rounded-lg bg-black px-3 py-2 text-sm text-white"
                 >
                   Upload Photo

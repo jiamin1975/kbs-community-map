@@ -11,6 +11,8 @@ import {
   X,
 } from "lucide-react"
 
+import type { Library } from "@/lib/libraries"
+
 type RecognizedBook = {
   title: string
   author: string | null
@@ -23,7 +25,13 @@ type RecognitionResult = {
   notes: string
 }
 
-export function BookPhotoTester() {
+type BookPhotoTesterProps = {
+  library: Library | null
+}
+
+export function BookPhotoTester({
+  library,
+}: BookPhotoTesterProps) {
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] =
     useState<string | null>(null)
@@ -80,13 +88,22 @@ export function BookPhotoTester() {
       return
     }
 
+    if (!library) {
+      setError(
+        "Please select a library from the map first.",
+      )
+      return
+    }
+
     setLoading(true)
     setError("")
     setResult(null)
 
     try {
       const formData = new FormData()
+
       formData.append("image", file)
+      formData.append("libraryId", library.id)
 
       const response = await fetch(
         "/api/analyze-books",
@@ -118,7 +135,10 @@ export function BookPhotoTester() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <section
+      id="book-photo-tester"
+      className="mx-auto max-w-6xl px-4 py-10 sm:px-6"
+    >
       <div className="rounded-2xl border border-border bg-card p-5 sm:p-7">
         <h2 className="text-2xl font-semibold text-foreground">
           Test AI Book Recognition
@@ -129,6 +149,30 @@ export function BookPhotoTester() {
           spines. The AI will identify titles that
           are sufficiently visible.
         </p>
+
+        {library ? (
+          <div className="mt-5 rounded-xl border border-border bg-secondary p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Updating inventory for
+            </p>
+
+            <p className="mt-1 text-lg font-semibold">
+              {library.name}
+            </p>
+
+            <p className="text-sm text-muted-foreground">
+              {library.address}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5 rounded-xl border border-dashed border-border p-4">
+            <p className="text-sm text-muted-foreground">
+              Select a library marker and click
+              <strong> Upload Photo </strong>
+              to begin updating its inventory.
+            </p>
+          </div>
+        )}
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <div>
@@ -174,7 +218,7 @@ export function BookPhotoTester() {
             <button
               type="button"
               onClick={analyzePhoto}
-              disabled={!file || loading}
+              disabled={!file || !library || loading}
               className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
@@ -191,7 +235,7 @@ export function BookPhotoTester() {
                     className="size-4"
                     aria-hidden="true"
                   />
-                  Recognize Books
+                  Update Library Inventory
                 </>
               )}
             </button>

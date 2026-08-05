@@ -1,8 +1,9 @@
 import { Library, MapPin, Sparkles } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
-import { CommunityMap } from '@/components/community-map'
+//import { CommunityMap } from '@/components/community-map'
 import { libraries } from '@/lib/libraries'
-import { BookPhotoTester } from "@/components/book-photo-tester"
+//import { BookPhotoTester } from "@/components/book-photo-tester"
+import { LibraryMapExperience } from "@/components/library-map-experience"
 
 export default function Page() {
   const totalBooks = libraries.reduce((sum, l) => sum + l.bookCount, 0)
@@ -48,10 +49,9 @@ export default function Page() {
           </dl>
         </section>
 
-        <section aria-label="Interactive library map" className="border-y border-border">
-          <CommunityMap />
-        </section>
-        <BookPhotoTester />
+        <LibraryMapExperience />
+
+
 
       </main>
 
