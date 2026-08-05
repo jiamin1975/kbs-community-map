@@ -1,114 +1,102 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { MapPin } from 'lucide-react'
-import { libraries, type Library } from '@/lib/libraries'
-import { cn } from '@/lib/utils'
-import { LibraryCard } from '@/components/library-card'
+import { useState } from "react"
+import {
+  APIProvider,
+  InfoWindow,
+  Map,
+  Marker,
+} from "@vis.gl/react-google-maps"
+
+import { libraries } from "@/lib/libraries"
+
+type SelectedLibrary = (typeof libraries)[number] | null
 
 export function CommunityMap() {
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [status, setStatus] = useState<string>('')
+  const [selectedLibrary, setSelectedLibrary] =
+    useState<SelectedLibrary>(null)
 
-  const selected = libraries.find((l) => l.id === selectedId) ?? null
+  const apiKey =
+    process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
-  function handleUploadPhoto(library: Library) {
-    setStatus(`Photo upload started for ${library.name}. (Demo only — no file was sent.)`)
+  if (!apiKey) {
+    return (
+      <div className="mx-auto flex h-[600px] max-w-6xl items-center justify-center px-4">
+        <div className="rounded-xl border border-border bg-card p-6 text-center">
+          <p className="font-medium text-foreground">
+            Google Maps API key is missing.
+          </p>
+
+          <p className="mt-2 text-sm text-muted-foreground">
+            Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to .env.local,
+            then restart the development server.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="relative">
-      {/* Map surface */}
-      <div
-        className="relative h-[62vh] min-h-[420px] w-full overflow-hidden bg-[oklch(0.93_0.03_230)]"
-        role="application"
-        aria-label="Community learning map showing little library locations"
-      >
-        {/* Placeholder map tiles: streets + blocks */}
-        <div aria-hidden="true" className="absolute inset-0">
-          {/* park / water blocks */}
-          <div className="absolute left-[6%] top-[10%] size-40 rounded-2xl bg-[oklch(0.9_0.06_150)]" />
-          <div className="absolute right-[8%] bottom-[8%] h-48 w-64 rounded-2xl bg-[oklch(0.88_0.05_220)]" />
-          <div className="absolute left-[40%] top-[46%] h-28 w-36 rounded-xl bg-[oklch(0.9_0.06_150)]" />
-          {/* road grid */}
-          <div
-            className="absolute inset-0 opacity-70"
-            style={{
-              backgroundImage:
-                'linear-gradient(to right, oklch(0.98 0.01 240) 0 6px, transparent 6px), linear-gradient(to bottom, oklch(0.98 0.01 240) 0 6px, transparent 6px)',
-              backgroundSize: '110px 110px',
-            }}
-          />
-          {/* diagonal avenue */}
-          <div className="absolute -left-10 top-1/3 h-2.5 w-[130%] rotate-6 bg-[oklch(0.98_0.01_240)]" />
-        </div>
-
-        {/* Markers */}
-        {libraries.map((library) => {
-          const isActive = library.id === selectedId
-          return (
-            <button
+    <div className="h-[600px] w-full">
+      <APIProvider apiKey={apiKey}>
+        <Map
+          defaultCenter={{
+            lat: 39.0458,
+            lng: -77.1224,
+          }}
+          defaultZoom={11}
+          gestureHandling="greedy"
+          mapTypeControl={false}
+          streetViewControl={false}
+          fullscreenControl
+        >
+          {libraries.map((library) => (
+            <Marker
               key={library.id}
-              type="button"
-              onClick={() => setSelectedId(library.id)}
-              style={{ top: `${library.position.top}%`, left: `${library.position.left}%` }}
-              className={cn(
-                'group absolute z-10 flex -translate-x-1/2 -translate-y-full flex-col items-center focus-visible:outline-none',
-              )}
-              aria-pressed={isActive}
-              aria-label={`${library.name}, ${library.bookCount} books, updated ${library.lastUpdated}`}
-            >
-              <span
-                className={cn(
-                  'flex size-9 items-center justify-center rounded-full border-2 border-card shadow-md transition-transform group-hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
-                  isActive ? 'bg-primary text-primary-foreground scale-110' : 'bg-card text-primary',
-                )}
-              >
-                <MapPin className="size-5" aria-hidden="true" />
-              </span>
-              <span
-                className={cn(
-                  'mt-1 max-w-[8rem] truncate rounded-md px-2 py-0.5 text-xs font-medium shadow-sm',
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-card/95 text-foreground',
-                )}
-              >
-                {library.name}
-              </span>
-            </button>
-          )
-        })}
-
-        {/* Placeholder attribution to mimic Google Maps chrome */}
-        <span className="absolute bottom-2 right-3 rounded bg-card/80 px-2 py-0.5 text-[11px] text-muted-foreground">
-          Map placeholder
-        </span>
-      </div>
-
-      {/* Selected library card overlay */}
-      {selected && (
-        <div className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center p-4 sm:items-start sm:justify-end sm:p-6">
-          <div className="pointer-events-auto w-full max-w-sm">
-            <LibraryCard
-              library={selected}
-              onClose={() => setSelectedId(null)}
-              onUploadPhoto={handleUploadPhoto}
+              position={{
+                lat: library.latitude,
+                lng: library.longitude,
+              }}
+              title={library.name}
+              onClick={() => setSelectedLibrary(library)}
             />
-          </div>
-        </div>
-      )}
+          ))}
 
-      <p role="status" aria-live="polite" className="sr-only">
-        {status}
-      </p>
-      {status && (
-        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
-          <p className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-secondary-foreground">
-            {status}
-          </p>
-        </div>
-      )}
+          {selectedLibrary && (
+            <InfoWindow
+              position={{
+                lat: selectedLibrary.latitude,
+                lng: selectedLibrary.longitude,
+              }}
+              onCloseClick={() => setSelectedLibrary(null)}
+            >
+              <div className="w-64 p-1 text-black">
+                <h2 className="font-semibold">
+                  {selectedLibrary.name}
+                </h2>
+
+                {"address" in selectedLibrary && (
+                  <p className="mt-1 text-sm">
+                    {selectedLibrary.address}
+                  </p>
+                )}
+
+                <p className="mt-3 text-sm">
+                  <strong>Books available:</strong>{" "}
+                  {selectedLibrary.bookCount}
+                </p>
+
+                <button
+                  type="button"
+                  className="mt-3 rounded-lg bg-black px-3 py-2 text-sm text-white"
+                >
+                  Upload Photo
+                </button>
+              </div>
+            </InfoWindow>
+          )}
+        </Map>
+      </APIProvider>
     </div>
   )
 }
