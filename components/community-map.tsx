@@ -15,6 +15,7 @@ import type { Library } from "@/lib/libraries"
 
 type CommunityMapProps = {
   onUploadPhoto: (library: Library) => void
+  onAddLibrary: () => void
 }
 
 type NearbyLibraryMatch = {
@@ -64,6 +65,7 @@ function calculateDistanceMeters(
 
 export function CommunityMap({
   onUploadPhoto,
+  onAddLibrary,
 }: CommunityMapProps) {
   const [libraries, setLibraries] =
     useState<Library[]>([])
@@ -328,25 +330,44 @@ export function CommunityMap({
   return (
     <div>
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
-        <button
-          type="button"
-          onClick={findNearbyLibrary}
-          disabled={locating}
-          className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {locating
-            ? "Finding Nearby Library…"
-            : "📍 Update a Nearby Library"}
-        </button>
+        <div className="flex flex-wrap gap-3">
+  <button
+    type="button"
+    type="button"
+    onClick={findNearbyLibrary}
+    disabled={locating}
+    className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    {locating
+      ? "Finding Nearby Library…"
+      : "📍 Update a Nearby Library"}
+  </button>
+
+  <button
+  type="button"
+  onClick={onAddLibrary}
+  className="inline-flex items-center justify-center rounded-xl border border-border bg-background px-4 py-2.5 font-medium text-foreground hover:bg-secondary"
+>
+  ＋ Add a New Library
+</button>
+</div>
 
         {locationError && (
-          <div
-            className="mt-3 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700"
-            role="alert"
-          >
-            {locationError}
-          </div>
-        )}
+  <div
+    className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
+    role="alert"
+  >
+    <p>{locationError}</p>
+
+    <button
+  type="button"
+  onClick={onAddLibrary}
+  className="mt-3 inline-flex rounded-lg bg-primary px-3 py-2 font-medium text-primary-foreground"
+>
+  Add a New Library
+</button>
+  </div>
+)}
       </div>
 
       <div className="relative h-[600px] w-full">

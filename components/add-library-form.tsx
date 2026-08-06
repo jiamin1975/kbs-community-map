@@ -7,6 +7,12 @@ import {
   getDocs,
   serverTimestamp,
 } from "firebase/firestore"
+import {
+  AdvancedMarker,
+  APIProvider,
+  Map,
+  type MapCameraChangedEvent,
+} from "@vis.gl/react-google-maps"
 
 import { db } from "@/lib/firebase"
 import type { Library } from "@/lib/libraries"
@@ -73,14 +79,133 @@ export function AddLibraryForm({
 
   const [saving, setSaving] = useState(false)
   const [locating, setLocating] = useState(false)
-  const [showAdvancedLocation, setShowAdvancedLocation] =
-    useState(false)
+
+  const [
+    showAdvancedLocation,
+    setShowAdvancedLocation,
+  ] = useState(false)
 
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
 
   const [nearbyLibrary, setNearbyLibrary] =
     useState<NearbyLibrary | null>(null)
+
+  const [mapCenter, setMapCenter] = useState({
+    lat: 39.0458,
+    lng: -77.1224,
+  })
+
+  const [mapZoom, setMapZoom] = useState(18)
+
+  const markerLatitude = Number(latitude)
+  const markerLongitude = Number(longitude)
+
+  const markerPosition =
+    latitude !== "" &&
+    longitude !== "" &&
+    Number.isFinite(markerLatitude) &&
+    Number.isFinite(markerLongitude)
+      ? {
+          lat: markerLatitude,
+          lng: markerLongitude,
+        }
+      : null
+
+  function handleCameraChanged(
+    event: MapCameraChangedEvent,
+  ) {
+    setMapCenter(event.detail.center)
+    setMapZoom(event.detail.zoom)
+  }
+
+  async function updateAddressFromCoordinates(
+    newLatitude: number,
+    newLongitude: number,
+  ) {
+    try {
+      const response = await fetch(
+        "/api/reverse-geocode",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            latitude: newLatitude,
+            longitude: newLongitude,
+          }),
+        },
+      )
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ??
+            "Could not find the address.",
+        )
+      }
+
+      setAddress(data.address ?? "")
+      setNeighborhood(data.neighborhood ?? "")
+
+      return true
+    } catch (caughtError) {
+      console.error(
+        "Could not refresh address:",
+        caughtError,
+      )
+
+      setMessage(
+        "The location was updated, but the address could not be refreshed automatically.",
+      )
+
+      return false
+    }
+  }
+
+  async function handleMarkerDragEnd(
+    event: google.maps.MapMouseEvent,
+  ) {
+    const newPosition = event.latLng
+
+    if (!newPosition) {
+      return
+    }
+
+    const newLatitude = newPosition.lat()
+    const newLongitude = newPosition.lng()
+
+    /*
+     * These two state updates are essential.
+     * They permanently save the dragged marker position,
+     * so it does not return to its old location when the
+     * map zooms or rerenders.
+     */
+    setLatitude(newLatitude.toFixed(6))
+    setLongitude(newLongitude.toFixed(6))
+
+    setMapCenter({
+      lat: newLatitude,
+      lng: newLongitude,
+    })
+
+    setError("")
+    setNearbyLibrary(null)
+
+    const addressUpdated =
+      await updateAddressFromCoordinates(
+        newLatitude,
+        newLongitude,
+      )
+
+    if (addressUpdated) {
+      setMessage(
+        "Library location adjusted. The address and neighborhood were updated automatically. Please confirm them before saving.",
+      )
+    }
+  }
 
   function useCurrentLocation() {
     setMessage("")
@@ -101,59 +226,34 @@ export function AddLibraryForm({
       async (position) => {
         const currentLatitude =
           position.coords.latitude
+
         const currentLongitude =
           position.coords.longitude
 
         setLatitude(currentLatitude.toFixed(6))
         setLongitude(currentLongitude.toFixed(6))
 
-        try {
-          const response = await fetch(
-            "/api/reverse-geocode",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                latitude: currentLatitude,
-                longitude: currentLongitude,
-              }),
-            },
+        setMapCenter({
+          lat: currentLatitude,
+          lng: currentLongitude,
+        })
+
+        setMapZoom(19)
+
+        const addressUpdated =
+          await updateAddressFromCoordinates(
+            currentLatitude,
+            currentLongitude,
           )
 
-          const data = await response.json()
-
-          if (!response.ok) {
-            throw new Error(
-              data.error ??
-                "Could not find the address.",
-            )
-          }
-
-          setAddress(data.address ?? "")
-
-          if (data.neighborhood) {
-            setNeighborhood(data.neighborhood)
-          }
-
+        if (addressUpdated) {
           setMessage(
-            "Current location, address, and neighborhood were added. Please confirm the information before saving.",
+            "Current location, address, and neighborhood were added. Drag the marker if the GPS position is not exact.",
           )
-
-          setShowAdvancedLocation(false)
-        } catch (caughtError) {
-          console.error(
-            "Could not find address:",
-            caughtError,
-          )
-
-          setMessage(
-            "Current coordinates were added, but the address could not be filled automatically.",
-          )
-        } finally {
-          setLocating(false)
         }
+
+        setShowAdvancedLocation(false)
+        setLocating(false)
       },
       (locationError) => {
         console.error(
@@ -210,7 +310,9 @@ export function AddLibraryForm({
       const data = documentSnapshot.data()
 
       const existingLatitude = Number(data.latitude)
-      const existingLongitude = Number(data.longitude)
+      const existingLongitude = Number(
+        data.longitude,
+      )
 
       if (
         !Number.isFinite(existingLatitude) ||
@@ -358,6 +460,13 @@ export function AddLibraryForm({
       setNearbyLibrary(null)
       setShowAdvancedLocation(false)
 
+      setMapCenter({
+        lat: 39.0458,
+        lng: -77.1224,
+      })
+
+      setMapZoom(18)
+
       setMessage(
         "Library added successfully. You can now upload its first shelf photo.",
       )
@@ -378,18 +487,9 @@ export function AddLibraryForm({
   }
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <div className="rounded-2xl border border-border bg-card p-6">
-        <h2 className="text-2xl font-semibold">
-          Add a New Library
-        </h2>
-
-        <p className="mt-2 text-muted-foreground">
-          Enter a verified community library
-          location.
-        </p>
-
-        <div className="mt-6 grid gap-4">
+    <div className="p-1">
+  <div className="rounded-2xl border border-border bg-card p-5">
+         <div className="mt-6 grid gap-4">
           <label className="grid gap-2">
             <span className="text-sm font-medium">
               Library Name
@@ -445,6 +545,67 @@ export function AddLibraryForm({
               ? "Finding My Location…"
               : "📍 Use My Current Location"}
           </button>
+
+          {markerPosition && (
+            <div className="overflow-hidden rounded-xl border border-border">
+              <div className="border-b border-border bg-secondary px-4 py-3">
+                <p className="text-sm font-medium">
+                  Confirm the library location
+                </p>
+
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Drag the red marker onto the exact
+                  position of the library.
+                </p>
+              </div>
+
+              <div className="h-[320px] w-full">
+                <APIProvider
+                  apiKey={
+                    process.env
+                      .NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!
+                  }
+                >
+                  <Map
+                    center={mapCenter}
+                    zoom={mapZoom}
+                    onCameraChanged={
+                      handleCameraChanged
+                    }
+                    mapId="DEMO_MAP_ID"
+                    gestureHandling="greedy"
+                    mapTypeControl={false}
+                    streetViewControl={false}
+                    fullscreenControl={false}
+                  >
+                    <AdvancedMarker
+                      position={markerPosition}
+                      draggable
+                      onDragEnd={
+                        handleMarkerDragEnd
+                      }
+                      title="Drag to the exact library location"
+                    >
+                      <div className="flex flex-col items-center">
+                        <div className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-lg">
+                          Library
+                        </div>
+
+                        <div className="h-3 w-3 -translate-y-0.5 rotate-45 bg-red-600" />
+                      </div>
+                    </AdvancedMarker>
+                  </Map>
+                </APIProvider>
+              </div>
+
+              <div className="bg-background px-4 py-3 text-xs text-muted-foreground">
+                Dragging the marker automatically
+                updates the coordinates, address, and
+                neighborhood. The corrected marker
+                position will remain after zooming.
+              </div>
+            </div>
+          )}
 
           <div className="rounded-xl border border-border bg-background">
             <button
@@ -586,7 +747,7 @@ export function AddLibraryForm({
             </div>
           )}
         </div>
-      </div>
-    </section>
-  )
+       </div>
+  </div>
+)
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 
+import { AddLibraryForm } from "@/components/add-library-form"
 import { BookPhotoTester } from "@/components/book-photo-tester"
 import { CommunityMap } from "@/components/community-map"
 import {
@@ -17,20 +18,36 @@ export function LibraryMapExperience() {
   const [selectedLibrary, setSelectedLibrary] =
     useState<Library | null>(null)
 
-  const [dialogOpen, setDialogOpen] =
+  const [uploadDialogOpen, setUploadDialogOpen] =
+    useState(false)
+
+  const [addLibraryDialogOpen, setAddLibraryDialogOpen] =
     useState(false)
 
   function handleUploadPhoto(library: Library) {
     setSelectedLibrary(library)
-    setDialogOpen(true)
+    setUploadDialogOpen(true)
   }
 
-  function handleDialogChange(open: boolean) {
-    setDialogOpen(open)
+  function handleUploadDialogChange(open: boolean) {
+    setUploadDialogOpen(open)
 
     if (!open) {
       setSelectedLibrary(null)
     }
+  }
+
+  function handleAddLibrary() {
+    setAddLibraryDialogOpen(true)
+  }
+
+  function handleLibraryAdded(library: Library) {
+    setAddLibraryDialogOpen(false)
+
+    // Open the first-inventory modal immediately
+    // for the newly created library.
+    setSelectedLibrary(library)
+    setUploadDialogOpen(true)
   }
 
   return (
@@ -41,12 +58,13 @@ export function LibraryMapExperience() {
       >
         <CommunityMap
           onUploadPhoto={handleUploadPhoto}
+          onAddLibrary={handleAddLibrary}
         />
       </section>
 
       <Dialog
-        open={dialogOpen}
-        onOpenChange={handleDialogChange}
+        open={uploadDialogOpen}
+        onOpenChange={handleUploadDialogChange}
       >
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
@@ -64,9 +82,31 @@ export function LibraryMapExperience() {
             <BookPhotoTester
               key={selectedLibrary.id}
               library={selectedLibrary}
-              onFinished={() => setDialogOpen(false)}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={addLibraryDialogOpen}
+        onOpenChange={setAddLibraryDialogOpen}
+      >
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              Add a New Library
+            </DialogTitle>
+
+            <DialogDescription>
+              Use your current location, adjust the
+              marker if needed, and add the library to
+              the community map.
+            </DialogDescription>
+          </DialogHeader>
+
+          <AddLibraryForm
+            onLibraryAdded={handleLibraryAdded}
+          />
         </DialogContent>
       </Dialog>
     </>
