@@ -1,12 +1,12 @@
 import { Library, MapPin, Sparkles } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 //import { CommunityMap } from '@/components/community-map'
-import { libraries } from '@/lib/libraries'
+//import { libraries } from '@/lib/libraries'
 //import { BookPhotoTester } from "@/components/book-photo-tester"
 import { LibraryMapExperience } from "@/components/library-map-experience"
 
 export default function Page() {
-  const totalBooks = libraries.reduce((sum, l) => sum + l.bookCount, 0)
+  //const totalBooks = libraries.reduce((sum, l) => sum + l.bookCount, 0)
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -27,26 +27,7 @@ export default function Page() {
             date.
           </p>
 
-          <dl className="mt-6 grid grid-cols-2 gap-3 sm:max-w-md">
-            <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
-              <span className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground" aria-hidden="true">
-                <MapPin className="size-5" />
-              </span>
-              <div>
-                <dt className="text-xs text-muted-foreground">Libraries</dt>
-                <dd className="text-xl font-semibold text-foreground">{libraries.length}</dd>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
-              <span className="flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground" aria-hidden="true">
-                <Library className="size-5" />
-              </span>
-              <div>
-                <dt className="text-xs text-muted-foreground">Books available</dt>
-                <dd className="text-xl font-semibold text-foreground">{totalBooks}</dd>
-              </div>
-            </div>
-          </dl>
+
         </section>
 
         <LibraryMapExperience />

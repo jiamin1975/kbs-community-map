@@ -2,18 +2,19 @@ export type Library = {
   id: string
   name: string
   neighborhood: string
-  books: string[]
+  address: string
+  books: unknown[]
   bookCount: number
   lastUpdated: string
-  /** Marker position as a percentage of the map area (0–100). */
   latitude: number
   longitude: number
+  verified: boolean
 }
 
 export const libraries: Library[] = [
   {
     id: "temp-001",
-    name: "Little Free Library (Temporary)",
+    name: "Little Free Library 3",
     neighborhood: "Bethesda",
     address: "Replace with verified address",
     latitude: 38.9847,
@@ -24,7 +25,7 @@ export const libraries: Library[] = [
   },
   {
     id: "temp-002",
-    name: "Little Free Library (Temporary)",
+    name: "Little Free Library 1",
     neighborhood: "Rockville",
     address: "Replace with verified address",
     latitude: 39.0840,
@@ -35,7 +36,7 @@ export const libraries: Library[] = [
   },
   {
     id: "temp-003",
-    name: "Little Free Library (Temporary)",
+    name: "Little Free Library 2",
     neighborhood: "Potomac",
     address: "Replace with verified address",
     latitude: 39.0182,

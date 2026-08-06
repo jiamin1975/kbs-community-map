@@ -12,6 +12,13 @@ import {
 } from "lucide-react"
 
 import type { Library } from "@/lib/libraries"
+import {
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore"
+
+import { db } from "@/lib/firebase"
 
 type RecognizedBook = {
   title: string
@@ -40,6 +47,9 @@ export function BookPhotoTester({
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -61,6 +71,7 @@ export function BookPhotoTester({
     setFile(selectedFile)
     setResult(null)
     setError("")
+    setSaved(false)
 
     if (selectedFile) {
       setPreviewUrl(
@@ -80,6 +91,7 @@ export function BookPhotoTester({
     setPreviewUrl(null)
     setResult(null)
     setError("")
+    setSaved(false)
   }
 
   async function analyzePhoto() {
@@ -95,6 +107,7 @@ export function BookPhotoTester({
       return
     }
 
+    setSaved(false)
     setLoading(true)
     setError("")
     setResult(null)
@@ -133,6 +146,56 @@ export function BookPhotoTester({
       setLoading(false)
     }
   }
+
+  async function saveInventory() {
+  if (!library) {
+    setError("Please select a library first.")
+    return
+  }
+
+  if (!result) {
+    setError("Recognize the books before saving.")
+    return
+  }
+
+  setSaving(true)
+  setSaved(false)
+  setError("")
+
+  try {
+    const libraryReference = doc(
+      db,
+      "libraries",
+      library.id,
+    )
+
+    const booksToSave = result.books.map((book) => ({
+      title: book.title,
+      author: book.author,
+      confidence: book.confidence,
+      visibleText: book.visibleText,
+    }))
+
+    await updateDoc(libraryReference, {
+      books: booksToSave,
+      bookCount: booksToSave.length,
+      lastUpdated: serverTimestamp(),
+      recognitionNotes: result.notes,
+    })
+
+    setSaved(true)
+  } catch (caughtError) {
+    console.error("Could not save inventory:", caughtError)
+
+    setError(
+      caughtError instanceof Error
+        ? caughtError.message
+        : "Could not save the inventory.",
+    )
+  } finally {
+    setSaving(false)
+  }
+}
 
   return (
     <section
@@ -323,7 +386,34 @@ export function BookPhotoTester({
                     </p>
                   </div>
                 )}
+
+                <div className="mt-5 border-t border-border pt-4">
+  <button
+    type="button"
+    onClick={saveInventory}
+    disabled={saving || saved}
+    className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    {saving
+      ? "Saving Inventory…"
+      : saved
+        ? "Inventory Saved"
+        : "Save Inventory"}
+  </button>
+
+  {saved && (
+    <div
+      className="mt-3 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-800"
+      role="status"
+    >
+      {result.books.length}{" "}
+      {result.books.length === 1 ? "book was" : "books were"}{" "}
+      saved to {library?.name}.
+    </div>
+  )}
+</div>
               </>
+
             )}
           </div>
         </div>
