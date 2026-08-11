@@ -134,9 +134,6 @@ export function BookPhotoTester({
     }
 
     setFile(selectedFile)
-
-    // New file = new current recognition result,
-    // but keep all session books already found.
     setResult(null)
     setError("")
     setSaved(false)
@@ -232,8 +229,6 @@ export function BookPhotoTester({
       setPhotosProcessed(
         (count) => count + 1,
       )
-
-      // Keep current photo visible for comparison.
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -321,83 +316,110 @@ export function BookPhotoTester({
   return (
     <div className="p-1">
       {library ? (
-       <div className="rounded-lg border border-border bg-secondary px-4 py-3">
+        <div className="rounded-lg border border-border bg-secondary px-4 py-3">
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 text-base">
+              📍
+            </span>
 
-  <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-semibold leading-tight">
+                {library.name}
+              </p>
 
-    <span className="text-base">
-      📍
-    </span>
+              {library.address && (
+                <p className="mt-0.5 truncate text-xs leading-tight text-muted-foreground">
+                  {library.address}
+                </p>
+              )}
+            </div>
+          </div>
 
-    <div className="min-w-0">
+          <div className="mt-2 flex items-center gap-6 border-t border-border/60 pt-2 text-sm">
+            <span>
+              📷{" "}
+              <strong>{photosProcessed}</strong>{" "}
+              Photos
+            </span>
 
-      <p className="text-base font-semibold leading-tight">
-        {library.name}
-      </p>
-
-      {library.address && (
-        <p className="mt-0.5 text-xs text-muted-foreground truncate">
-          {library.address}
-        </p>
-      )}
-
-    </div>
-
-  </div>
-
-</div>
+            <span>
+              📚{" "}
+              <strong>{sessionBooks.length}</strong>{" "}
+              Books
+            </span>
+          </div>
+        </div>
       ) : (
-        <div className="rounded-xl border border-dashed border-border p-4">
+        <div className="rounded-lg border border-dashed border-border p-3">
           <p className="text-sm text-muted-foreground">
-            Select a library before
-            updating inventory.
+            Select a library before updating inventory.
           </p>
         </div>
       )}
 
-<div className="mt-2 flex items-center gap-6 rounded-md bg-secondary px-3 py-2 text-sm">
-
-  <span>
-    📷{" "}
-    <strong>{photosProcessed}</strong>{" "}
-    Photos
-  </span>
-
-  <span>
-    📚{" "}
-    <strong>{sessionBooks.length}</strong>{" "}
-    Books
-  </span>
-
-</div>
-
-
       {!saved && (
-        <div className="mt-5 grid gap-6 md:grid-cols-2">
-          {/* LEFT SIDE: PHOTO */}
+        <div className="mt-4 grid gap-5 md:grid-cols-2">
+          {/* LEFT SIDE */}
           <div>
-
             <input
-                id="book-photo"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleFileChange}
-                disabled={loading || saving}
-                className="hidden"
+              id="book-photo"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+              disabled={loading || saving}
+              className="hidden"
             />
 
-            <label
+            <div className="flex gap-3">
+              <label
                 htmlFor="book-photo"
-                className="mt-3 inline-flex cursor-pointer items-center rounded-xl border border-border bg-background px-4 py-3 font-medium hover:bg-secondary"
-            >
-                📷{" "}
-                {photosProcessed === 0
-                ? "Choose The First Shelf Photo"
-                : "Choose Another Shelf Photo"}
-            </label>
+                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+              >
+                📷 Choose Photo
+              </label>
+
+              <button
+                type="button"
+                onClick={analyzePhoto}
+                disabled={
+                  !file ||
+                  !library ||
+                  loading ||
+                  saving ||
+                  !!result
+                }
+                className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed ${
+                  result
+                    ? "bg-green-600 text-white disabled:opacity-100"
+                    : "bg-primary text-primary-foreground disabled:opacity-50"
+                }`}
+              >
+                {loading ? (
+                  <>
+                    <LoaderCircle
+                      className="size-4 animate-spin"
+                      aria-hidden="true"
+                    />
+                    Analyzing…
+                  </>
+                ) : result ? (
+                  <>
+                    ✓ Added
+                  </>
+                ) : (
+                  <>
+                    <ImageUp
+                      className="size-4"
+                      aria-hidden="true"
+                    />
+                    Analyze Photo
+                  </>
+                )}
+              </button>
+            </div>
 
             {previewUrl && (
-              <div className="relative mt-4">
+              <div className="relative mt-3">
                 <img
                   src={previewUrl}
                   alt="Selected bookshelf preview"
@@ -419,58 +441,17 @@ export function BookPhotoTester({
               </div>
             )}
 
-            <button
-  type="button"
-  onClick={analyzePhoto}
-  disabled={
-    !file ||
-    !library ||
-    loading ||
-    saving ||
-    !!result
-  }
-  className={`mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-colors disabled:cursor-not-allowed ${
-    result
-      ? "bg-green-600 text-white disabled:opacity-100"
-      : "bg-primary text-primary-foreground disabled:opacity-50"
-  }`}
->
-  {loading ? (
-    <>
-      <LoaderCircle
-        className="size-4 animate-spin"
-        aria-hidden="true"
-      />
-      Analyzing & Adding...
-    </>
-  ) : result ? (
-    <>
-      Added ✓
-    </>
-  ) : (
-    <>
-      <ImageUp
-        className="size-4"
-        aria-hidden="true"
-      />
-      Analyze & Update
-    </>
-  )}
-</button>
-
             {sessionBooks.length > 0 && (
-              <div className="mt-4 rounded-xl border border-border bg-card p-4">
-                <p className="font-semibold">
-                  Finished photographing this
-                  library?
+              <div className="mt-4 rounded-xl border border-border bg-card p-3">
+                <p className="text-sm font-semibold">
+                  Finished photographing this library?
                 </p>
 
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-xs text-muted-foreground">
                   This will replace the previous
-                  inventory with the{" "}
-                  {sessionBooks.length} unique
-                  books found during this update
-                  session.
+                  inventory with{" "}
+                  {sessionBooks.length} unique books
+                  from this update.
                 </p>
 
                 <button
@@ -479,7 +460,7 @@ export function BookPhotoTester({
                     finishAndSaveInventory
                   }
                   disabled={saving}
-                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mt-3 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {saving ? (
                     <>
@@ -503,39 +484,36 @@ export function BookPhotoTester({
             )}
           </div>
 
-          {/* RIGHT SIDE: RECOGNITION RESULTS */}
+          {/* RIGHT SIDE */}
           <div
-            className="rounded-xl border border-border bg-background p-5"
+            className="rounded-xl border border-border bg-background p-4"
             aria-live="polite"
           >
-            <h3 className="font-semibold text-foreground">
-              Recognition results
+            <h3 className="text-sm font-semibold text-foreground">
+              Recognition Results
             </h3>
 
             {!loading && !result && (
-              <p className="mt-3 text-sm text-muted-foreground">
-                Books from the current photo
-                will appear here.
+              <p className="mt-2 text-xs text-muted-foreground">
+                Books from the current photo will appear here.
               </p>
             )}
 
             {loading && (
-              <p className="mt-3 text-sm text-muted-foreground">
-                Reading visible titles and
-                authors…
+              <p className="mt-2 text-xs text-muted-foreground">
+                Reading visible titles and authors…
               </p>
             )}
 
             {result && (
-              <div className="mt-3 max-h-[430px] overflow-y-auto pr-2">
+              <div className="mt-2 max-h-[400px] overflow-y-auto pr-2">
                 {result.books.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No book titles could be
-                    identified confidently.
+                  <p className="text-xs text-muted-foreground">
+                    No book titles could be identified confidently.
                   </p>
                 ) : (
                   <>
-                    <p className="text-sm text-green-700">
+                    <p className="text-xs text-green-700">
                       {result.books.length}{" "}
                       {result.books.length === 1
                         ? "book was"
@@ -543,32 +521,30 @@ export function BookPhotoTester({
                       added to this update.
                     </p>
 
-                    <ul className="mt-4 space-y-3">
+                    <ul className="mt-3 space-y-2">
                       {result.books.map(
                         (book, index) => (
                           <li
                             key={`${book.title}-${index}`}
-                            className="rounded-lg border border-border p-3"
+                            className="rounded-lg border border-border px-3 py-2"
                           >
-                            <p className="font-medium text-foreground">
+                            <p className="text-sm font-medium leading-tight text-foreground">
                               {book.title}
                             </p>
 
                             {book.author && (
-                              <p className="mt-1 text-sm text-muted-foreground">
+                              <p className="mt-0.5 text-xs leading-tight text-muted-foreground">
                                 {book.author}
                               </p>
                             )}
 
-                            <p className="mt-2 text-xs capitalize text-muted-foreground">
+                            <p className="mt-1 text-[11px] capitalize text-muted-foreground">
                               Confidence:{" "}
-                              {
-                                book.confidence
-                              }
+                              {book.confidence}
                             </p>
 
                             {book.visibleText && (
-                              <p className="mt-1 text-xs text-muted-foreground">
+                              <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
                                 Visible text:{" "}
                                 {book.visibleText}
                               </p>
@@ -579,12 +555,12 @@ export function BookPhotoTester({
                     </ul>
 
                     {result.notes && (
-                      <div className="mt-4 rounded-lg bg-secondary p-3">
-                        <p className="text-sm font-medium">
+                      <div className="mt-3 rounded-lg bg-secondary p-2.5">
+                        <p className="text-xs font-medium">
                           Notes
                         </p>
 
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           {result.notes}
                         </p>
                       </div>
@@ -599,14 +575,14 @@ export function BookPhotoTester({
 
       {saved && (
         <div
-          className="mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-green-900"
+          className="mt-4 rounded-xl border border-green-300 bg-green-50 p-3 text-green-900"
           role="status"
         >
-          <p className="font-semibold">
+          <p className="text-sm font-semibold">
             Inventory updated successfully
           </p>
 
-          <p className="mt-1 text-sm">
+          <p className="mt-1 text-xs">
             {sessionBooks.length} unique{" "}
             {sessionBooks.length === 1
               ? "book was"
