@@ -8,10 +8,9 @@ import {
 import {
   ImageUp,
   LoaderCircle,
+  Save,
   X,
 } from "lucide-react"
-
-import type { Library } from "@/lib/libraries"
 import {
   doc,
   serverTimestamp,
@@ -19,6 +18,7 @@ import {
 } from "firebase/firestore"
 
 import { db } from "@/lib/firebase"
+import type { Library } from "@/lib/libraries"
 
 type RecognizedBook = {
   title: string
@@ -34,19 +34,84 @@ type RecognitionResult = {
 
 type BookPhotoTesterProps = {
   library: Library | null
+  onFinished?: () => void
+}
+
+function normalizeBookTitle(title: string) {
+  return title
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
+function mergeBooks(
+  existing: RecognizedBook[],
+  incoming: RecognizedBook[],
+) {
+  const merged = new Map<string, RecognizedBook>()
+
+  for (const book of existing) {
+    merged.set(
+      normalizeBookTitle(book.title),
+      book,
+    )
+  }
+
+  for (const book of incoming) {
+    const key = normalizeBookTitle(book.title)
+
+    if (!key) {
+      continue
+    }
+
+    const existingBook = merged.get(key)
+
+    if (!existingBook) {
+      merged.set(key, book)
+      continue
+    }
+
+    merged.set(key, {
+      ...existingBook,
+      author:
+        existingBook.author ??
+        book.author,
+      visibleText:
+        existingBook.visibleText ??
+        book.visibleText,
+      confidence:
+        existingBook.confidence === "high"
+          ? "high"
+          : book.confidence,
+    })
+  }
+
+  return Array.from(merged.values())
 }
 
 export function BookPhotoTester({
   library,
+  onFinished,
 }: BookPhotoTesterProps) {
-  const [file, setFile] = useState<File | null>(null)
+  const [file, setFile] =
+    useState<File | null>(null)
+
   const [previewUrl, setPreviewUrl] =
     useState<string | null>(null)
+
   const [result, setResult] =
     useState<RecognitionResult | null>(null)
+
+  const [sessionBooks, setSessionBooks] =
+    useState<RecognizedBook[]>([])
+
+  const [photosProcessed, setPhotosProcessed] =
+    useState(0)
+
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -69,6 +134,9 @@ export function BookPhotoTester({
     }
 
     setFile(selectedFile)
+
+    // New file = new current recognition result,
+    // but keep all session books already found.
     setResult(null)
     setError("")
     setSaved(false)
@@ -91,32 +159,36 @@ export function BookPhotoTester({
     setPreviewUrl(null)
     setResult(null)
     setError("")
-    setSaved(false)
   }
 
   async function analyzePhoto() {
     if (!file) {
-      setError("Please choose a photo first.")
+      setError(
+        "Please choose a photo first.",
+      )
       return
     }
 
     if (!library) {
       setError(
-        "Please select a library from the map first.",
+        "Please select a library first.",
       )
       return
     }
 
-    setSaved(false)
     setLoading(true)
     setError("")
     setResult(null)
+    setSaved(false)
 
     try {
       const formData = new FormData()
 
       formData.append("image", file)
-      formData.append("libraryId", library.id)
+      formData.append(
+        "libraryId",
+        library.id,
+      )
 
       const response = await fetch(
         "/api/analyze-books",
@@ -135,7 +207,33 @@ export function BookPhotoTester({
         )
       }
 
-      setResult(data)
+      const recognitionResult =
+        data as RecognitionResult
+
+      setResult(recognitionResult)
+
+      if (
+        recognitionResult.books.length === 0
+      ) {
+        setError(
+          "No books were recognized clearly enough in this photo.",
+        )
+        return
+      }
+
+      setSessionBooks(
+        (currentBooks) =>
+          mergeBooks(
+            currentBooks,
+            recognitionResult.books,
+          ),
+      )
+
+      setPhotosProcessed(
+        (count) => count + 1,
+      )
+
+      // Keep current photo visible for comparison.
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -147,120 +245,163 @@ export function BookPhotoTester({
     }
   }
 
-  async function saveInventory() {
-  if (!library) {
-    setError("Please select a library first.")
-    return
+  async function finishAndSaveInventory() {
+    if (!library) {
+      setError(
+        "Please select a library first.",
+      )
+      return
+    }
+
+    if (sessionBooks.length === 0) {
+      setError(
+        "Add at least one photo to this update before saving.",
+      )
+      return
+    }
+
+    setSaving(true)
+    setSaved(false)
+    setError("")
+
+    try {
+      const libraryReference = doc(
+        db,
+        "libraries",
+        library.id,
+      )
+
+      const booksToSave =
+        sessionBooks.map((book) => ({
+          title: book.title,
+          author: book.author,
+          confidence: book.confidence,
+          visibleText: book.visibleText,
+        }))
+
+      await updateDoc(
+        libraryReference,
+        {
+          books: booksToSave,
+          bookCount: booksToSave.length,
+          lastUpdated:
+            serverTimestamp(),
+          recognitionNotes:
+            `Inventory created from ${photosProcessed} photo${
+              photosProcessed === 1
+                ? ""
+                : "s"
+            }.`,
+        },
+      )
+
+      setSaved(true)
+
+      if (onFinished) {
+        window.setTimeout(() => {
+          onFinished()
+        }, 1000)
+      }
+    } catch (caughtError) {
+      console.error(
+        "Could not save inventory:",
+        caughtError,
+      )
+
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Could not save the inventory.",
+      )
+    } finally {
+      setSaving(false)
+    }
   }
-
-  if (!result) {
-    setError("Recognize the books before saving.")
-    return
-  }
-
-  setSaving(true)
-  setSaved(false)
-  setError("")
-
-  try {
-    const libraryReference = doc(
-      db,
-      "libraries",
-      library.id,
-    )
-
-    const booksToSave = result.books.map((book) => ({
-      title: book.title,
-      author: book.author,
-      confidence: book.confidence,
-      visibleText: book.visibleText,
-    }))
-
-    await updateDoc(libraryReference, {
-      books: booksToSave,
-      bookCount: booksToSave.length,
-      lastUpdated: serverTimestamp(),
-      recognitionNotes: result.notes,
-    })
-
-    setSaved(true)
-  } catch (caughtError) {
-    console.error("Could not save inventory:", caughtError)
-
-    setError(
-      caughtError instanceof Error
-        ? caughtError.message
-        : "Could not save the inventory.",
-    )
-  } finally {
-    setSaving(false)
-  }
-}
 
   return (
-    <section
-      id="book-photo-tester"
-      className="mx-auto max-w-6xl px-4 py-10 sm:px-6"
-    >
-      <div className="rounded-2xl border border-border bg-card p-5 sm:p-7">
-        <h2 className="text-2xl font-semibold text-foreground">
-          Test AI Book Recognition
-        </h2>
+    <div className="p-1">
+      {library ? (
+       <div className="rounded-lg border border-border bg-secondary px-4 py-3">
 
-        <p className="mt-2 max-w-2xl text-muted-foreground">
-          Upload a clear photo of book covers or
-          spines. The AI will identify titles that
-          are sufficiently visible.
+  <div className="flex items-center gap-2">
+
+    <span className="text-base">
+      📍
+    </span>
+
+    <div className="min-w-0">
+
+      <p className="text-base font-semibold leading-tight">
+        {library.name}
+      </p>
+
+      {library.address && (
+        <p className="mt-0.5 text-xs text-muted-foreground truncate">
+          {library.address}
         </p>
+      )}
 
-        {library ? (
-          <div className="mt-5 rounded-xl border border-border bg-secondary p-4">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              Updating inventory for
-            </p>
+    </div>
 
-            <p className="mt-1 text-lg font-semibold">
-              {library.name}
-            </p>
+  </div>
 
-            <p className="text-sm text-muted-foreground">
-              {library.address}
-            </p>
-          </div>
-        ) : (
-          <div className="mt-5 rounded-xl border border-dashed border-border p-4">
-            <p className="text-sm text-muted-foreground">
-              Select a library marker and click
-              <strong> Upload Photo </strong>
-              to begin updating its inventory.
-            </p>
-          </div>
-        )}
+</div>
+      ) : (
+        <div className="rounded-xl border border-dashed border-border p-4">
+          <p className="text-sm text-muted-foreground">
+            Select a library before
+            updating inventory.
+          </p>
+        </div>
+      )}
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
+<div className="mt-2 flex items-center gap-6 rounded-md bg-secondary px-3 py-2 text-sm">
+
+  <span>
+    📷{" "}
+    <strong>{photosProcessed}</strong>{" "}
+    Photos
+  </span>
+
+  <span>
+    📚{" "}
+    <strong>{sessionBooks.length}</strong>{" "}
+    Books
+  </span>
+
+</div>
+
+
+      {!saved && (
+        <div className="mt-5 grid gap-6 md:grid-cols-2">
+          {/* LEFT SIDE: PHOTO */}
           <div>
-            <label
-              htmlFor="book-photo"
-              className="block text-sm font-medium text-foreground"
-            >
-              Choose a book photo
-            </label>
 
             <input
-              id="book-photo"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleFileChange}
-              disabled={loading}
-              className="mt-2 block w-full rounded-xl border border-border bg-background p-3 text-sm"
+                id="book-photo"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileChange}
+                disabled={loading || saving}
+                className="hidden"
             />
+
+            <label
+                htmlFor="book-photo"
+                className="mt-3 inline-flex cursor-pointer items-center rounded-xl border border-border bg-background px-4 py-3 font-medium hover:bg-secondary"
+            >
+                📷{" "}
+                {photosProcessed === 0
+                ? "Choose The First Shelf Photo"
+                : "Choose Another Shelf Photo"}
+            </label>
 
             {previewUrl && (
               <div className="relative mt-4">
                 <img
                   src={previewUrl}
                   alt="Selected bookshelf preview"
-                  className="max-h-[450px] w-full rounded-xl border border-border object-contain"
+                  className="max-h-[400px] w-full rounded-xl border border-border object-contain"
                 />
 
                 <button
@@ -279,40 +420,90 @@ export function BookPhotoTester({
             )}
 
             <button
-              type="button"
-              onClick={analyzePhoto}
-              disabled={!file || !library || loading}
-              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? (
-                <>
-                  <LoaderCircle
-                    className="size-4 animate-spin"
-                    aria-hidden="true"
-                  />
-                  Analyzing photo…
-                </>
-              ) : (
-                <>
-                  <ImageUp
-                    className="size-4"
-                    aria-hidden="true"
-                  />
-                  Update Library Inventory
-                </>
-              )}
-            </button>
+  type="button"
+  onClick={analyzePhoto}
+  disabled={
+    !file ||
+    !library ||
+    loading ||
+    saving ||
+    !!result
+  }
+  className={`mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 font-medium transition-colors disabled:cursor-not-allowed ${
+    result
+      ? "bg-green-600 text-white disabled:opacity-100"
+      : "bg-primary text-primary-foreground disabled:opacity-50"
+  }`}
+>
+  {loading ? (
+    <>
+      <LoaderCircle
+        className="size-4 animate-spin"
+        aria-hidden="true"
+      />
+      Analyzing & Adding...
+    </>
+  ) : result ? (
+    <>
+      Added ✓
+    </>
+  ) : (
+    <>
+      <ImageUp
+        className="size-4"
+        aria-hidden="true"
+      />
+      Analyze & Update
+    </>
+  )}
+</button>
 
-            {error && (
-              <p
-                className="mt-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700"
-                role="alert"
-              >
-                {error}
-              </p>
+            {sessionBooks.length > 0 && (
+              <div className="mt-4 rounded-xl border border-border bg-card p-4">
+                <p className="font-semibold">
+                  Finished photographing this
+                  library?
+                </p>
+
+                <p className="mt-1 text-sm text-muted-foreground">
+                  This will replace the previous
+                  inventory with the{" "}
+                  {sessionBooks.length} unique
+                  books found during this update
+                  session.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={
+                    finishAndSaveInventory
+                  }
+                  disabled={saving}
+                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {saving ? (
+                    <>
+                      <LoaderCircle
+                        className="size-4 animate-spin"
+                        aria-hidden="true"
+                      />
+                      Saving Inventory…
+                    </>
+                  ) : (
+                    <>
+                      <Save
+                        className="size-4"
+                        aria-hidden="true"
+                      />
+                      Finish & Save Inventory
+                    </>
+                  )}
+                </button>
+              </div>
             )}
           </div>
 
+          {/* RIGHT SIDE: RECOGNITION RESULTS */}
           <div
             className="rounded-xl border border-border bg-background p-5"
             aria-live="polite"
@@ -323,101 +514,120 @@ export function BookPhotoTester({
 
             {!loading && !result && (
               <p className="mt-3 text-sm text-muted-foreground">
-                The identified books will appear
-                here.
+                Books from the current photo
+                will appear here.
               </p>
             )}
 
             {loading && (
               <p className="mt-3 text-sm text-muted-foreground">
-                Reading visible titles and authors…
+                Reading visible titles and
+                authors…
               </p>
             )}
 
             {result && (
-              <>
+              <div className="mt-3 max-h-[430px] overflow-y-auto pr-2">
                 {result.books.length === 0 ? (
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    No book titles could be identified
-                    confidently.
+                  <p className="text-sm text-muted-foreground">
+                    No book titles could be
+                    identified confidently.
                   </p>
                 ) : (
-                  <ul className="mt-4 space-y-3">
-                    {result.books.map(
-                      (book, index) => (
-                        <li
-                          key={`${book.title}-${index}`}
-                          className="rounded-lg border border-border p-3"
-                        >
-                          <p className="font-medium text-foreground">
-                            {book.title}
-                          </p>
+                  <>
+                    <p className="text-sm text-green-700">
+                      {result.books.length}{" "}
+                      {result.books.length === 1
+                        ? "book was"
+                        : "books were"}{" "}
+                      added to this update.
+                    </p>
 
-                          {book.author && (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {book.author}
+                    <ul className="mt-4 space-y-3">
+                      {result.books.map(
+                        (book, index) => (
+                          <li
+                            key={`${book.title}-${index}`}
+                            className="rounded-lg border border-border p-3"
+                          >
+                            <p className="font-medium text-foreground">
+                              {book.title}
                             </p>
-                          )}
 
-                          <p className="mt-2 text-xs capitalize text-muted-foreground">
-                            Confidence:{" "}
-                            {book.confidence}
-                          </p>
+                            {book.author && (
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                {book.author}
+                              </p>
+                            )}
 
-                          {book.visibleText && (
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              Visible text:{" "}
-                              {book.visibleText}
+                            <p className="mt-2 text-xs capitalize text-muted-foreground">
+                              Confidence:{" "}
+                              {
+                                book.confidence
+                              }
                             </p>
-                          )}
-                        </li>
-                      ),
+
+                            {book.visibleText && (
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                Visible text:{" "}
+                                {book.visibleText}
+                              </p>
+                            )}
+                          </li>
+                        ),
+                      )}
+                    </ul>
+
+                    {result.notes && (
+                      <div className="mt-4 rounded-lg bg-secondary p-3">
+                        <p className="text-sm font-medium">
+                          Notes
+                        </p>
+
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {result.notes}
+                        </p>
+                      </div>
                     )}
-                  </ul>
+                  </>
                 )}
-
-                {result.notes && (
-                  <div className="mt-4 rounded-lg bg-secondary p-3">
-                    <p className="text-sm font-medium text-secondary-foreground">
-                      Notes
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {result.notes}
-                    </p>
-                  </div>
-                )}
-
-                <div className="mt-5 border-t border-border pt-4">
-  <button
-    type="button"
-    onClick={saveInventory}
-    disabled={saving || saved}
-    className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
-  >
-    {saving
-      ? "Saving Inventory…"
-      : saved
-        ? "Inventory Saved"
-        : "Save Inventory"}
-  </button>
-
-  {saved && (
-    <div
-      className="mt-3 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-800"
-      role="status"
-    >
-      {result.books.length}{" "}
-      {result.books.length === 1 ? "book was" : "books were"}{" "}
-      saved to {library?.name}.
-    </div>
-  )}
-</div>
-              </>
-
+              </div>
             )}
           </div>
         </div>
-      </div>
-    </section>
+      )}
+
+      {saved && (
+        <div
+          className="mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-green-900"
+          role="status"
+        >
+          <p className="font-semibold">
+            Inventory updated successfully
+          </p>
+
+          <p className="mt-1 text-sm">
+            {sessionBooks.length} unique{" "}
+            {sessionBooks.length === 1
+              ? "book was"
+              : "books were"}{" "}
+            saved from{" "}
+            {photosProcessed}{" "}
+            {photosProcessed === 1
+              ? "photo"
+              : "photos"}.
+          </p>
+        </div>
+      )}
+
+      {error && (
+        <p
+          className="mt-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700"
+          role="alert"
+        >
+          {error}
+        </p>
+      )}
+    </div>
   )
 }

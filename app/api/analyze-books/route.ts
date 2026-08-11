@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       `data:${image.type};base64,${base64Image}`
 
     const response = await openai.responses.parse({
-      model: "gpt-5.6",
+      model: "gpt-5.6-luna",
       input: [
         {
           role: "system",
