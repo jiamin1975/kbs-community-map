@@ -9,6 +9,7 @@ export type Library = {
   latitude: number
   longitude: number
   verified: boolean
+  photoUrl?: string
 }
 
 export const libraries: Library[] = [

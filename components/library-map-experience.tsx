@@ -15,21 +15,36 @@ import {
 import type { Library } from "@/lib/libraries"
 
 export function LibraryMapExperience() {
+  // Used when refreshing an existing library's inventory
   const [selectedLibrary, setSelectedLibrary] =
     useState<Library | null>(null)
 
-  const [uploadDialogOpen, setUploadDialogOpen] =
-    useState(false)
+  // Tells CommunityMap which library card to open
+  const [
+    newlyAddedLibrary,
+    setNewlyAddedLibrary,
+  ] = useState<Library | null>(null)
 
-  const [addLibraryDialogOpen, setAddLibraryDialogOpen] =
-    useState(false)
+  const [
+    uploadDialogOpen,
+    setUploadDialogOpen,
+  ] = useState(false)
 
-  function handleUploadPhoto(library: Library) {
+  const [
+    addLibraryDialogOpen,
+    setAddLibraryDialogOpen,
+  ] = useState(false)
+
+  function handleUploadPhoto(
+    library: Library,
+  ) {
     setSelectedLibrary(library)
     setUploadDialogOpen(true)
   }
 
-  function handleUploadDialogChange(open: boolean) {
+  function handleUploadDialogChange(
+    open: boolean,
+  ) {
     setUploadDialogOpen(open)
 
     if (!open) {
@@ -41,13 +56,20 @@ export function LibraryMapExperience() {
     setAddLibraryDialogOpen(true)
   }
 
-  function handleLibraryAdded(library: Library) {
+  function handleLibraryAdded(
+    library: Library,
+  ) {
+    // Step 3 already created the first inventory.
+    // Close the form and open the new library's
+    // information card on the map.
+    setNewlyAddedLibrary(library)
     setAddLibraryDialogOpen(false)
+  }
 
-    // Open the first-inventory modal immediately
-    // for the newly created library.
-    setSelectedLibrary(library)
-    setUploadDialogOpen(true)
+  function handleAddLibraryDialogChange(
+    open: boolean,
+  ) {
+    setAddLibraryDialogOpen(open)
   }
 
   return (
@@ -59,22 +81,26 @@ export function LibraryMapExperience() {
         <CommunityMap
           onUploadPhoto={handleUploadPhoto}
           onAddLibrary={handleAddLibrary}
+          focusedLibrary={newlyAddedLibrary}
         />
       </section>
 
+      {/* Refresh inventory for an existing library */}
       <Dialog
         open={uploadDialogOpen}
-        onOpenChange={handleUploadDialogChange}
+        onOpenChange={
+          handleUploadDialogChange
+        }
       >
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>
-              Update Library Inventory
+              Refresh Book Inventory
             </DialogTitle>
 
             <DialogDescription>
-              Upload a clear photo of the visible books.
-              AI will identify readable titles for review.
+              Upload new book photos to refresh this
+              library&apos;s inventory.
             </DialogDescription>
           </DialogHeader>
 
@@ -82,14 +108,20 @@ export function LibraryMapExperience() {
             <BookPhotoTester
               key={selectedLibrary.id}
               library={selectedLibrary}
+              onFinished={() =>
+                handleUploadDialogChange(false)
+              }
             />
           )}
         </DialogContent>
       </Dialog>
 
+      {/* Create a library and its first inventory */}
       <Dialog
         open={addLibraryDialogOpen}
-        onOpenChange={setAddLibraryDialogOpen}
+        onOpenChange={
+          handleAddLibraryDialogChange
+        }
       >
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
@@ -98,14 +130,15 @@ export function LibraryMapExperience() {
             </DialogTitle>
 
             <DialogDescription>
-              Use your current location, adjust the
-              marker if needed, and add the library to
-              the community map.
+              Add the location, library photo, and
+              initial book inventory.
             </DialogDescription>
           </DialogHeader>
 
           <AddLibraryForm
-            onLibraryAdded={handleLibraryAdded}
+            onLibraryAdded={
+              handleLibraryAdded
+            }
           />
         </DialogContent>
       </Dialog>

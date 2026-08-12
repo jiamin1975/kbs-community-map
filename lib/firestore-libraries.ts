@@ -37,6 +37,11 @@ function convertLibrary(
               .toLocaleString()
           : "Not yet updated",
     verified: data.verified ?? false,
+
+    photoFile:
+      typeof data.photoFile === "string"
+      ? data.photoFile
+      : undefined,
   }
 }
 

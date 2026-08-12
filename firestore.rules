@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isApprovedVolunteer() {
+      return request.auth != null
+        && exists(
+          /databases/$(database)/documents/authorizedVolunteers/$(request.auth.uid)
+        )
+        && get(
+          /databases/$(database)/documents/authorizedVolunteers/$(request.auth.uid)
+        ).data.active == true;
+    }
+
+    match /libraries/{libraryId} {
+      allow read: if true;
+      allow create, update: if isApprovedVolunteer();
+      allow delete: if false;
+    }
+
+    match /authorizedVolunteers/{volunteerId} {
+      allow read: if request.auth != null
+        && request.auth.uid == volunteerId;
+      allow write: if false;
+    }
+  }
+}
