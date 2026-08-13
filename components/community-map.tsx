@@ -88,8 +88,20 @@ export function CommunityMap({
   const [libraryPhotoUrl, setLibraryPhotoUrl] = useState<string | null>(null);
 
   const [photoLoading, setPhotoLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia("(max-width: 639px)");
+
+    const updateMobileState = () => setIsMobile(mobileQuery.matches);
+
+    updateMobileState();
+    mobileQuery.addEventListener("change", updateMobileState);
+
+    return () => mobileQuery.removeEventListener("change", updateMobileState);
+  }, []);
 
   function handleCameraChanged(event: MapCameraChangedEvent) {
     setMapCenter(event.detail.center);
@@ -465,7 +477,7 @@ export function CommunityMap({
                 />
               ))}
 
-            {selectedLibrary && (
+            {selectedLibrary && !isMobile && (
               <InfoWindow
                 maxWidth={600}
                 position={{
@@ -607,6 +619,134 @@ export function CommunityMap({
             )}
           </Map>
         </APIProvider>
+
+        {selectedLibrary && isMobile && (
+          <div className="absolute inset-2 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-4 text-black shadow-2xl">
+            <button
+              type="button"
+              aria-label="Close library details"
+              onClick={() => {
+                setSelectedLibrary(null);
+                setLibraryPhotoUrl(null);
+              }}
+              className="absolute right-3 top-3 z-10 flex size-11 items-center justify-center rounded-full bg-white/95 text-3xl leading-none text-gray-600 shadow-sm"
+            >
+              ×
+            </button>
+
+            <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto pr-1 [overflow-wrap:anywhere]">
+              {photoLoading && (
+                <div className="mb-3 flex h-40 w-full items-center justify-center rounded-xl bg-gray-100">
+                  <p className="text-base text-gray-500">Loading photo…</p>
+                </div>
+              )}
+
+              {!photoLoading && libraryPhotoUrl && (
+                <img
+                  src={libraryPhotoUrl}
+                  alt={selectedLibrary.name}
+                  className="mb-3 block h-48 w-full rounded-xl bg-gray-100 object-contain brightness-110 contrast-105"
+                />
+              )}
+
+              <h2 className="max-w-full whitespace-normal break-words pr-12 text-xl font-semibold leading-tight [overflow-wrap:anywhere]">
+                {selectedLibrary.name}
+              </h2>
+
+              {selectedLibrary.address && (
+                <p className="mt-1 max-w-full whitespace-normal break-words text-base leading-snug text-gray-600 [overflow-wrap:anywhere]">
+                  {selectedLibrary.address}
+                </p>
+              )}
+
+              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-base font-medium text-blue-700">
+                📚 <span>{selectedLibrary.bookCount} books</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onUploadPhoto(selectedLibrary)}
+                className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-base font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                📷 Update Inventory
+              </button>
+
+              <p className="mt-2 max-w-full whitespace-normal break-words rounded-lg bg-gray-100 px-3 py-2.5 text-sm font-medium text-gray-700 [overflow-wrap:anywhere]">
+                <span aria-hidden="true">🕒</span>{" "}
+                <span className="font-semibold">Last updated:</span>{" "}
+                {selectedLibrary.lastUpdated}
+              </p>
+
+              <p className="mt-5 text-xl font-semibold">Current Inventory</p>
+
+              {selectedLibrary.books.length === 0 ? (
+                <p className="mt-2 text-base text-gray-500">
+                  No books have been inventoried yet.
+                </p>
+              ) : (
+                <ul className="mt-3 min-w-0 space-y-2.5 overflow-x-hidden pb-1">
+                  {[...selectedLibrary.books]
+                    .sort((firstBook, secondBook) => {
+                      const firstTitle =
+                        typeof firstBook === "string"
+                          ? firstBook
+                          : typeof firstBook === "object" &&
+                              firstBook !== null &&
+                              "title" in firstBook
+                            ? String(firstBook.title)
+                            : "";
+
+                      const secondTitle =
+                        typeof secondBook === "string"
+                          ? secondBook
+                          : typeof secondBook === "object" &&
+                              secondBook !== null &&
+                              "title" in secondBook
+                            ? String(secondBook.title)
+                            : "";
+
+                      return firstTitle.localeCompare(secondTitle);
+                    })
+                    .map((book, index) => {
+                      const title =
+                        typeof book === "string"
+                          ? book
+                          : typeof book === "object" &&
+                              book !== null &&
+                              "title" in book
+                            ? String(book.title)
+                            : "Untitled book";
+
+                      const author =
+                        typeof book === "object" &&
+                        book !== null &&
+                        "author" in book &&
+                        book.author
+                          ? String(book.author)
+                          : null;
+
+                      return (
+                        <li
+                          key={`${title}-${index}`}
+                          className="min-w-0 overflow-hidden rounded-xl bg-gray-100 px-4 py-3"
+                        >
+                          <p className="max-w-full whitespace-normal break-words text-lg font-medium leading-tight [overflow-wrap:anywhere]">
+                            {title}
+                          </p>
+
+                          {author && (
+                            <p className="mt-1 max-w-full whitespace-normal break-words text-base leading-tight text-gray-500 [overflow-wrap:anywhere]">
+                              {author}
+                            </p>
+                          )}
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
 
         {nearbyMatch && (
           <div className="absolute inset-x-3 bottom-3 z-20 rounded-2xl border border-blue-300 bg-white/95 p-4 text-blue-950 shadow-xl backdrop-blur sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2">
