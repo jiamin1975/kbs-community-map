@@ -929,7 +929,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             }`}
           >
             <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
-              {stepOneComplete ? "✓ Step 1" : "Step 1"}
+              Step 1
             </span>
             <p className="min-w-0 flex-1 break-words text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {duplicateCheckStatus === "checking"
@@ -1091,7 +1091,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             }`}
           >
             <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
-              {stepTwoComplete ? "✓ Step 2" : "Step 2"}
+              Step 2
             </span>
             <p className="min-w-0 flex-1 break-words text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {stepTwoComplete ? "Library Photo Added" : "Add Library Photo"}
@@ -1235,7 +1235,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             }`}
           >
             <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
-              {stepThreeComplete ? "✓ Step 3" : "Step 3"}
+              Step 3
             </span>
             <p className="min-w-0 flex-1 break-words text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {stepThreeComplete ? "Books Recognized" : "Add Book Photos"}
