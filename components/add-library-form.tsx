@@ -926,19 +926,19 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
         <div className="mt-4 grid gap-3">
           <div
-            className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-white shadow-sm ${
+            className={`flex w-full items-center gap-2 rounded-xl border border-l-4 px-3 py-2.5 ${
               duplicateCheckStatus === "duplicate"
-                ? "bg-amber-500"
+                ? "border-amber-200 border-l-amber-500 bg-amber-50 text-amber-950"
                 : stepOneComplete
-                  ? "bg-green-600"
-                  : "bg-blue-600"
+                  ? "border-green-200 border-l-green-600 bg-green-50 text-green-950"
+                  : "border-slate-200 border-l-slate-500 bg-slate-50 text-slate-900"
             }`}
           >
             <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepOneComplete ? "✓ Step 1" : "Step 1"}
             </span>
-            <span className="text-white/70" aria-hidden="true">·</span>
-            <p className="min-w-0 flex-1 text-base font-semibold leading-tight text-white max-sm:!text-base sm:text-sm">
+            <span className="opacity-50" aria-hidden="true">·</span>
+            <p className="min-w-0 flex-1 text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {duplicateCheckStatus === "checking"
                 ? "Checking Location…"
                 : duplicateCheckStatus === "duplicate"
@@ -1124,12 +1124,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           )}
 
           <div
-            className={`mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 shadow-sm ${
+            className={`mt-1 flex w-full items-center gap-2 rounded-xl border border-l-4 px-3 py-2.5 ${
               stepTwoComplete
-                ? "bg-green-600 text-white"
+                ? "border-green-200 border-l-green-600 bg-green-50 text-green-950"
                 : stepOneComplete
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-500"
+                  ? "border-slate-200 border-l-slate-500 bg-slate-50 text-slate-900"
+                  : "border-gray-200 border-l-gray-300 bg-gray-50 text-gray-500"
             }`}
           >
             <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
@@ -1266,12 +1266,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </div>
 
           <div
-            className={`mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 shadow-sm ${
+            className={`mt-1 flex w-full items-center gap-2 rounded-xl border border-l-4 px-3 py-2.5 ${
               stepThreeComplete
-                ? "bg-green-600 text-white"
+                ? "border-green-200 border-l-green-600 bg-green-50 text-green-950"
                 : stepTwoComplete
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-500"
+                  ? "border-slate-200 border-l-slate-500 bg-slate-50 text-slate-900"
+                  : "border-gray-200 border-l-gray-300 bg-gray-50 text-gray-500"
             }`}
           >
             <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
