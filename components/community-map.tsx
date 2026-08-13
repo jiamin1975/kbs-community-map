@@ -476,7 +476,7 @@ export function CommunityMap({
                   setLibraryPhotoUrl(null);
                 }}
               >
-                <div className="w-72 px-0 pb-0 pt-0 text-black">
+                <div className="max-h-[78vh] w-[92vw] max-w-[420px] overflow-y-auto px-0 pb-1 pt-0 text-black sm:max-h-[76vh] sm:w-72">
                   {photoLoading && (
                     <div className="mb-3 flex h-36 w-full items-center justify-center rounded-lg bg-gray-100">
                       <p className="text-xs text-gray-500">Loading photo…</p>
@@ -487,23 +487,23 @@ export function CommunityMap({
                     <img
                       src={libraryPhotoUrl}
                       alt={selectedLibrary.name}
-                      className="-mt-2 mb-3 max-h-56 w-full rounded-lg bg-gray-100 object-contain brightness-110 contrast-105"
+                      className="-mt-2 mb-3 max-h-44 w-full rounded-lg bg-gray-100 object-contain brightness-110 contrast-105 sm:max-h-56"
                     />
                   )}
 
-                  <h2 className="text-base font-semibold leading-tight">
+                  <h2 className="text-lg font-semibold leading-tight sm:text-base">
                     {selectedLibrary.name}
                   </h2>
 
                   {selectedLibrary.address && (
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500 sm:mt-0.5 sm:text-xs">
                       {selectedLibrary.address}
                     </p>
                   )}
 
                   {/* Book count + Update button */}
-                  <div className="mt-2 flex items-center justify-between gap-3">
-                    <div className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                  <div className="mt-3 grid gap-2 sm:mt-2 sm:flex sm:items-center sm:justify-between sm:gap-3">
+                    <div className="inline-flex w-fit items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 sm:px-2.5 sm:py-1 sm:text-xs">
                       📚
                       <span>{selectedLibrary.bookCount} books</span>
                     </div>
@@ -511,7 +511,7 @@ export function CommunityMap({
                     <button
                       type="button"
                       onClick={() => onUploadPhoto(selectedLibrary)}
-                      className="inline-flex items-center gap-1 rounded-full bg-blue-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-400"
+                      className="inline-flex h-11 w-full items-center justify-center gap-1 rounded-xl bg-blue-600 px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:h-auto sm:w-auto sm:rounded-full sm:bg-blue-500 sm:py-1.5 sm:text-xs sm:hover:bg-blue-400"
                     >
                       📷 Update Inventory
                     </button>
@@ -519,14 +519,14 @@ export function CommunityMap({
 
                   {/* Current inventory */}
                   <div className="mt-3">
-                    <p className="text-sm font-semibold">Current Inventory</p>
+                    <p className="text-base font-semibold sm:text-sm">Current Inventory</p>
 
                     {selectedLibrary.books.length === 0 ? (
                       <p className="mt-2 text-xs text-gray-500">
                         No books have been inventoried yet.
                       </p>
                     ) : (
-                      <ul className="mt-2 max-h-32 space-y-1.5 overflow-y-auto pr-1 text-sm">
+                      <ul className="mt-2 max-h-72 space-y-2 overflow-y-auto overscroll-contain pr-1 text-sm sm:max-h-64 sm:space-y-1.5">
                         {[...selectedLibrary.books]
                           .sort((firstBook, secondBook) => {
                             const firstTitle =
@@ -570,14 +570,14 @@ export function CommunityMap({
                             return (
                               <li
                                 key={`${title}-${index}`}
-                                className="rounded-md bg-gray-100 px-2.5 py-1.5"
+                                className="rounded-lg bg-gray-100 px-3 py-2 sm:rounded-md sm:px-2.5 sm:py-1.5"
                               >
-                                <p className="text-sm font-medium leading-tight">
+                                <p className="text-base font-medium leading-tight sm:text-sm">
                                   {title}
                                 </p>
 
                                 {author && (
-                                  <p className="mt-0.5 text-[11px] leading-tight text-gray-500">
+                                  <p className="mt-1 text-sm leading-tight text-gray-500 sm:mt-0.5 sm:text-[11px]">
                                     {author}
                                   </p>
                                 )}
