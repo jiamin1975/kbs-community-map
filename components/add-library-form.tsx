@@ -908,7 +908,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
   return (
     <div>
-      <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-3 sm:p-4">
+      <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-3 max-sm:[&_button]:text-base max-sm:[&_button_span]:text-base max-sm:[&_input]:text-base max-sm:[&_label]:text-sm max-sm:[&_label_span]:text-sm max-sm:[&_p]:text-sm sm:p-4">
         <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
           <p className="min-w-0 truncate text-xs text-muted-foreground">
             Volunteer: {currentUser.email}
@@ -953,7 +953,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               type="button"
               onClick={useCurrentLocation}
               disabled={locating || saving}
-              className="inline-flex h-10 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10"
             >
               <span aria-hidden="true">📍</span>
               <span className="truncate">
@@ -972,7 +972,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="h-9 min-w-0 rounded-lg border border-border bg-background px-2.5 text-xs"
+                className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-base sm:h-9 sm:px-2.5 sm:text-xs"
                 placeholder="Generated from location"
               />
             </label>
@@ -985,7 +985,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <input
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
-                className="h-9 min-w-0 rounded-lg border border-border bg-background px-2.5 text-xs"
+                className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-base sm:h-9 sm:px-2.5 sm:text-xs"
                 placeholder="123 Main St, Rockville, MD"
               />
             </label>
@@ -996,7 +996,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <input
                 value={neighborhood}
                 onChange={(event) => setNeighborhood(event.target.value)}
-                className="h-9 min-w-0 rounded-lg border border-border bg-background px-2.5 text-xs"
+                className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-base sm:h-9 sm:px-2.5 sm:text-xs"
                 placeholder="Town Center"
               />
             </label>
@@ -1173,7 +1173,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 <label
                   htmlFor="library-photo"
                   aria-disabled={!stepOneComplete}
-                  className="inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-sm font-bold text-white shadow-md transition hover:bg-blue-700"
+                  className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:text-sm"
                 >
                   📷 Choose Library Photo
                 </label>
@@ -1319,7 +1319,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <div className="grid gap-2 sm:grid-cols-2">
               <label
                 htmlFor="book-photo"
-                className="inline-flex h-10 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-blue-700 bg-blue-600 px-2 text-xs font-bold text-white shadow-md transition hover:bg-blue-700 sm:text-sm"
+                className="inline-flex h-12 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-blue-700 bg-blue-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:px-2 sm:text-sm"
               >
                 📚{" "}
                 {bookPhotosProcessed > 0
@@ -1331,7 +1331,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 type="button"
                 onClick={analyzeBookPhoto}
                 disabled={!bookPhoto || analyzingBooks || saving}
-                className="inline-flex h-10 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-violet-700 bg-violet-600 px-2 text-xs font-bold text-white shadow-md transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none sm:text-sm"
+                className="inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-violet-700 bg-violet-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none sm:h-10 sm:px-2 sm:text-sm"
               >
                 {analyzingBooks ? "Recognizing…" : "✨ Recognize Books"}
               </button>
