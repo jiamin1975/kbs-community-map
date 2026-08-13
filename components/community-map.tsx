@@ -621,7 +621,7 @@ export function CommunityMap({
         </APIProvider>
 
         {selectedLibrary && isMobile && (
-          <div className="absolute inset-2 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-4 text-black shadow-2xl">
+          <div className="absolute inset-4 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-4 text-black shadow-2xl">
             <button
               type="button"
               aria-label="Close library details"
