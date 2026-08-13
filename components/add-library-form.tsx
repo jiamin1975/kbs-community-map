@@ -925,19 +925,20 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         </div>
 
         <div className="mt-4 grid gap-3">
-          <div className="flex flex-nowrap items-center gap-2">
-            <span
-              className={`inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 text-base font-bold text-white max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
-                duplicateCheckStatus === "duplicate"
-                  ? "bg-amber-500"
-                  : stepOneComplete
-                    ? "bg-green-600"
-                    : "bg-blue-600"
-              }`}
-            >
+          <div
+            className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-white shadow-sm ${
+              duplicateCheckStatus === "duplicate"
+                ? "bg-amber-500"
+                : stepOneComplete
+                  ? "bg-green-600"
+                  : "bg-blue-600"
+            }`}
+          >
+            <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepOneComplete ? "✓ Step 1" : "Step 1"}
             </span>
-            <p className="min-w-0 flex-1 text-lg font-bold leading-tight max-sm:!text-lg sm:text-sm sm:font-semibold">
+            <span className="text-white/70" aria-hidden="true">·</span>
+            <p className="min-w-0 flex-1 text-base font-semibold leading-tight text-white max-sm:!text-base sm:text-sm">
               {duplicateCheckStatus === "checking"
                 ? "Checking Location…"
                 : duplicateCheckStatus === "duplicate"
@@ -1122,23 +1123,20 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             </div>
           )}
 
-          <div className="mt-1 flex flex-nowrap items-center gap-2 border-t border-border pt-3">
-            <span
-              className={`inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 text-base font-bold max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
-                stepTwoComplete
-                  ? "bg-green-600 text-white"
-                  : stepOneComplete
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-500"
-              }`}
-            >
+          <div
+            className={`mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 shadow-sm ${
+              stepTwoComplete
+                ? "bg-green-600 text-white"
+                : stepOneComplete
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-500"
+            }`}
+          >
+            <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepTwoComplete ? "✓ Step 2" : "Step 2"}
             </span>
-            <p
-              className={`min-w-0 flex-1 text-lg font-bold leading-tight max-sm:!text-lg sm:text-sm sm:font-semibold ${
-                stepOneComplete ? "" : "text-muted-foreground"
-              }`}
-            >
+            <span className="opacity-60" aria-hidden="true">·</span>
+            <p className="min-w-0 flex-1 text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {stepTwoComplete ? "Library Photo Added" : "Add Library Photo"}
             </p>
           </div>
@@ -1267,23 +1265,20 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             )}
           </div>
 
-          <div className="mt-1 flex flex-nowrap items-center gap-2 border-t border-border pt-3">
-            <span
-              className={`inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 text-base font-bold max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
-                stepThreeComplete
-                  ? "bg-green-600 text-white"
-                  : stepTwoComplete
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-500"
-              }`}
-            >
+          <div
+            className={`mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 shadow-sm ${
+              stepThreeComplete
+                ? "bg-green-600 text-white"
+                : stepTwoComplete
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-500"
+            }`}
+          >
+            <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepThreeComplete ? "✓ Step 3" : "Step 3"}
             </span>
-            <p
-              className={`min-w-0 flex-1 text-lg font-bold leading-tight max-sm:!text-lg sm:text-sm sm:font-semibold ${
-                stepTwoComplete ? "" : "text-muted-foreground"
-              }`}
-            >
+            <span className="opacity-60" aria-hidden="true">·</span>
+            <p className="min-w-0 flex-1 text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {stepThreeComplete ? "Books Recognized" : "Add Book Photos"}
             </p>
           </div>
