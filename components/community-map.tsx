@@ -477,7 +477,7 @@ export function CommunityMap({
                   setLibraryPhotoUrl(null);
                 }}
               >
-                <div className="box-border max-h-[78vh] w-[calc(100vw-96px)] max-w-[360px] overflow-x-hidden overflow-y-auto px-0 pb-1 pt-0 text-black [overflow-wrap:anywhere] sm:max-h-none sm:w-[560px] sm:max-w-[560px] sm:overflow-visible">
+                <div className="box-border max-h-[78vh] w-[calc(100vw-48px)] max-w-[420px] overflow-x-hidden overflow-y-auto whitespace-normal px-0 pb-1 pt-0 text-black [overflow-wrap:anywhere] sm:max-h-none sm:w-[560px] sm:max-w-[560px] sm:overflow-visible">
                   <div className="box-border w-full min-w-0 max-w-full overflow-x-hidden sm:grid sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] sm:gap-4 sm:overflow-visible">
                     <div className="w-full min-w-0 max-w-full sm:sticky sm:top-0 sm:self-start">
                       {photoLoading && (
@@ -576,14 +576,14 @@ export function CommunityMap({
                             return (
                               <li
                                 key={`${title}-${index}`}
-                                className="rounded-lg bg-gray-100 px-3 py-2 sm:rounded-md sm:px-2.5 sm:py-1.5"
+                                className="w-full min-w-0 max-w-full overflow-hidden rounded-lg bg-gray-100 px-3 py-2 sm:rounded-md sm:px-2.5 sm:py-1.5"
                               >
-                                <p className="break-words text-base font-medium leading-tight sm:text-sm">
+                                <p className="w-full min-w-0 max-w-full whitespace-normal break-words text-base font-medium leading-tight [overflow-wrap:anywhere] sm:text-sm">
                                   {title}
                                 </p>
 
                                 {author && (
-                                  <p className="mt-1 break-words text-sm leading-tight text-gray-500 sm:mt-0.5 sm:text-[11px]">
+                                  <p className="mt-1 w-full min-w-0 max-w-full whitespace-normal break-words text-sm leading-tight text-gray-500 [overflow-wrap:anywhere] sm:mt-0.5 sm:text-[11px]">
                                     {author}
                                   </p>
                                 )}
