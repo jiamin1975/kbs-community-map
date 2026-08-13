@@ -477,9 +477,9 @@ export function CommunityMap({
                   setLibraryPhotoUrl(null);
                 }}
               >
-                <div className="max-h-[78vh] w-[calc(100vw-56px)] max-w-[420px] overflow-x-hidden overflow-y-auto px-0 pb-1 pt-0 text-black sm:max-h-none sm:w-[560px] sm:max-w-[560px] sm:overflow-visible">
-                  <div className="min-w-0 w-full sm:grid sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] sm:gap-4">
-                    <div className="sm:sticky sm:top-0 sm:self-start">
+                <div className="box-border max-h-[78vh] w-[calc(100vw-96px)] max-w-[360px] overflow-x-hidden overflow-y-auto px-0 pb-1 pt-0 text-black [overflow-wrap:anywhere] sm:max-h-none sm:w-[560px] sm:max-w-[560px] sm:overflow-visible">
+                  <div className="box-border w-full min-w-0 max-w-full overflow-x-hidden sm:grid sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] sm:gap-4 sm:overflow-visible">
+                    <div className="w-full min-w-0 max-w-full sm:sticky sm:top-0 sm:self-start">
                       {photoLoading && (
                         <div className="mb-3 flex h-36 w-full items-center justify-center rounded-lg bg-gray-100 sm:mb-0 sm:h-56">
                           <p className="text-xs text-gray-500">Loading photo…</p>
@@ -490,17 +490,17 @@ export function CommunityMap({
                         <img
                           src={libraryPhotoUrl}
                           alt={selectedLibrary.name}
-                          className="-mt-2 mb-3 max-h-44 w-full rounded-lg bg-gray-100 object-contain brightness-110 contrast-105 sm:mt-0 sm:mb-0 sm:h-56 sm:max-h-none"
+                          className="-mt-2 mb-3 block max-h-44 w-full max-w-full rounded-lg bg-gray-100 object-contain brightness-110 contrast-105 sm:mt-0 sm:mb-0 sm:h-56 sm:max-h-none"
                         />
                       )}
 
-                      <div className="sm:mt-3">
-                        <h2 className="text-lg font-semibold leading-tight sm:text-base">
+                      <div className="w-full min-w-0 max-w-full sm:mt-3">
+                        <h2 className="break-words text-lg font-semibold leading-tight sm:text-base">
                           {selectedLibrary.name}
                         </h2>
 
                         {selectedLibrary.address && (
-                          <p className="mt-1 text-sm text-gray-500 sm:mt-0.5 sm:text-xs">
+                          <p className="mt-1 break-words text-sm text-gray-500 sm:mt-0.5 sm:text-xs">
                             {selectedLibrary.address}
                           </p>
                         )}
@@ -522,7 +522,7 @@ export function CommunityMap({
                       </div>
                     </div>
 
-                    <div className="min-w-0">
+                    <div className="w-full min-w-0 max-w-full overflow-x-hidden sm:overflow-visible">
                   {/* Current inventory */}
                   <div className="mt-3 sm:mt-0">
                     <p className="text-base font-semibold sm:text-sm">Current Inventory</p>
@@ -532,7 +532,7 @@ export function CommunityMap({
                         No books have been inventoried yet.
                       </p>
                     ) : (
-                      <ul className="mt-2 max-h-72 space-y-2 overflow-y-auto overscroll-contain pr-1 text-sm sm:max-h-80 sm:space-y-1.5">
+                      <ul className="mt-2 max-h-72 w-full min-w-0 max-w-full space-y-2 overflow-x-hidden overflow-y-auto overscroll-contain pr-1 text-sm sm:max-h-80 sm:space-y-1.5">
                         {[...selectedLibrary.books]
                           .sort((firstBook, secondBook) => {
                             const firstTitle =
@@ -578,12 +578,12 @@ export function CommunityMap({
                                 key={`${title}-${index}`}
                                 className="rounded-lg bg-gray-100 px-3 py-2 sm:rounded-md sm:px-2.5 sm:py-1.5"
                               >
-                                <p className="text-base font-medium leading-tight sm:text-sm">
+                                <p className="break-words text-base font-medium leading-tight sm:text-sm">
                                   {title}
                                 </p>
 
                                 {author && (
-                                  <p className="mt-1 text-sm leading-tight text-gray-500 sm:mt-0.5 sm:text-[11px]">
+                                  <p className="mt-1 break-words text-sm leading-tight text-gray-500 sm:mt-0.5 sm:text-[11px]">
                                     {author}
                                   </p>
                                 )}
@@ -594,7 +594,7 @@ export function CommunityMap({
                     )}
                   </div>
 
-                  <p className="mt-3 rounded-lg bg-gray-100 px-2.5 py-2 text-xs font-medium text-gray-700">
+                  <p className="mt-3 max-w-full break-words rounded-lg bg-gray-100 px-2.5 py-2 text-xs font-medium text-gray-700">
                     <span aria-hidden="true">🕒</span>{" "}
                     <span className="font-semibold">Last updated:</span>{" "}
                     {selectedLibrary.lastUpdated}
