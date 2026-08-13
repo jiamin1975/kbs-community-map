@@ -1179,10 +1179,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             ) : (
               <div className="w-full min-w-0 max-w-full overflow-hidden">
                 <p className="mb-2 text-xs font-medium text-muted-foreground">
-                  Photos added
+                  <span className="sm:hidden">Library photo</span>
+                  <span className="hidden sm:inline">Photos added</span>
                 </p>
 
-                <div className="flex w-full min-w-0 max-w-full flex-col gap-3 overflow-x-hidden pb-2 sm:flex-row sm:gap-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
+                <div className="flex w-full min-w-0 max-w-full gap-2 overflow-x-hidden pb-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
                   <div className="w-full overflow-hidden rounded-xl border border-blue-200 bg-background sm:w-48 sm:shrink-0">
                     <img
                       src={photoPreviewUrl}
@@ -1222,7 +1223,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   {processedBookPhotos.map((bookPhotoPreview, index) => (
                     <div
                       key={bookPhotoPreview.url}
-                      className="w-full overflow-hidden rounded-xl border border-violet-200 bg-background sm:w-48 sm:shrink-0"
+                      className="hidden overflow-hidden rounded-xl border border-violet-200 bg-background sm:block sm:w-48 sm:shrink-0"
                     >
                       <img
                         src={bookPhotoPreview.url}
@@ -1244,7 +1245,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   ))}
 
                   {bookPhoto && bookPreviewUrl && (
-                    <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:w-48 sm:shrink-0">
+                    <div className="hidden overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:block sm:w-48 sm:shrink-0">
                       <img
                         src={bookPreviewUrl}
                         alt="Book photo awaiting recognition"
@@ -1331,6 +1332,55 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 {analyzingBooks ? "Recognizing…" : "✨ Recognize Books"}
               </button>
             </div>
+
+            {(processedBookPhotos.length > 0 ||
+              (bookPhoto && bookPreviewUrl)) && (
+              <div className="grid gap-3 sm:hidden">
+                <p className="text-sm font-semibold text-muted-foreground">
+                  Book photos
+                </p>
+
+                {processedBookPhotos.map((bookPhotoPreview, index) => (
+                  <div
+                    key={bookPhotoPreview.url}
+                    className="w-full overflow-hidden rounded-xl border border-violet-200 bg-background"
+                  >
+                    <img
+                      src={bookPhotoPreview.url}
+                      alt={`Book photo ${index + 1}`}
+                      className="h-40 w-full bg-gray-100 object-cover"
+                    />
+                    <div className="p-2">
+                      <p className="font-semibold">Book photo {index + 1}</p>
+                      <p className="truncate text-muted-foreground">
+                        {bookPhotoPreview.name}
+                      </p>
+                      <p className="mt-2 font-semibold text-green-700">
+                        ✓ Recognition Done
+                      </p>
+                    </div>
+                  </div>
+                ))}
+
+                {bookPhoto && bookPreviewUrl && (
+                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                    <img
+                      src={bookPreviewUrl}
+                      alt="Book photo awaiting recognition"
+                      className="h-40 w-full bg-gray-100 object-cover"
+                    />
+                    <div className="p-2">
+                      <p className="font-semibold">
+                        Book photo {processedBookPhotos.length + 1}
+                      </p>
+                      <p className="text-amber-700">
+                        Click “Recognize Books”
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {bookRecognitionError && (
               <p className="text-xs text-red-600" role="alert">
