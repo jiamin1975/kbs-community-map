@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AdvancedMarker,
   APIProvider,
@@ -89,8 +89,56 @@ export function CommunityMap({
 
   const [photoLoading, setPhotoLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [bookSearchQuery, setBookSearchQuery] = useState("");
+  const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
+  const bookSearchAreaRef = useRef<HTMLDivElement>(null);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+  const bookSearchResults = useMemo(() => {
+    const normalizedQuery = bookSearchQuery.trim().toLocaleLowerCase();
+
+    if (!normalizedQuery) {
+      return [];
+    }
+
+    return libraries
+      .flatMap((library) =>
+        library.books.map((book, index) => {
+          const title =
+            typeof book === "string"
+              ? book
+              : typeof book === "object" &&
+                  book !== null &&
+                  "title" in book
+                ? String(book.title)
+                : "Untitled book";
+
+          const author =
+            typeof book === "object" &&
+            book !== null &&
+            "author" in book &&
+            book.author
+              ? String(book.author)
+              : null;
+
+          return {
+            library,
+            title,
+            author,
+            key: `${library.id}-${title}-${index}`,
+          };
+        }),
+      )
+      .filter(
+        ({ title, author }) =>
+          title.toLocaleLowerCase().includes(normalizedQuery) ||
+          author?.toLocaleLowerCase().includes(normalizedQuery),
+      )
+      .sort((firstResult, secondResult) =>
+        firstResult.title.localeCompare(secondResult.title),
+      );
+  }, [bookSearchQuery, libraries]);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 639px)");
@@ -101,6 +149,25 @@ export function CommunityMap({
     mobileQuery.addEventListener("change", updateMobileState);
 
     return () => mobileQuery.removeEventListener("change", updateMobileState);
+  }, []);
+
+  useEffect(() => {
+    function closeBookSearchWhenClickingOutside(event: PointerEvent) {
+      if (
+        bookSearchAreaRef.current &&
+        !bookSearchAreaRef.current.contains(event.target as Node)
+      ) {
+        setIsBookSearchOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", closeBookSearchWhenClickingOutside);
+
+    return () =>
+      document.removeEventListener(
+        "pointerdown",
+        closeBookSearchWhenClickingOutside,
+      );
   }, []);
 
   function handleCameraChanged(event: MapCameraChangedEvent) {
@@ -349,6 +416,21 @@ export function CommunityMap({
     setSelectedLibrary(null);
   }
 
+  function openLibraryFromSearch(library: Library) {
+    setIsBookSearchOpen(false);
+    setSelectedLibrary(library);
+    setNearbyMatch(null);
+    setLocationError("");
+    setLibraryPhotoUrl(null);
+
+    setMapCenter({
+      lat: library.latitude,
+      lng: library.longitude,
+    });
+
+    setMapZoom(18);
+  }
+
   if (!apiKey) {
     return (
       <div className="mx-auto flex h-[600px] max-w-6xl items-center justify-center px-4">
@@ -404,6 +486,90 @@ export function CommunityMap({
           >
             ＋ Add a New Library
           </button>
+        </div>
+
+        <div ref={bookSearchAreaRef} className="mt-4">
+          <label
+            htmlFor="book-search"
+            className="block text-base font-semibold text-foreground"
+          >
+            Search the Library Inventories
+          </label>
+
+          <div className="relative mt-2">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg"
+            >
+              🔎
+            </span>
+
+            <input
+              id="book-search"
+              type="search"
+              value={bookSearchQuery}
+              onFocus={() => {
+                if (bookSearchQuery.trim()) {
+                  setIsBookSearchOpen(true);
+                }
+              }}
+              onChange={(event) => {
+                setBookSearchQuery(event.target.value);
+                setIsBookSearchOpen(Boolean(event.target.value.trim()));
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  setIsBookSearchOpen(false);
+                  event.currentTarget.blur();
+                }
+              }}
+              placeholder="Search by book title or author"
+              className="h-12 w-full rounded-xl border border-border bg-background pl-12 pr-4 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            />
+          </div>
+
+          {bookSearchQuery.trim() && isBookSearchOpen && (
+            <div className="mt-2 max-h-72 overflow-y-auto rounded-xl border border-border bg-background p-2 shadow-sm">
+              {bookSearchResults.length === 0 ? (
+                <p className="px-3 py-4 text-base text-muted-foreground">
+                  No matching books found.
+                </p>
+              ) : (
+                <>
+                  <p className="px-3 py-1 text-sm font-medium text-muted-foreground">
+                    {bookSearchResults.length}{" "}
+                    {bookSearchResults.length === 1 ? "match" : "matches"}
+                  </p>
+
+                  <ul className="mt-1 space-y-1">
+                    {bookSearchResults.map((result) => (
+                      <li key={result.key}>
+                        <button
+                          type="button"
+                          onClick={() => openLibraryFromSearch(result.library)}
+                          className="w-full min-w-0 rounded-lg px-3 py-3 text-left transition hover:bg-secondary focus:bg-secondary focus:outline-none"
+                        >
+                          <span className="block max-w-full break-words text-base font-semibold leading-tight text-foreground [overflow-wrap:anywhere]">
+                            {result.title}
+                          </span>
+
+                          {result.author && (
+                            <span className="mt-1 block max-w-full break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+                              {result.author}
+                            </span>
+                          )}
+
+                          <span className="mt-1.5 block max-w-full break-words text-sm font-medium text-blue-700 [overflow-wrap:anywhere]">
+                            📍 {result.library.name}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {locationError && (
