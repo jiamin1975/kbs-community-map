@@ -927,7 +927,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         <div className="mt-4 grid gap-3">
           <div className="flex items-center gap-2">
             <span
-              className={`inline-flex h-7 shrink-0 items-center justify-center rounded-full px-2.5 text-xs font-semibold text-white ${
+              className={`inline-flex h-9 shrink-0 items-center justify-center rounded-full px-3 text-base font-bold text-white max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
                 duplicateCheckStatus === "duplicate"
                   ? "bg-amber-500"
                   : stepOneComplete
@@ -937,7 +937,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             >
               {stepOneComplete ? "✓ Step 1" : "Step 1"}
             </span>
-            <p className="text-sm font-semibold">
+            <p className="text-lg font-bold max-sm:!text-lg sm:text-sm sm:font-semibold">
               {duplicateCheckStatus === "checking"
                 ? "Checking Location…"
                 : duplicateCheckStatus === "duplicate"
@@ -1124,7 +1124,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           <div className="mt-1 flex items-center gap-2 border-t border-border pt-3">
             <span
-              className={`inline-flex h-7 shrink-0 items-center justify-center rounded-full px-2.5 text-xs font-semibold ${
+              className={`inline-flex h-9 shrink-0 items-center justify-center rounded-full px-3 text-base font-bold max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
                 stepTwoComplete
                   ? "bg-green-600 text-white"
                   : stepOneComplete
@@ -1135,7 +1135,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               {stepTwoComplete ? "✓ Step 2" : "Step 2"}
             </span>
             <p
-              className={`text-sm font-semibold ${
+              className={`text-lg font-bold max-sm:!text-lg sm:text-sm sm:font-semibold ${
                 stepOneComplete ? "" : "text-muted-foreground"
               }`}
             >
@@ -1184,12 +1184,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   Photos added
                 </p>
 
-                <div className="flex w-full min-w-0 max-w-full gap-2 overflow-x-auto overscroll-x-contain pb-2 pr-1 [scrollbar-width:thin]">
-                  <div className="w-40 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-background sm:w-48">
+                <div className="flex w-full min-w-0 max-w-full flex-col gap-3 overflow-x-hidden pb-2 sm:flex-row sm:gap-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
+                  <div className="w-full overflow-hidden rounded-xl border border-blue-200 bg-background sm:w-48 sm:shrink-0">
                     <img
                       src={photoPreviewUrl}
                       alt="Preview of the library"
-                      className="h-32 w-full bg-gray-100 object-cover brightness-110 contrast-105 sm:h-36"
+                      className="h-56 w-full bg-gray-100 object-cover brightness-110 contrast-105 sm:h-36"
                     />
 
                     <div className="p-1.5">
@@ -1224,12 +1224,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   {processedBookPhotos.map((bookPhotoPreview, index) => (
                     <div
                       key={bookPhotoPreview.url}
-                      className="w-40 shrink-0 overflow-hidden rounded-xl border border-violet-200 bg-background sm:w-48"
+                      className="w-full overflow-hidden rounded-xl border border-violet-200 bg-background sm:w-48 sm:shrink-0"
                     >
                       <img
                         src={bookPhotoPreview.url}
                         alt={`Book photo ${index + 1}`}
-                        className="h-32 w-full bg-gray-100 object-cover sm:h-36"
+                        className="h-56 w-full bg-gray-100 object-cover sm:h-36"
                       />
                       <div className="p-1.5">
                         <p className="text-[11px] font-semibold leading-tight">
@@ -1246,11 +1246,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   ))}
 
                   {bookPhoto && bookPreviewUrl && (
-                    <div className="w-40 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:w-48">
+                    <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:w-48 sm:shrink-0">
                       <img
                         src={bookPreviewUrl}
                         alt="Book photo awaiting recognition"
-                        className="h-32 w-full bg-gray-100 object-cover sm:h-36"
+                        className="h-56 w-full bg-gray-100 object-cover sm:h-36"
                       />
                       <div className="p-1.5">
                         <p className="text-[11px] font-semibold leading-tight">
@@ -1269,7 +1269,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           <div className="mt-1 flex items-center gap-2 border-t border-border pt-3">
             <span
-              className={`inline-flex h-7 shrink-0 items-center justify-center rounded-full px-2.5 text-xs font-semibold ${
+              className={`inline-flex h-9 shrink-0 items-center justify-center rounded-full px-3 text-base font-bold max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
                 stepThreeComplete
                   ? "bg-green-600 text-white"
                   : stepTwoComplete
@@ -1280,7 +1280,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               {stepThreeComplete ? "✓ Step 3" : "Step 3"}
             </span>
             <p
-              className={`text-sm font-semibold ${
+              className={`text-lg font-bold max-sm:!text-lg sm:text-sm sm:font-semibold ${
                 stepTwoComplete ? "" : "text-muted-foreground"
               }`}
             >
