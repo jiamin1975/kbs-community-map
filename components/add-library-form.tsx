@@ -1189,7 +1189,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     <img
                       src={photoPreviewUrl}
                       alt="Preview of the library"
-                      className="h-56 w-full bg-gray-100 object-cover brightness-110 contrast-105 sm:h-36"
+                      className="h-40 w-full bg-gray-100 object-cover brightness-110 contrast-105 sm:h-36"
                     />
 
                     <div className="p-1.5">
@@ -1229,7 +1229,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <img
                         src={bookPhotoPreview.url}
                         alt={`Book photo ${index + 1}`}
-                        className="h-56 w-full bg-gray-100 object-cover sm:h-36"
+                        className="h-40 w-full bg-gray-100 object-cover sm:h-36"
                       />
                       <div className="p-1.5">
                         <p className="text-[11px] font-semibold leading-tight">
@@ -1250,14 +1250,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <img
                         src={bookPreviewUrl}
                         alt="Book photo awaiting recognition"
-                        className="h-56 w-full bg-gray-100 object-cover sm:h-36"
+                        className="h-40 w-full bg-gray-100 object-cover sm:h-36"
                       />
                       <div className="p-1.5">
                         <p className="text-[11px] font-semibold leading-tight">
                           Book photo {processedBookPhotos.length + 1}
                         </p>
                         <p className="truncate text-[10px] leading-tight text-amber-700">
-                          Waiting for recognition
+                          Click Recognize Books
                         </p>
                       </div>
                     </div>
@@ -1295,9 +1295,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 : "pointer-events-none bg-gray-50 opacity-50"
             }`}
           >
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <p className="text-xs text-muted-foreground">
-                AI will recognize visible titles
+                AI will recognize the visible titles.
               </p>
               {recognizedBooks.length > 0 && (
                 <p className="text-xs font-medium text-green-700">
