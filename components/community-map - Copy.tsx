@@ -91,8 +91,6 @@ export function CommunityMap({
   const [isMobile, setIsMobile] = useState(false);
   const [bookSearchQuery, setBookSearchQuery] = useState("");
   const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
-  const [locatingForBookSearch, setLocatingForBookSearch] = useState(false);
-  const [bookSearchLocationError, setBookSearchLocationError] = useState("");
   const bookSearchAreaRef = useRef<HTMLDivElement>(null);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -141,50 +139,6 @@ export function CommunityMap({
         firstResult.title.localeCompare(secondResult.title),
       );
   }, [bookSearchQuery, libraries]);
-
-  const bookSearchLibraryResults = useMemo(() => {
-    const resultsByLibrary = new globalThis.Map<
-      string,
-      {
-        library: Library;
-        books: typeof bookSearchResults;
-        distanceMeters: number | null;
-      }
-    >();
-
-    bookSearchResults.forEach((bookResult) => {
-      const existingResult = resultsByLibrary.get(bookResult.library.id);
-
-      if (existingResult) {
-        existingResult.books.push(bookResult);
-        return;
-      }
-
-      resultsByLibrary.set(bookResult.library.id, {
-        library: bookResult.library,
-        books: [bookResult],
-        distanceMeters: userLocation
-          ? calculateDistanceMeters(
-              userLocation.lat,
-              userLocation.lng,
-              bookResult.library.latitude,
-              bookResult.library.longitude,
-            )
-          : null,
-      });
-    });
-
-    return [...resultsByLibrary.values()].sort((firstResult, secondResult) => {
-      if (
-        firstResult.distanceMeters !== null &&
-        secondResult.distanceMeters !== null
-      ) {
-        return firstResult.distanceMeters - secondResult.distanceMeters;
-      }
-
-      return firstResult.library.name.localeCompare(secondResult.library.name);
-    });
-  }, [bookSearchResults, userLocation]);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 639px)");
@@ -477,41 +431,6 @@ export function CommunityMap({
     setMapZoom(18);
   }
 
-  function sortBookSearchByDistance() {
-    setBookSearchLocationError("");
-
-    if (!navigator.geolocation) {
-      setBookSearchLocationError(
-        "Your browser does not support location services.",
-      );
-      return;
-    }
-
-    setLocatingForBookSearch(true);
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setUserLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-        setLocatingForBookSearch(false);
-        setIsBookSearchOpen(true);
-      },
-      () => {
-        setBookSearchLocationError(
-          "Location is unavailable. Please allow location access and try again.",
-        );
-        setLocatingForBookSearch(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 60_000,
-      },
-    );
-  }
-
   if (!apiKey) {
     return (
       <div className="mx-auto flex h-[600px] max-w-6xl items-center justify-center px-4">
@@ -617,76 +536,31 @@ export function CommunityMap({
                 </p>
               ) : (
                 <>
-                  <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {bookSearchLibraryResults.length}{" "}
-                      {bookSearchLibraryResults.length === 1
-                        ? "library"
-                        : "libraries"}{" "}
-                      · {bookSearchResults.length}{" "}
-                      {bookSearchResults.length === 1 ? "book" : "books"}
-                    </p>
+                  <p className="px-3 py-1 text-sm font-medium text-muted-foreground">
+                    {bookSearchResults.length}{" "}
+                    {bookSearchResults.length === 1 ? "match" : "matches"}
+                  </p>
 
-                    <button
-                      type="button"
-                      onClick={sortBookSearchByDistance}
-                      disabled={locatingForBookSearch}
-                      className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {locatingForBookSearch
-                        ? "Finding location…"
-                        : userLocation
-                          ? "✓ Sorted by distance"
-                          : "📍 Sort by Distance"}
-                    </button>
-                  </div>
-
-                  {bookSearchLocationError && (
-                    <p className="mx-3 mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                      {bookSearchLocationError}
-                    </p>
-                  )}
-
-                  <ul className="mt-1 space-y-2">
-                    {bookSearchLibraryResults.map((result) => (
-                      <li key={result.library.id}>
+                  <ul className="mt-1 space-y-1">
+                    {bookSearchResults.map((result) => (
+                      <li key={result.key}>
                         <button
                           type="button"
                           onClick={() => openLibraryFromSearch(result.library)}
-                          className="w-full min-w-0 rounded-lg bg-secondary/60 px-3 py-3 text-left transition hover:bg-secondary focus:bg-secondary focus:outline-none"
+                          className="w-full min-w-0 rounded-lg px-3 py-3 text-left transition hover:bg-secondary focus:bg-secondary focus:outline-none"
                         >
-                          <span className="flex max-w-full flex-wrap items-start justify-between gap-2">
-                            <span className="min-w-0 flex-1 break-words text-base font-semibold leading-tight text-blue-700 [overflow-wrap:anywhere]">
-                              📍 {result.library.name}
-                            </span>
-
-                            {result.distanceMeters !== null && (
-                              <span className="shrink-0 rounded-full bg-white px-2 py-1 text-sm font-semibold text-gray-700">
-                                {(result.distanceMeters / 1609.344).toFixed(1)} mi
-                              </span>
-                            )}
+                          <span className="block max-w-full break-words text-base font-semibold leading-tight text-foreground [overflow-wrap:anywhere]">
+                            {result.title}
                           </span>
 
-                          {result.library.address && (
+                          {result.author && (
                             <span className="mt-1 block max-w-full break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
-                              {result.library.address}
+                              {result.author}
                             </span>
                           )}
 
-                          <span className="mt-2 block space-y-1 border-t border-border pt-2">
-                            {result.books.map((book) => (
-                              <span key={book.key} className="block">
-                                <span className="block max-w-full break-words text-base font-medium leading-tight text-foreground [overflow-wrap:anywhere]">
-                                  {book.title}
-                                </span>
-
-                                {book.author && (
-                                  <span className="mt-0.5 block max-w-full break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
-                                    {book.author}
-                                  </span>
-                                )}
-                              </span>
-                            ))}
+                          <span className="mt-1.5 block max-w-full break-words text-sm font-medium text-blue-700 [overflow-wrap:anywhere]">
+                            📍 {result.library.name}
                           </span>
                         </button>
                       </li>

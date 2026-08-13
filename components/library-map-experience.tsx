@@ -20,31 +20,21 @@ export function LibraryMapExperience() {
     useState<Library | null>(null)
 
   // Tells CommunityMap which library card to open
-  const [
-    newlyAddedLibrary,
-    setNewlyAddedLibrary,
-  ] = useState<Library | null>(null)
+  const [newlyAddedLibrary, setNewlyAddedLibrary] =
+    useState<Library | null>(null)
 
-  const [
-    uploadDialogOpen,
-    setUploadDialogOpen,
-  ] = useState(false)
+  const [uploadDialogOpen, setUploadDialogOpen] =
+    useState(false)
 
-  const [
-    addLibraryDialogOpen,
-    setAddLibraryDialogOpen,
-  ] = useState(false)
+  const [addLibraryDialogOpen, setAddLibraryDialogOpen] =
+    useState(false)
 
-  function handleUploadPhoto(
-    library: Library,
-  ) {
+  function handleUploadPhoto(library: Library) {
     setSelectedLibrary(library)
     setUploadDialogOpen(true)
   }
 
-  function handleUploadDialogChange(
-    open: boolean,
-  ) {
+  function handleUploadDialogChange(open: boolean) {
     setUploadDialogOpen(open)
 
     if (!open) {
@@ -56,9 +46,7 @@ export function LibraryMapExperience() {
     setAddLibraryDialogOpen(true)
   }
 
-  function handleLibraryAdded(
-    library: Library,
-  ) {
+  function handleLibraryAdded(library: Library) {
     // Step 3 already created the first inventory.
     // Close the form and open the new library's
     // information card on the map.
@@ -66,16 +54,14 @@ export function LibraryMapExperience() {
     setAddLibraryDialogOpen(false)
   }
 
-  function handleAddLibraryDialogChange(
-    open: boolean,
-  ) {
+  function handleAddLibraryDialogChange(open: boolean) {
     setAddLibraryDialogOpen(open)
   }
 
   return (
     <>
       <section
-        aria-label="Interactive library map"
+        aria-label="Search and update community library inventories"
         className="border-y border-border"
       >
         <CommunityMap
@@ -85,22 +71,18 @@ export function LibraryMapExperience() {
         />
       </section>
 
-      {/* Refresh inventory for an existing library */}
+      {/* Update the inventory for an existing library */}
       <Dialog
         open={uploadDialogOpen}
-        onOpenChange={
-          handleUploadDialogChange
-        }
+        onOpenChange={handleUploadDialogChange}
       >
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>
-              Refresh Book Inventory
-            </DialogTitle>
+            <DialogTitle>Update Library Inventory</DialogTitle>
 
             <DialogDescription>
-              Upload new book photos to refresh this
-              library&apos;s inventory.
+              Add current photos of the books on the shelf. AI will recognize
+              the visible titles and update this library&apos;s inventory.
             </DialogDescription>
           </DialogHeader>
 
@@ -108,9 +90,7 @@ export function LibraryMapExperience() {
             <BookPhotoTester
               key={selectedLibrary.id}
               library={selectedLibrary}
-              onFinished={() =>
-                handleUploadDialogChange(false)
-              }
+              onFinished={() => handleUploadDialogChange(false)}
             />
           )}
         </DialogContent>
@@ -119,27 +99,19 @@ export function LibraryMapExperience() {
       {/* Create a library and its first inventory */}
       <Dialog
         open={addLibraryDialogOpen}
-        onOpenChange={
-          handleAddLibraryDialogChange
-        }
+        onOpenChange={handleAddLibraryDialogChange}
       >
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>
-              Add a New Library
-            </DialogTitle>
+            <DialogTitle>Add a New Library</DialogTitle>
 
             <DialogDescription>
-              Add the location, library photo, and
-              initial book inventory.
+              Add the library&apos;s location, a photo of the library box, and
+              photos of its books to create the first inventory.
             </DialogDescription>
           </DialogHeader>
 
-          <AddLibraryForm
-            onLibraryAdded={
-              handleLibraryAdded
-            }
-          />
+          <AddLibraryForm onLibraryAdded={handleLibraryAdded} />
         </DialogContent>
       </Dialog>
     </>
