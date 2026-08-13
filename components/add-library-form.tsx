@@ -908,7 +908,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
   return (
     <div>
-      <div className="rounded-2xl border border-border bg-card p-4">
+      <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-3 sm:p-4">
         <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
           <p className="min-w-0 truncate text-xs text-muted-foreground">
             Volunteer: {currentUser.email}
@@ -948,7 +948,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 items-end gap-2">
+          <div className="grid gap-2 sm:grid-cols-2 sm:items-end">
             <button
               type="button"
               onClick={useCurrentLocation}
@@ -978,7 +978,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             </label>
           </div>
 
-          <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-2">
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <label className="grid min-w-0 gap-1">
               <span className="text-xs font-medium">Address</span>
 
@@ -1144,7 +1144,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </div>
 
           <div
-            className={`grid gap-2 rounded-xl p-3 transition ${
+            className={`grid min-w-0 max-w-full gap-2 overflow-hidden rounded-xl p-2.5 transition sm:p-3 ${
               stepOneComplete
                 ? "bg-blue-50/50"
                 : "pointer-events-none bg-gray-50 opacity-50"
@@ -1179,17 +1179,17 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 </label>
               </>
             ) : (
-              <div className="min-w-0 max-w-full overflow-hidden">
+              <div className="w-full min-w-0 max-w-full overflow-hidden">
                 <p className="mb-2 text-xs font-medium text-muted-foreground">
                   Photos added
                 </p>
 
-                <div className="flex max-w-full gap-2 overflow-x-auto overscroll-x-contain pb-2">
-                  <div className="w-48 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-background">
+                <div className="flex w-full min-w-0 max-w-full gap-2 overflow-x-auto overscroll-x-contain pb-2 pr-1 [scrollbar-width:thin]">
+                  <div className="w-40 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-background sm:w-48">
                     <img
                       src={photoPreviewUrl}
                       alt="Preview of the library"
-                      className="h-36 w-full bg-gray-100 object-cover brightness-110 contrast-105"
+                      className="h-32 w-full bg-gray-100 object-cover brightness-110 contrast-105 sm:h-36"
                     />
 
                     <div className="p-1.5">
@@ -1224,12 +1224,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   {processedBookPhotos.map((bookPhotoPreview, index) => (
                     <div
                       key={bookPhotoPreview.url}
-                      className="w-48 shrink-0 overflow-hidden rounded-xl border border-violet-200 bg-background"
+                      className="w-40 shrink-0 overflow-hidden rounded-xl border border-violet-200 bg-background sm:w-48"
                     >
                       <img
                         src={bookPhotoPreview.url}
                         alt={`Book photo ${index + 1}`}
-                        className="h-36 w-full bg-gray-100 object-cover"
+                        className="h-32 w-full bg-gray-100 object-cover sm:h-36"
                       />
                       <div className="p-1.5">
                         <p className="text-[11px] font-semibold leading-tight">
@@ -1246,11 +1246,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   ))}
 
                   {bookPhoto && bookPreviewUrl && (
-                    <div className="w-48 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                    <div className="w-40 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:w-48">
                       <img
                         src={bookPreviewUrl}
                         alt="Book photo awaiting recognition"
-                        className="h-36 w-full bg-gray-100 object-cover"
+                        className="h-32 w-full bg-gray-100 object-cover sm:h-36"
                       />
                       <div className="p-1.5">
                         <p className="text-[11px] font-semibold leading-tight">
@@ -1316,7 +1316,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               className="hidden"
             />
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2 sm:grid-cols-2">
               <label
                 htmlFor="book-photo"
                 className="inline-flex h-10 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-blue-700 bg-blue-600 px-2 text-xs font-bold text-white shadow-md transition hover:bg-blue-700 sm:text-sm"
