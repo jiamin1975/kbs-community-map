@@ -467,6 +467,7 @@ export function CommunityMap({
 
             {selectedLibrary && (
               <InfoWindow
+                maxWidth={600}
                 position={{
                   lat: selectedLibrary.latitude,
                   lng: selectedLibrary.longitude,
@@ -476,49 +477,54 @@ export function CommunityMap({
                   setLibraryPhotoUrl(null);
                 }}
               >
-                <div className="max-h-[78vh] w-[92vw] max-w-[420px] overflow-y-auto px-0 pb-1 pt-0 text-black sm:max-h-[76vh] sm:w-72">
-                  {photoLoading && (
-                    <div className="mb-3 flex h-36 w-full items-center justify-center rounded-lg bg-gray-100">
-                      <p className="text-xs text-gray-500">Loading photo…</p>
+                <div className="max-h-[78vh] w-[calc(100vw-56px)] max-w-[420px] overflow-x-hidden overflow-y-auto px-0 pb-1 pt-0 text-black sm:max-h-none sm:w-[560px] sm:max-w-[560px] sm:overflow-visible">
+                  <div className="min-w-0 w-full sm:grid sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] sm:gap-4">
+                    <div className="sm:sticky sm:top-0 sm:self-start">
+                      {photoLoading && (
+                        <div className="mb-3 flex h-36 w-full items-center justify-center rounded-lg bg-gray-100 sm:mb-0 sm:h-56">
+                          <p className="text-xs text-gray-500">Loading photo…</p>
+                        </div>
+                      )}
+
+                      {!photoLoading && libraryPhotoUrl && (
+                        <img
+                          src={libraryPhotoUrl}
+                          alt={selectedLibrary.name}
+                          className="-mt-2 mb-3 max-h-44 w-full rounded-lg bg-gray-100 object-contain brightness-110 contrast-105 sm:mt-0 sm:mb-0 sm:h-56 sm:max-h-none"
+                        />
+                      )}
+
+                      <div className="sm:mt-3">
+                        <h2 className="text-lg font-semibold leading-tight sm:text-base">
+                          {selectedLibrary.name}
+                        </h2>
+
+                        {selectedLibrary.address && (
+                          <p className="mt-1 text-sm text-gray-500 sm:mt-0.5 sm:text-xs">
+                            {selectedLibrary.address}
+                          </p>
+                        )}
+
+                        <div className="mt-3 grid gap-2 sm:mt-2">
+                          <div className="inline-flex w-fit items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 sm:px-2.5 sm:py-1 sm:text-xs">
+                            📚
+                            <span>{selectedLibrary.bookCount} books</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => onUploadPhoto(selectedLibrary)}
+                            className="inline-flex h-11 w-full items-center justify-center gap-1 rounded-xl bg-blue-600 px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:h-8"
+                          >
+                            📷 Update Inventory
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  )}
 
-                  {!photoLoading && libraryPhotoUrl && (
-                    <img
-                      src={libraryPhotoUrl}
-                      alt={selectedLibrary.name}
-                      className="-mt-2 mb-3 max-h-44 w-full rounded-lg bg-gray-100 object-contain brightness-110 contrast-105 sm:max-h-56"
-                    />
-                  )}
-
-                  <h2 className="text-lg font-semibold leading-tight sm:text-base">
-                    {selectedLibrary.name}
-                  </h2>
-
-                  {selectedLibrary.address && (
-                    <p className="mt-1 text-sm text-gray-500 sm:mt-0.5 sm:text-xs">
-                      {selectedLibrary.address}
-                    </p>
-                  )}
-
-                  {/* Book count + Update button */}
-                  <div className="mt-3 grid gap-2 sm:mt-2 sm:flex sm:items-center sm:justify-between sm:gap-3">
-                    <div className="inline-flex w-fit items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 sm:px-2.5 sm:py-1 sm:text-xs">
-                      📚
-                      <span>{selectedLibrary.bookCount} books</span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => onUploadPhoto(selectedLibrary)}
-                      className="inline-flex h-11 w-full items-center justify-center gap-1 rounded-xl bg-blue-600 px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:h-auto sm:w-auto sm:rounded-full sm:bg-blue-500 sm:py-1.5 sm:text-xs sm:hover:bg-blue-400"
-                    >
-                      📷 Update Inventory
-                    </button>
-                  </div>
-
+                    <div className="min-w-0">
                   {/* Current inventory */}
-                  <div className="mt-3">
+                  <div className="mt-3 sm:mt-0">
                     <p className="text-base font-semibold sm:text-sm">Current Inventory</p>
 
                     {selectedLibrary.books.length === 0 ? (
@@ -526,7 +532,7 @@ export function CommunityMap({
                         No books have been inventoried yet.
                       </p>
                     ) : (
-                      <ul className="mt-2 max-h-72 space-y-2 overflow-y-auto overscroll-contain pr-1 text-sm sm:max-h-64 sm:space-y-1.5">
+                      <ul className="mt-2 max-h-72 space-y-2 overflow-y-auto overscroll-contain pr-1 text-sm sm:max-h-80 sm:space-y-1.5">
                         {[...selectedLibrary.books]
                           .sort((firstBook, secondBook) => {
                             const firstTitle =
@@ -588,9 +594,13 @@ export function CommunityMap({
                     )}
                   </div>
 
-                  <p className="mt-2 text-[11px] text-gray-400">
-                    Updated {selectedLibrary.lastUpdated}
+                  <p className="mt-3 rounded-lg bg-gray-100 px-2.5 py-2 text-xs font-medium text-gray-700">
+                    <span aria-hidden="true">🕒</span>{" "}
+                    <span className="font-semibold">Last updated:</span>{" "}
+                    {selectedLibrary.lastUpdated}
                   </p>
+                    </div>
+                  </div>
                 </div>
               </InfoWindow>
             )}
