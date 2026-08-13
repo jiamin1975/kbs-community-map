@@ -928,10 +928,10 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-slate-200 bg-slate-100 text-slate-900"
             }`}
           >
-            <span className="shrink-0 whitespace-nowrap text-sm font-bold max-sm:!text-sm sm:text-sm">
+            <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepOneComplete ? "✓ Step 1" : "Step 1"}
             </span>
-            <p className="min-w-0 flex-1 break-words text-sm font-semibold leading-tight max-sm:!text-sm">
+            <p className="min-w-0 flex-1 break-words text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {duplicateCheckStatus === "checking"
                 ? "Checking Location…"
                 : duplicateCheckStatus === "duplicate"
@@ -1090,10 +1090,10 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-gray-200 bg-gray-100 text-gray-500"
             }`}
           >
-            <span className="shrink-0 whitespace-nowrap text-sm font-bold max-sm:!text-sm">
+            <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepTwoComplete ? "✓ Step 2" : "Step 2"}
             </span>
-            <p className="min-w-0 flex-1 break-words text-sm font-semibold leading-tight max-sm:!text-sm">
+            <p className="min-w-0 flex-1 break-words text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {stepTwoComplete ? "Library Photo Added" : "Add Library Photo"}
             </p>
             <span className="absolute -right-4 top-0 h-full w-6 bg-inherit [clip-path:polygon(0_0,38%_0,100%_50%,38%_100%,0_100%,62%_50%)]" aria-hidden="true" />
@@ -1234,10 +1234,10 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-gray-200 bg-gray-100 text-gray-500"
             }`}
           >
-            <span className="shrink-0 whitespace-nowrap text-sm font-bold max-sm:!text-sm">
+            <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepThreeComplete ? "✓ Step 3" : "Step 3"}
             </span>
-            <p className="min-w-0 flex-1 break-words text-sm font-semibold leading-tight max-sm:!text-sm">
+            <p className="min-w-0 flex-1 break-words text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {stepThreeComplete ? "Books Recognized" : "Add Book Photos"}
             </p>
             <span className="absolute -right-4 top-0 h-full w-6 bg-inherit [clip-path:polygon(0_0,38%_0,100%_50%,38%_100%,0_100%,62%_50%)]" aria-hidden="true" />
@@ -1300,28 +1300,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   Book photos
                 </p>
 
-                {processedBookPhotos.map((bookPhotoPreview, index) => (
-                  <div
-                    key={bookPhotoPreview.url}
-                    className="w-full overflow-hidden rounded-xl border border-violet-200 bg-background"
-                  >
-                    <img
-                      src={bookPhotoPreview.url}
-                      alt={`Book photo ${index + 1}`}
-                      className="h-40 w-full bg-gray-100 object-cover"
-                    />
-                    <div className="p-2">
-                      <p className="font-semibold">Book photo {index + 1}</p>
-                      <p className="truncate text-muted-foreground">
-                        {bookPhotoPreview.name}
-                      </p>
-                      <p className="mt-2 font-semibold text-green-700">
-                        ✓ Recognition Done
-                      </p>
-                    </div>
-                  </div>
-                ))}
-
                 {bookPhoto && bookPreviewUrl && (
                   <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
                     <img
@@ -1339,6 +1317,34 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     </div>
                   </div>
                 )}
+
+                {processedBookPhotos
+                  .map((bookPhotoPreview, index) => ({
+                    bookPhotoPreview,
+                    number: index + 1,
+                  }))
+                  .reverse()
+                  .map(({ bookPhotoPreview, number }) => (
+                    <div
+                      key={bookPhotoPreview.url}
+                      className="w-full overflow-hidden rounded-xl border border-violet-200 bg-background"
+                    >
+                      <img
+                        src={bookPhotoPreview.url}
+                        alt={`Book photo ${number}`}
+                        className="h-40 w-full bg-gray-100 object-cover"
+                      />
+                      <div className="p-2">
+                        <p className="font-semibold">Book photo {number}</p>
+                        <p className="truncate text-muted-foreground">
+                          {bookPhotoPreview.name}
+                        </p>
+                        <p className="mt-2 font-semibold text-green-700">
+                          ✓ Recognition Done
+                        </p>
+                      </div>
+                    </div>
+                  ))}
               </div>
             )}
 
@@ -1351,7 +1357,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             {(bookPreviewUrl || recognizedBooks.length > 0) && (
               recognizedBooks.length > 0 ? (
                 <div className="overflow-hidden rounded-lg border border-green-200 bg-green-50">
-                  <p className="border-b border-green-200 bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-950 max-sm:!text-xs">
+                  <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
                     Library Inventory
                   </p>
                   <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto text-green-950 sm:max-h-52">
