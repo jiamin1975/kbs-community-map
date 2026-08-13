@@ -925,9 +925,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         </div>
 
         <div className="mt-4 grid gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-nowrap items-center gap-2">
             <span
-              className={`inline-flex h-9 shrink-0 items-center justify-center rounded-full px-3 text-base font-bold text-white max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
+              className={`inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 text-base font-bold text-white max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
                 duplicateCheckStatus === "duplicate"
                   ? "bg-amber-500"
                   : stepOneComplete
@@ -937,7 +937,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             >
               {stepOneComplete ? "✓ Step 1" : "Step 1"}
             </span>
-            <p className="text-lg font-bold max-sm:!text-lg sm:text-sm sm:font-semibold">
+            <p className="min-w-0 flex-1 text-lg font-bold leading-tight max-sm:!text-lg sm:text-sm sm:font-semibold">
               {duplicateCheckStatus === "checking"
                 ? "Checking Location…"
                 : duplicateCheckStatus === "duplicate"
@@ -1122,9 +1122,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             </div>
           )}
 
-          <div className="mt-1 flex items-center gap-2 border-t border-border pt-3">
+          <div className="mt-1 flex flex-nowrap items-center gap-2 border-t border-border pt-3">
             <span
-              className={`inline-flex h-9 shrink-0 items-center justify-center rounded-full px-3 text-base font-bold max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
+              className={`inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 text-base font-bold max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
                 stepTwoComplete
                   ? "bg-green-600 text-white"
                   : stepOneComplete
@@ -1135,7 +1135,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               {stepTwoComplete ? "✓ Step 2" : "Step 2"}
             </span>
             <p
-              className={`text-lg font-bold max-sm:!text-lg sm:text-sm sm:font-semibold ${
+              className={`min-w-0 flex-1 text-lg font-bold leading-tight max-sm:!text-lg sm:text-sm sm:font-semibold ${
                 stepOneComplete ? "" : "text-muted-foreground"
               }`}
             >
@@ -1201,7 +1201,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <div className="mt-1 flex items-center gap-2.5">
                         <label
                           htmlFor="library-photo"
-                          className="cursor-pointer text-[10px] font-medium text-muted-foreground underline underline-offset-2 hover:text-blue-700"
+                          className="cursor-pointer text-[10px] font-medium text-muted-foreground underline underline-offset-2 hover:text-blue-700 max-sm:!text-sm"
                         >
                           Change
                         </label>
@@ -1213,7 +1213,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                             setPhotoPreviewUrl(null);
                           }}
                           disabled={saving}
-                          className="text-[10px] font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
+                          className="text-[10px] font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50 max-sm:!text-sm"
                         >
                           Remove
                         </button>
@@ -1257,7 +1257,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                           Book photo {processedBookPhotos.length + 1}
                         </p>
                         <p className="truncate text-[10px] leading-tight text-amber-700">
-                          Click Recognize Books
+                          Click “Recognize Books”
                         </p>
                       </div>
                     </div>
@@ -1267,9 +1267,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             )}
           </div>
 
-          <div className="mt-1 flex items-center gap-2 border-t border-border pt-3">
+          <div className="mt-1 flex flex-nowrap items-center gap-2 border-t border-border pt-3">
             <span
-              className={`inline-flex h-9 shrink-0 items-center justify-center rounded-full px-3 text-base font-bold max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
+              className={`inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 text-base font-bold max-sm:!text-base sm:h-7 sm:px-2.5 sm:text-xs sm:font-semibold ${
                 stepThreeComplete
                   ? "bg-green-600 text-white"
                   : stepTwoComplete
@@ -1280,7 +1280,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               {stepThreeComplete ? "✓ Step 3" : "Step 3"}
             </span>
             <p
-              className={`text-lg font-bold max-sm:!text-lg sm:text-sm sm:font-semibold ${
+              className={`min-w-0 flex-1 text-lg font-bold leading-tight max-sm:!text-lg sm:text-sm sm:font-semibold ${
                 stepTwoComplete ? "" : "text-muted-foreground"
               }`}
             >
@@ -1345,7 +1345,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
             {(bookPreviewUrl || recognizedBooks.length > 0) && (
               recognizedBooks.length > 0 ? (
-                <ul className="max-h-28 divide-y divide-green-200 overflow-y-auto rounded-lg border border-green-200 bg-green-50 text-green-950">
+                <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto rounded-lg border border-green-200 bg-green-50 text-green-950 sm:max-h-52">
                   {recognizedBooks
                     .slice()
                     .sort((a, b) => a.title.localeCompare(b.title))
