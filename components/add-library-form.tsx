@@ -150,10 +150,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
 
-  const [showAdvancedLocation, setShowAdvancedLocation] = useState(false);
-
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [locationAdjusted, setLocationAdjusted] = useState(false);
 
   const [nearbyLibrary, setNearbyLibrary] = useState<NearbyLibrary | null>(
     null,
@@ -370,9 +369,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     );
 
     if (addressUpdated) {
-      setMessage(
-        "Library location adjusted. The address and neighborhood were updated automatically. Please confirm them before saving.",
-      );
+      setLocationAdjusted(true);
+      setMessage("");
     }
   }
 
@@ -381,6 +379,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     setError("");
     setNearbyLibrary(null);
     setNeighborhood("");
+    setLocationAdjusted(false);
 
     if (!navigator.geolocation) {
       setError("Your browser does not support location services.");
@@ -411,12 +410,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         );
 
         if (addressUpdated) {
-          setMessage(
-            "Current location, address, and neighborhood were added. Drag the marker if the GPS position is not exact.",
-          );
+          setMessage("");
         }
-
-        setShowAdvancedLocation(false);
         setLocating(false);
       },
       (locationError) => {
@@ -816,10 +811,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
       setRecognizedBooks([]);
       setBookPhotosProcessed(0);
       setBookRecognitionError("");
+      setLocationAdjusted(false);
       setPendingLibraryId(doc(collection(db, "libraries")).id);
       setNearbyLibrary(null);
-      setShowAdvancedLocation(false);
-
       setMapCenter({
         lat: 39.0458,
         lng: -77.1224,
@@ -926,18 +920,25 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
         <div className="mt-4 grid gap-3">
           <div
-            className={`flex w-full items-center gap-2 rounded-xl border border-l-4 px-3 py-2.5 ${
+            className={`relative flex w-full items-center gap-2 rounded-r-xl border px-3 py-2.5 pl-12 ${
               duplicateCheckStatus === "duplicate"
-                ? "border-amber-200 border-l-amber-500 bg-amber-50 text-amber-950"
+                ? "border-amber-200 bg-amber-100 text-amber-950"
                 : stepOneComplete
-                  ? "border-green-200 border-l-green-600 bg-green-50 text-green-950"
-                  : "border-slate-200 border-l-slate-500 bg-slate-50 text-slate-900"
+                  ? "border-green-200 bg-green-100 text-green-950"
+                  : "border-slate-200 bg-slate-100 text-slate-900"
             }`}
           >
+            <span
+              className="absolute left-2 h-6 w-5 bg-current opacity-20 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
+              aria-hidden="true"
+            />
+            <span
+              className="absolute left-5 h-6 w-5 bg-current opacity-35 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
+              aria-hidden="true"
+            />
             <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepOneComplete ? "✓ Step 1" : "Step 1"}
             </span>
-            <span className="opacity-50" aria-hidden="true">·</span>
             <p className="min-w-0 flex-1 text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {duplicateCheckStatus === "checking"
                 ? "Checking Location…"
@@ -1048,46 +1049,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             </div>
           )}
 
-          <div className="rounded-xl border border-border bg-background">
-            <button
-              type="button"
-              onClick={() => setShowAdvancedLocation((current) => !current)}
-              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-            >
-              <span>Advanced Location</span>
-
-              <span aria-hidden="true">{showAdvancedLocation ? "−" : "+"}</span>
-            </button>
-
-            {showAdvancedLocation && (
-              <div className="grid gap-3 border-t border-border p-3 sm:grid-cols-2">
-                <label className="grid gap-1.5">
-                  <span className="text-sm font-medium">Latitude</span>
-
-                  <input
-                    value={latitude}
-                    onChange={(event) => setLatitude(event.target.value)}
-                    className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
-                    placeholder="39.084013"
-                    inputMode="decimal"
-                  />
-                </label>
-
-                <label className="grid gap-1.5">
-                  <span className="text-sm font-medium">Longitude</span>
-
-                  <input
-                    value={longitude}
-                    onChange={(event) => setLongitude(event.target.value)}
-                    className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
-                    placeholder="-77.152812"
-                    inputMode="decimal"
-                  />
-                </label>
-              </div>
-            )}
-          </div>
-
           {duplicateCheckStatus === "checking" && (
             <div
               className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800"
@@ -1099,10 +1060,16 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "clear" && (
             <div
-              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-medium text-green-800"
+              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-normal text-green-800"
               role="status"
             >
-              ✓ No duplicate found. Continue to Step 2.
+              {locationAdjusted ? (
+                <>
+                  ✓ Library location adjusted. No duplicate found. Continue to Step 2.
+                </>
+              ) : (
+                <>✓ No duplicate found. Continue to Step 2.</>
+              )}
             </div>
           )}
 
@@ -1118,24 +1085,31 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               )}
               <p className="mt-1 text-xs">
                 About {Math.round(nearbyLibrary.distanceMeters)} meters away.
-                Adjust the marker if this is a different library.
+                {" "}<strong>Adjust the marker if this is a different library.</strong>
               </p>
             </div>
           )}
 
           <div
-            className={`mt-1 flex w-full items-center gap-2 rounded-xl border border-l-4 px-3 py-2.5 ${
+            className={`relative mt-1 flex w-full items-center gap-2 rounded-r-xl border px-3 py-2.5 pl-12 ${
               stepTwoComplete
-                ? "border-green-200 border-l-green-600 bg-green-50 text-green-950"
+                ? "border-green-200 bg-green-100 text-green-950"
                 : stepOneComplete
-                  ? "border-slate-200 border-l-slate-500 bg-slate-50 text-slate-900"
-                  : "border-gray-200 border-l-gray-300 bg-gray-50 text-gray-500"
+                  ? "border-slate-200 bg-slate-100 text-slate-900"
+                  : "border-gray-200 bg-gray-100 text-gray-500"
             }`}
           >
+            <span
+              className="absolute left-2 h-6 w-5 bg-current opacity-20 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
+              aria-hidden="true"
+            />
+            <span
+              className="absolute left-5 h-6 w-5 bg-current opacity-35 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
+              aria-hidden="true"
+            />
             <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepTwoComplete ? "✓ Step 2" : "Step 2"}
             </span>
-            <span className="opacity-60" aria-hidden="true">·</span>
             <p className="min-w-0 flex-1 text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {stepTwoComplete ? "Library Photo Added" : "Add Library Photo"}
             </p>
@@ -1267,18 +1241,25 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </div>
 
           <div
-            className={`mt-1 flex w-full items-center gap-2 rounded-xl border border-l-4 px-3 py-2.5 ${
+            className={`relative mt-1 flex w-full items-center gap-2 rounded-r-xl border px-3 py-2.5 pl-12 ${
               stepThreeComplete
-                ? "border-green-200 border-l-green-600 bg-green-50 text-green-950"
+                ? "border-green-200 bg-green-100 text-green-950"
                 : stepTwoComplete
-                  ? "border-slate-200 border-l-slate-500 bg-slate-50 text-slate-900"
-                  : "border-gray-200 border-l-gray-300 bg-gray-50 text-gray-500"
+                  ? "border-slate-200 bg-slate-100 text-slate-900"
+                  : "border-gray-200 bg-gray-100 text-gray-500"
             }`}
           >
+            <span
+              className="absolute left-2 h-6 w-5 bg-current opacity-20 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
+              aria-hidden="true"
+            />
+            <span
+              className="absolute left-5 h-6 w-5 bg-current opacity-35 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
+              aria-hidden="true"
+            />
             <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
               {stepThreeComplete ? "✓ Step 3" : "Step 3"}
             </span>
-            <span className="opacity-60" aria-hidden="true">·</span>
             <p className="min-w-0 flex-1 text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
               {stepThreeComplete ? "Books Recognized" : "Add Book Photos"}
             </p>
@@ -1390,26 +1371,31 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
             {(bookPreviewUrl || recognizedBooks.length > 0) && (
               recognizedBooks.length > 0 ? (
-                <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto rounded-lg border border-green-200 bg-green-50 text-green-950 sm:max-h-52">
-                  {recognizedBooks
-                    .slice()
-                    .sort((a, b) => a.title.localeCompare(b.title))
-                    .map((book) => (
-                      <li
-                        key={normalizeBookTitle(book.title)}
-                        className="px-2 py-1"
-                      >
-                        <p className="text-[11px] font-semibold leading-tight">
-                          {book.title}
-                        </p>
-                        {book.author && (
-                          <p className="text-[10px] leading-tight text-green-800">
-                            {book.author}
+                <div className="overflow-hidden rounded-lg border border-green-200 bg-green-50">
+                  <p className="border-b border-green-200 bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-950 max-sm:!text-xs">
+                    Library Inventory
+                  </p>
+                  <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto text-green-950 sm:max-h-52">
+                    {recognizedBooks
+                      .slice()
+                      .sort((a, b) => a.title.localeCompare(b.title))
+                      .map((book) => (
+                        <li
+                          key={normalizeBookTitle(book.title)}
+                          className="px-2 py-1"
+                        >
+                          <p className="text-[11px] font-semibold leading-tight">
+                            {book.title}
                           </p>
-                        )}
-                      </li>
-                    ))}
-                </ul>
+                          {book.author && (
+                            <p className="text-[10px] leading-tight text-green-800">
+                              {book.author}
+                            </p>
+                          )}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
               ) : (
                 <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-violet-200 bg-background px-3 text-center">
                   <p className="text-xs leading-relaxed text-muted-foreground">
