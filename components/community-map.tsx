@@ -518,6 +518,12 @@ export function CommunityMap({
                           >
                             📷 Update Inventory
                           </button>
+
+                          <p className="max-w-full break-words rounded-lg bg-gray-100 px-2.5 py-2 text-xs font-medium text-gray-700">
+                            <span aria-hidden="true">🕒</span>{" "}
+                            <span className="font-semibold">Last updated:</span>{" "}
+                            {selectedLibrary.lastUpdated}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -594,11 +600,6 @@ export function CommunityMap({
                     )}
                   </div>
 
-                  <p className="mt-3 max-w-full break-words rounded-lg bg-gray-100 px-2.5 py-2 text-xs font-medium text-gray-700">
-                    <span aria-hidden="true">🕒</span>{" "}
-                    <span className="font-semibold">Last updated:</span>{" "}
-                    {selectedLibrary.lastUpdated}
-                  </p>
                     </div>
                   </div>
                 </div>
