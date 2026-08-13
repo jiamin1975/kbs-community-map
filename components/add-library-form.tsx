@@ -920,7 +920,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
         <div className="mt-4 grid gap-3">
           <div
-            className={`relative flex w-full items-center gap-2 rounded-r-xl border px-3 py-2.5 pl-12 ${
+            className={`relative mr-8 flex w-fit max-w-[calc(100%_-_2rem)] items-center gap-2 border px-3 py-2.5 pr-4 ${
               duplicateCheckStatus === "duplicate"
                 ? "border-amber-200 bg-amber-100 text-amber-950"
                 : stepOneComplete
@@ -928,18 +928,10 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-slate-200 bg-slate-100 text-slate-900"
             }`}
           >
-            <span
-              className="absolute left-2 h-6 w-5 bg-current opacity-20 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
-              aria-hidden="true"
-            />
-            <span
-              className="absolute left-5 h-6 w-5 bg-current opacity-35 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
-              aria-hidden="true"
-            />
-            <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
+            <span className="shrink-0 whitespace-nowrap text-sm font-bold max-sm:!text-sm sm:text-sm">
               {stepOneComplete ? "✓ Step 1" : "Step 1"}
             </span>
-            <p className="min-w-0 flex-1 text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
+            <p className="min-w-0 flex-1 break-words text-sm font-semibold leading-tight max-sm:!text-sm">
               {duplicateCheckStatus === "checking"
                 ? "Checking Location…"
                 : duplicateCheckStatus === "duplicate"
@@ -948,6 +940,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     ? "Location Confirmed"
                     : "Confirm Location"}
             </p>
+            <span className="absolute -right-4 top-0 h-full w-6 bg-inherit [clip-path:polygon(0_0,38%_0,100%_50%,38%_100%,0_100%,62%_50%)]" aria-hidden="true" />
+            <span className="absolute -right-7 top-0 h-full w-6 bg-inherit [clip-path:polygon(0_0,38%_0,100%_50%,38%_100%,0_100%,62%_50%)]" aria-hidden="true" />
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 sm:items-end">
@@ -1006,11 +1000,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {markerPosition && (
             <div className="overflow-hidden rounded-xl border border-border">
-              <div className="flex items-center justify-between border-b border-border bg-secondary px-3 py-2">
-                <p className="text-sm font-medium">
-                  Confirm the library location
-                </p>
-                <p className="text-[11px] text-muted-foreground">
+              <div className="border-b border-border bg-secondary px-3 py-2">
+                <p className="text-sm font-bold text-foreground">
                   Drag to adjust
                 </p>
               </div>
@@ -1091,7 +1082,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           )}
 
           <div
-            className={`relative mt-1 flex w-full items-center gap-2 rounded-r-xl border px-3 py-2.5 pl-12 ${
+            className={`relative mr-8 mt-1 flex w-fit max-w-[calc(100%_-_2rem)] items-center gap-2 border px-3 py-2.5 pr-4 ${
               stepTwoComplete
                 ? "border-green-200 bg-green-100 text-green-950"
                 : stepOneComplete
@@ -1099,20 +1090,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-gray-200 bg-gray-100 text-gray-500"
             }`}
           >
-            <span
-              className="absolute left-2 h-6 w-5 bg-current opacity-20 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
-              aria-hidden="true"
-            />
-            <span
-              className="absolute left-5 h-6 w-5 bg-current opacity-35 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
-              aria-hidden="true"
-            />
-            <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
+            <span className="shrink-0 whitespace-nowrap text-sm font-bold max-sm:!text-sm">
               {stepTwoComplete ? "✓ Step 2" : "Step 2"}
             </span>
-            <p className="min-w-0 flex-1 text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
+            <p className="min-w-0 flex-1 break-words text-sm font-semibold leading-tight max-sm:!text-sm">
               {stepTwoComplete ? "Library Photo Added" : "Add Library Photo"}
             </p>
+            <span className="absolute -right-4 top-0 h-full w-6 bg-inherit [clip-path:polygon(0_0,38%_0,100%_50%,38%_100%,0_100%,62%_50%)]" aria-hidden="true" />
+            <span className="absolute -right-7 top-0 h-full w-6 bg-inherit [clip-path:polygon(0_0,38%_0,100%_50%,38%_100%,0_100%,62%_50%)]" aria-hidden="true" />
           </div>
 
           <div
@@ -1135,7 +1120,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs text-muted-foreground">
-                    Photo of the outside library box
+                    Photo of library box
                   </p>
                   <p className="text-[11px] text-muted-foreground">
                     10 MB max
@@ -1241,7 +1226,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </div>
 
           <div
-            className={`relative mt-1 flex w-full items-center gap-2 rounded-r-xl border px-3 py-2.5 pl-12 ${
+            className={`relative mr-8 mt-1 flex w-fit max-w-[calc(100%_-_2rem)] items-center gap-2 border px-3 py-2.5 pr-4 ${
               stepThreeComplete
                 ? "border-green-200 bg-green-100 text-green-950"
                 : stepTwoComplete
@@ -1249,20 +1234,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-gray-200 bg-gray-100 text-gray-500"
             }`}
           >
-            <span
-              className="absolute left-2 h-6 w-5 bg-current opacity-20 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
-              aria-hidden="true"
-            />
-            <span
-              className="absolute left-5 h-6 w-5 bg-current opacity-35 [clip-path:polygon(0_0,42%_0,100%_50%,42%_100%,0_100%,58%_50%)]"
-              aria-hidden="true"
-            />
-            <span className="shrink-0 whitespace-nowrap text-base font-bold max-sm:!text-base sm:text-sm">
+            <span className="shrink-0 whitespace-nowrap text-sm font-bold max-sm:!text-sm">
               {stepThreeComplete ? "✓ Step 3" : "Step 3"}
             </span>
-            <p className="min-w-0 flex-1 text-base font-semibold leading-tight max-sm:!text-base sm:text-sm">
+            <p className="min-w-0 flex-1 break-words text-sm font-semibold leading-tight max-sm:!text-sm">
               {stepThreeComplete ? "Books Recognized" : "Add Book Photos"}
             </p>
+            <span className="absolute -right-4 top-0 h-full w-6 bg-inherit [clip-path:polygon(0_0,38%_0,100%_50%,38%_100%,0_100%,62%_50%)]" aria-hidden="true" />
+            <span className="absolute -right-7 top-0 h-full w-6 bg-inherit [clip-path:polygon(0_0,38%_0,100%_50%,38%_100%,0_100%,62%_50%)]" aria-hidden="true" />
           </div>
 
           <div
