@@ -923,7 +923,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             type="button"
             onClick={handleSignOut}
             disabled={saving}
-            className="shrink-0 text-xs font-medium text-muted-foreground hover:text-foreground hover:underline disabled:opacity-50"
+            className="shrink-0 text-xs font-medium text-muted-foreground hover:text-foreground hover:underline disabled:opacity-50 max-sm:!text-[11px]"
           >
             Sign Out
           </button>
@@ -1182,7 +1182,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
                     <div className="p-1.5">
                       <p className="text-[11px] font-semibold leading-tight">Library photo</p>
-                      <p className="truncate text-[10px] leading-tight text-muted-foreground">
+                      <p className="truncate text-[9px] leading-tight text-muted-foreground max-sm:!text-[11px]">
                         {photo?.name}
                       </p>
 
@@ -1223,7 +1223,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                         <p className="text-[11px] font-semibold leading-tight">
                           Book photo {index + 1}
                         </p>
-                        <p className="truncate text-[10px] leading-tight text-muted-foreground">
+                        <p className="truncate text-[9px] leading-tight text-muted-foreground max-sm:!text-[11px]">
                           {bookPhotoPreview.name}
                         </p>
                         <p className="mt-1 text-[9px] font-semibold leading-tight text-green-700">
@@ -1322,7 +1322,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <p className="font-semibold">
                         Book photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground">
+                      <p className="truncate text-[9px] text-muted-foreground max-sm:!text-[11px]">
                         {bookPhoto.name}
                       </p>
                     </div>
@@ -1347,7 +1347,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       />
                       <div className="p-2">
                         <p className="font-semibold">Book photo {number}</p>
-                        <p className="truncate text-xs text-muted-foreground">
+                        <p className="truncate text-[9px] text-muted-foreground max-sm:!text-[11px]">
                           {bookPhotoPreview.name}
                         </p>
                         <p className="mt-1 font-semibold text-green-700">
@@ -1375,19 +1375,24 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     {recognizedBooks
                       .slice()
                       .sort((a, b) => a.title.localeCompare(b.title))
-                      .map((book) => (
+                      .map((book, index) => (
                         <li
                           key={normalizeBookTitle(book.title)}
-                          className="px-2 py-1"
+                          className="flex gap-1.5 px-2 py-1"
                         >
-                          <p className="text-[11px] font-semibold leading-tight">
-                            {book.title}
-                          </p>
-                          {book.author && (
-                            <p className="text-[10px] leading-tight text-green-800">
-                              {book.author}
+                          <span className="shrink-0 text-sm font-semibold leading-tight sm:text-[11px]">
+                            {index + 1}.
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-semibold leading-tight">
+                              {book.title}
                             </p>
-                          )}
+                            {book.author && (
+                              <p className="text-[10px] leading-tight text-green-800">
+                                {book.author}
+                              </p>
+                            )}
+                          </div>
                         </li>
                       ))}
                   </ul>
