@@ -913,7 +913,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
   return (
     <div>
-      <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-3 max-sm:[&_button]:text-base max-sm:[&_button_span]:text-base max-sm:[&_input]:text-base max-sm:[&_label]:text-sm max-sm:[&_label_span]:text-sm max-sm:[&_p]:text-sm sm:p-4">
+      <div className="min-w-0 overflow-visible rounded-2xl border border-border bg-card p-3 max-sm:[&_button]:text-base max-sm:[&_button_span]:text-base max-sm:[&_input]:text-base max-sm:[&_label]:text-sm max-sm:[&_label_span]:text-sm max-sm:[&_p]:text-sm sm:p-4">
         <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
           <p className="min-w-0 truncate text-xs text-muted-foreground">
             Volunteer: {currentUser.email}
@@ -930,21 +930,22 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         </div>
 
         <ol
-          className="mt-4 grid gap-2 sm:grid-cols-3"
+          className="sticky top-0 z-30 -mx-3 mt-2 grid grid-cols-3 gap-1 border-y border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur sm:-mx-4 sm:mt-3 sm:px-4"
           aria-label="Add library progress"
         >
           <li
-            className={`flex min-w-0 items-center gap-2 rounded-xl border px-3 py-2.5 ${
+            className={`flex min-w-0 items-center gap-1 border py-2 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
               stepOneComplete
                 ? "border-green-200 bg-green-50 text-green-900"
                 : "border-blue-300 bg-blue-50 text-blue-950"
             }`}
           >
-            <span className="shrink-0 text-lg font-bold" aria-hidden="true">
+            <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
               ①
             </span>
-            <span className="min-w-0 flex-1 text-sm font-semibold">
-              Confirm Location
+            <span className="min-w-0 flex-1 truncate text-xs font-semibold sm:text-sm">
+              <span className="sm:hidden">Location</span>
+              <span className="hidden sm:inline">Confirm Location</span>
             </span>
             {stepOneComplete && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
@@ -952,7 +953,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex min-w-0 items-center gap-2 rounded-xl border px-3 py-2.5 ${
+            className={`flex min-w-0 items-center gap-1 border py-2 pl-4 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 ${
               stepTwoComplete
                 ? "border-green-200 bg-green-50 text-green-900"
                 : stepOneComplete
@@ -960,11 +961,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-gray-200 bg-gray-50 text-gray-500"
             }`}
           >
-            <span className="shrink-0 text-lg font-bold" aria-hidden="true">
+            <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
               ②
             </span>
-            <span className="min-w-0 flex-1 text-sm font-semibold">
-              Add Library Photo
+            <span className="min-w-0 flex-1 truncate text-xs font-semibold sm:text-sm">
+              <span className="sm:hidden">Photo</span>
+              <span className="hidden sm:inline">Add Library Photo</span>
             </span>
             {stepTwoComplete && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
@@ -972,7 +974,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex min-w-0 items-center gap-2 rounded-xl border px-3 py-2.5 ${
+            className={`flex min-w-0 items-center gap-1 border py-2 pl-4 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 ${
               stepThreeComplete
                 ? "border-green-200 bg-green-50 text-green-900"
                 : stepTwoComplete
@@ -980,11 +982,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-gray-200 bg-gray-50 text-gray-500"
             }`}
           >
-            <span className="shrink-0 text-lg font-bold" aria-hidden="true">
+            <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
               ③
             </span>
-            <span className="min-w-0 flex-1 text-sm font-semibold">
-              Add Book Photos
+            <span className="min-w-0 flex-1 truncate text-xs font-semibold sm:text-sm">
+              <span className="sm:hidden">Books</span>
+              <span className="hidden sm:inline">Add Book Photos</span>
             </span>
             {stepThreeComplete && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
@@ -1245,7 +1248,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                           Book photo {processedBookPhotos.length + 1}
                         </p>
                         <p className="truncate text-[10px] leading-tight text-amber-700">
-                          Click “Recognize Books”
+                          Select “Recognize Books”
                         </p>
                       </div>
                     </div>
@@ -1269,7 +1272,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               {recognizedBooks.length > 0 && (
                 <p className="text-xs font-medium leading-normal text-green-700 max-sm:!text-sm">
                   ✓ {recognizedBooks.length} book
-                  {recognizedBooks.length === 1 ? "" : "s"} found
+                  {recognizedBooks.length === 1 ? "" : "s"} found in total
                 </p>
               )}
             </div>
