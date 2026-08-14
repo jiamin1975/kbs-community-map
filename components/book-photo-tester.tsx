@@ -359,11 +359,11 @@ export function BookPhotoTester({
       {!saved && (
         <div className="mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl bg-violet-50/50 p-3">
           <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground max-sm:!text-base">
               AI will recognize the visible titles.
             </p>
             {sessionBooks.length > 0 && (
-              <p className="text-xs font-medium text-green-700">
+              <p className="text-xs font-medium text-green-700 max-sm:!text-base">
                 ✓ {sessionBooks.length} book
                 {sessionBooks.length === 1 ? "" : "s"} found
               </p>
@@ -519,10 +519,10 @@ export function BookPhotoTester({
                     firstBook.title.localeCompare(secondBook.title),
                   )
                   .map((book) => (
-                    <li key={normalizeBookTitle(book.title)} className="px-2 py-1">
-                      <p className="text-[11px] font-semibold leading-tight">{book.title}</p>
+                    <li key={normalizeBookTitle(book.title)} className="px-3 py-2 sm:px-2 sm:py-1">
+                      <p className="text-base font-semibold leading-tight sm:text-[11px]">{book.title}</p>
                       {book.author && (
-                        <p className="text-[10px] leading-tight text-green-800">
+                        <p className="mt-1 text-sm leading-tight text-green-800 sm:mt-0 sm:text-[10px]">
                           {book.author}
                         </p>
                       )}
