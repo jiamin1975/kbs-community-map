@@ -226,8 +226,19 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
       }
 
       try {
+        const volunteerEmail = user.email?.trim().toLowerCase();
+
+        if (!volunteerEmail) {
+          setIsAuthorized(false);
+          setAccessMessage(
+            "No email address was found for this Google account. Please use a Google account with a verified email address.",
+          );
+          setAuthLoading(false);
+          return;
+        }
+
         const volunteerSnapshot = await getDoc(
-          doc(db, "authorizedVolunteers", user.uid),
+          doc(db, "authorizedVolunteerEmails", volunteerEmail),
         );
 
         if (

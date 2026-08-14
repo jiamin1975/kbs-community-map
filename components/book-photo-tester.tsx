@@ -3,13 +3,11 @@
 import {
   type ChangeEvent,
   useEffect,
+  useRef,
   useState,
 } from "react"
 import {
-  ImageUp,
   LoaderCircle,
-  Save,
-  X,
 } from "lucide-react"
 import {
   doc,
@@ -30,6 +28,11 @@ type RecognizedBook = {
 type RecognitionResult = {
   books: RecognizedBook[]
   notes: string
+}
+
+type ProcessedBookPhoto = {
+  name: string
+  url: string
 }
 
 type BookPhotoTesterProps = {
@@ -107,6 +110,11 @@ export function BookPhotoTester({
   const [sessionBooks, setSessionBooks] =
     useState<RecognizedBook[]>([])
 
+  const [processedBookPhotos, setProcessedBookPhotos] =
+    useState<ProcessedBookPhoto[]>([])
+
+  const processedBookPhotoUrls = useRef<string[]>([])
+
   const [photosProcessed, setPhotosProcessed] =
     useState(0)
 
@@ -117,11 +125,11 @@ export function BookPhotoTester({
 
   useEffect(() => {
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
+      processedBookPhotoUrls.current.forEach((url) =>
+        URL.revokeObjectURL(url),
+      )
     }
-  }, [previewUrl])
+  }, [])
 
   function handleFileChange(
     event: ChangeEvent<HTMLInputElement>,
@@ -129,33 +137,27 @@ export function BookPhotoTester({
     const selectedFile =
       event.target.files?.[0] ?? null
 
+    event.target.value = ""
+
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl)
     }
 
     setFile(selectedFile)
+
+    // New file = new current recognition result,
+    // but keep all session books already found.
     setResult(null)
     setError("")
     setSaved(false)
 
     if (selectedFile) {
-      setPreviewUrl(
-        URL.createObjectURL(selectedFile),
-      )
+      const nextPreviewUrl = URL.createObjectURL(selectedFile)
+      processedBookPhotoUrls.current.push(nextPreviewUrl)
+      setPreviewUrl(nextPreviewUrl)
     } else {
       setPreviewUrl(null)
     }
-  }
-
-  function clearPhoto() {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl)
-    }
-
-    setFile(null)
-    setPreviewUrl(null)
-    setResult(null)
-    setError("")
   }
 
   async function analyzePhoto() {
@@ -212,6 +214,7 @@ export function BookPhotoTester({
       if (
         recognitionResult.books.length === 0
       ) {
+        setResult(null)
         setError(
           "No books were recognized clearly enough in this photo.",
         )
@@ -229,6 +232,20 @@ export function BookPhotoTester({
       setPhotosProcessed(
         (count) => count + 1,
       )
+
+      if (previewUrl) {
+        setProcessedBookPhotos((currentPhotos) => [
+          ...currentPhotos,
+          {
+            name: file.name,
+            url: previewUrl,
+          },
+        ])
+      }
+
+      setFile(null)
+      setPreviewUrl(null)
+      setResult(null)
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -314,43 +331,25 @@ export function BookPhotoTester({
   }
 
   return (
-    <div className="p-1">
+    <div className="min-w-0 p-1">
       {library ? (
-        <div className="rounded-lg border border-border bg-secondary px-4 py-3">
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 text-base">
-              📍
-            </span>
-
+        <div className="rounded-xl border border-border bg-secondary px-4 py-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <span className="mt-0.5 shrink-0 text-base">📍</span>
             <div className="min-w-0 flex-1">
-              <p className="text-base font-semibold leading-tight">
+              <p className="break-words text-base font-semibold leading-tight">
                 {library.name}
               </p>
-
               {library.address && (
-                <p className="mt-0.5 truncate text-xs leading-tight text-muted-foreground">
+                <p className="mt-1 break-words text-sm leading-tight text-muted-foreground">
                   {library.address}
                 </p>
               )}
             </div>
           </div>
-
-          <div className="mt-2 flex items-center gap-6 border-t border-border/60 pt-2 text-sm">
-            <span>
-              📷{" "}
-              <strong>{photosProcessed}</strong>{" "}
-              Photos
-            </span>
-
-            <span>
-              📚{" "}
-              <strong>{sessionBooks.length}</strong>{" "}
-              Books
-            </span>
-          </div>
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed border-border p-3">
+        <div className="rounded-xl border border-dashed border-border p-4">
           <p className="text-sm text-muted-foreground">
             Select a library before updating inventory.
           </p>
@@ -358,231 +357,217 @@ export function BookPhotoTester({
       )}
 
       {!saved && (
-        <div className="mt-4 grid gap-5 md:grid-cols-2">
-          {/* LEFT SIDE */}
-          <div>
-            <input
-              id="book-photo"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleFileChange}
-              disabled={loading || saving}
-              className="hidden"
-            />
-
-            <div className="flex gap-3">
-              <label
-                htmlFor="book-photo"
-                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5 text-sm font-medium hover:bg-secondary"
-              >
-                📷 Choose Photo
-              </label>
-
-              <button
-                type="button"
-                onClick={analyzePhoto}
-                disabled={
-                  !file ||
-                  !library ||
-                  loading ||
-                  saving ||
-                  !!result
-                }
-                className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed ${
-                  result
-                    ? "border border-border bg-secondary text-muted-foreground disabled:opacity-100"
-                    : "bg-primary text-primary-foreground disabled:opacity-50"
-                }`}
-              >
-                {loading ? (
-                  <>
-                    <LoaderCircle
-                      className="size-4 animate-spin"
-                      aria-hidden="true"
-                    />
-                    Analyzing…
-                  </>
-                ) : result ? (
-                  <>
-                    ✓ Analyzed
-                  </>
-                ) : (
-                  <>
-                    <ImageUp
-                      className="size-4"
-                      aria-hidden="true"
-                    />
-                    Analyze Photo
-                  </>
-                )}
-              </button>
-            </div>
-
-            {previewUrl && (
-              <div className="relative mt-3">
-                <img
-                  src={previewUrl}
-                  alt="Selected bookshelf preview"
-                  className="max-h-[400px] w-full rounded-xl border border-border object-contain"
-                />
-
-                <button
-                  type="button"
-                  onClick={clearPhoto}
-                  disabled={loading}
-                  aria-label="Remove selected photo"
-                  className="absolute right-2 top-2 inline-flex size-9 items-center justify-center rounded-full bg-background shadow"
-                >
-                  <X
-                    className="size-4"
-                    aria-hidden="true"
-                  />
-                </button>
-              </div>
-            )}
-
+        <div className="mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl bg-violet-50/50 p-3">
+          <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            <p className="text-xs text-muted-foreground">
+              AI will recognize the visible titles.
+            </p>
             {sessionBooks.length > 0 && (
-              <div className="mt-4 rounded-xl border border-border bg-card p-3">
-                <p className="text-sm font-semibold">
-                  Finished photographing this library?
-                </p>
-
-                <p className="mt-1 text-xs text-muted-foreground">
-                  This will replace the previous
-                  inventory with{" "}
-                  {sessionBooks.length} unique books
-                  from this update.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={
-                    finishAndSaveInventory
-                  }
-                  disabled={saving}
-                  className="mt-3 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {saving ? (
-                    <>
-                      <LoaderCircle
-                        className="size-4 animate-spin"
-                        aria-hidden="true"
-                      />
-                      Saving Inventory…
-                    </>
-                  ) : (
-                    <>
-                      <Save
-                        className="size-4"
-                        aria-hidden="true"
-                      />
-                      Finish & Save Inventory
-                    </>
-                  )}
-                </button>
-              </div>
+              <p className="text-xs font-medium text-green-700">
+                ✓ {sessionBooks.length} book
+                {sessionBooks.length === 1 ? "" : "s"} found
+              </p>
             )}
           </div>
 
-          {/* RIGHT SIDE */}
-          <div
-            className="rounded-xl border border-border bg-background p-4"
-            aria-live="polite"
-          >
-            <h3 className="text-sm font-semibold text-foreground">
-              Recognition Results
-            </h3>
+          <input
+            id="update-book-photo"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFileChange}
+            disabled={loading || saving}
+            className="hidden"
+          />
 
-            {!loading && !result && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Books from the current photo will appear here.
-              </p>
-            )}
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label
+              htmlFor="update-book-photo"
+              className="inline-flex h-12 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-blue-700 bg-blue-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:px-2 sm:text-sm"
+            >
+              📚 {photosProcessed > 0 ? "Choose Another Photo" : "Choose Book Photo"}
+            </label>
 
-            {loading && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Reading visible titles and authors…
-              </p>
-            )}
+            <button
+              type="button"
+              onClick={analyzePhoto}
+              disabled={!file || !library || loading || saving || !!result}
+              className="inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-violet-700 bg-violet-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none sm:h-10 sm:px-2 sm:text-sm"
+            >
+              {loading ? (
+                <>
+                  <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                  Recognizing…
+                </>
+              ) : result ? (
+                "✓ Recognition Done"
+              ) : (
+                "✨ Recognize Books"
+              )}
+            </button>
+          </div>
 
-            {result && (
-              <div className="mt-2 max-h-[400px] overflow-y-auto pr-2">
-                {result.books.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">
-                    No book titles could be identified confidently.
-                  </p>
-                ) : (
-                  <>
-                    <p className="text-xs text-green-700">
-                      {result.books.length}{" "}
-                      {result.books.length === 1
-                        ? "book was"
-                        : "books were"}{" "}
-                      added to this update.
-                    </p>
+          {(processedBookPhotos.length > 0 || previewUrl) && (
+            <>
+              <div className="grid min-w-0 gap-3 sm:hidden">
+                <p className="text-sm font-semibold text-muted-foreground">
+                  Book photos
+                </p>
 
-                    <ul className="mt-3 space-y-2">
-                      {result.books.map(
-                        (book, index) => (
-                          <li
-                            key={`${book.title}-${index}`}
-                            className="rounded-lg border border-border px-3 py-2"
-                          >
-                            <p className="text-sm font-medium leading-tight text-foreground">
-                              {book.title}
-                            </p>
+                {previewUrl && file && (
+                  <div
+                    className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background"
+                  >
+                    <img
+                      src={previewUrl}
+                      alt="Book photo awaiting recognition"
+                      className="h-40 w-full bg-gray-100 object-cover"
+                    />
+                    <div className="p-2">
+                      <p className="font-semibold">
+                        Book photo {processedBookPhotos.length + 1}
+                      </p>
+                      <p className="truncate text-muted-foreground">
+                        {file.name}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
-                            {book.author && (
-                              <p className="mt-0.5 text-xs leading-tight text-muted-foreground">
-                                {book.author}
-                              </p>
-                            )}
-
-                            <p className="mt-1 text-[11px] capitalize text-muted-foreground">
-                              Confidence:{" "}
-                              {book.confidence}
-                            </p>
-
-                            {book.visibleText && (
-                              <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
-                                Visible text:{" "}
-                                {book.visibleText}
-                              </p>
-                            )}
-                          </li>
-                        ),
-                      )}
-                    </ul>
-
-                    {result.notes && (
-                      <div className="mt-3 rounded-lg bg-secondary p-2.5">
-                        <p className="text-xs font-medium">
-                          Notes
+                {processedBookPhotos
+                  .map((photo, index) => ({
+                    photo,
+                    number: index + 1,
+                  }))
+                  .reverse()
+                  .map(({ photo, number }) => (
+                    <div
+                      key={photo.url}
+                      className="w-full overflow-hidden rounded-xl border border-violet-200 bg-background"
+                    >
+                      <img
+                        src={photo.url}
+                        alt={`Book photo ${number}`}
+                        className="h-40 w-full bg-gray-100 object-cover"
+                      />
+                      <div className="p-2">
+                        <p className="font-semibold">Book photo {number}</p>
+                        <p className="truncate text-muted-foreground">
+                          {photo.name}
                         </p>
-
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {result.notes}
+                        <p className="mt-2 font-semibold text-green-700">
+                          ✓ Recognition Done
                         </p>
                       </div>
-                    )}
-                  </>
+                    </div>
+                  ))}
+              </div>
+
+              <div className="hidden min-w-0 gap-3 overflow-x-auto pb-2 sm:flex">
+                {processedBookPhotos.map((photo, index) => (
+                  <div
+                    key={photo.url}
+                    className="w-52 shrink-0 overflow-hidden rounded-xl border border-violet-200 bg-background"
+                  >
+                    <img
+                      src={photo.url}
+                      alt={`Book photo ${index + 1}`}
+                      className="h-40 w-full bg-gray-100 object-cover"
+                    />
+                    <div className="p-2.5">
+                      <p className="font-semibold">Book photo {index + 1}</p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {photo.name}
+                      </p>
+                      <p className="mt-2 font-semibold text-green-700">
+                        ✓ Recognition Done
+                      </p>
+                    </div>
+                  </div>
+                ))}
+
+                {previewUrl && file && (
+                  <div className="w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                    <img
+                      src={previewUrl}
+                      alt="Book photo awaiting recognition"
+                      className="h-40 w-full bg-gray-100 object-cover"
+                    />
+                    <div className="p-2.5">
+                      <p className="font-semibold">
+                        Book photo {processedBookPhotos.length + 1}
+                      </p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {file.name}
+                      </p>
+                    </div>
+                  </div>
                 )}
+              </div>
+            </>
+          )}
+
+          <div className="overflow-hidden rounded-lg border border-green-200 bg-green-50" aria-live="polite">
+            <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
+              Library Inventory
+            </p>
+
+            {sessionBooks.length > 0 ? (
+              <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto text-green-950 sm:max-h-52">
+                {sessionBooks
+                  .slice()
+                  .sort((firstBook, secondBook) =>
+                    firstBook.title.localeCompare(secondBook.title),
+                  )
+                  .map((book) => (
+                    <li key={normalizeBookTitle(book.title)} className="px-2 py-1">
+                      <p className="text-[11px] font-semibold leading-tight">{book.title}</p>
+                      {book.author && (
+                        <p className="text-[10px] leading-tight text-green-800">
+                          {book.author}
+                        </p>
+                      )}
+                    </li>
+                  ))}
+              </ul>
+            ) : (
+              <div className="flex h-24 items-center justify-center px-3 text-center">
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  Choose a book photo, then select Recognize Books.
+                </p>
               </div>
             )}
           </div>
+
+          <button
+            type="button"
+            onClick={finishAndSaveInventory}
+            disabled={saving || sessionBooks.length === 0}
+            className="h-12 rounded-xl border border-green-800 bg-green-700 px-4 text-base font-bold text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {saving ? (
+              <>
+                <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                Saving Inventory…
+              </>
+            ) : (
+              `Update Library with ${sessionBooks.length} Book${
+                sessionBooks.length === 1 ? "" : "s"
+              }`
+            )}
+          </button>
         </div>
       )}
 
       {saved && (
         <div
-          className="mt-4 rounded-xl border border-green-300 bg-green-50 p-3 text-green-900"
+          className="mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-green-900"
           role="status"
         >
-          <p className="text-sm font-semibold">
+          <p className="font-semibold">
             Inventory updated successfully
           </p>
 
-          <p className="mt-1 text-xs">
+          <p className="mt-1 text-sm">
             {sessionBooks.length} unique{" "}
             {sessionBooks.length === 1
               ? "book was"

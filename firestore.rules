@@ -2,7 +2,8 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isApprovedVolunteer() {
+
+    function hasApprovedUid() {
       return request.auth != null
         && exists(
           /databases/$(database)/documents/authorizedVolunteers/$(request.auth.uid)
@@ -12,15 +13,45 @@ service cloud.firestore {
         ).data.active == true;
     }
 
+    function hasApprovedEmail() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true
+        && exists(
+          /databases/$(database)/documents/authorizedVolunteerEmails/$(request.auth.token.email)
+        )
+        && get(
+          /databases/$(database)/documents/authorizedVolunteerEmails/$(request.auth.token.email)
+        ).data.active == true;
+    }
+
+    function isApprovedVolunteer() {
+      return hasApprovedUid() || hasApprovedEmail();
+    }
+
     match /libraries/{libraryId} {
       allow read: if true;
       allow create, update: if isApprovedVolunteer();
       allow delete: if false;
+
+      match /activity/{activityId} {
+        allow read: if isApprovedVolunteer();
+        allow create, update, delete: if false;
+      }
     }
 
+    // Existing UID-based volunteer records
     match /authorizedVolunteers/{volunteerId} {
       allow read: if request.auth != null
         && request.auth.uid == volunteerId;
+      allow write: if false;
+    }
+
+    // New Gmail-based volunteer records
+    match /authorizedVolunteerEmails/{volunteerEmail} {
+      allow read: if request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == volunteerEmail;
       allow write: if false;
     }
   }
