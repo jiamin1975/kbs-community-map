@@ -359,11 +359,11 @@ export function BookPhotoTester({
       {!saved && (
         <div className="mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl bg-violet-50/50 p-3">
           <div className="flex flex-col items-start gap-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-            <p className="text-xs leading-tight text-muted-foreground max-sm:!text-sm">
+            <p className="text-xs leading-normal text-muted-foreground max-sm:!text-sm">
               AI will recognize the visible titles.
             </p>
             {sessionBooks.length > 0 && (
-              <p className="text-xs font-medium leading-tight text-green-700 max-sm:!text-sm">
+              <p className="text-xs font-medium leading-normal text-green-700 max-sm:!text-sm">
                 ✓ {sessionBooks.length} book
                 {sessionBooks.length === 1 ? "" : "s"} found
               </p>
@@ -426,7 +426,7 @@ export function BookPhotoTester({
                       <p className="font-semibold">
                         Book photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="truncate text-muted-foreground">
+                      <p className="truncate text-xs text-muted-foreground">
                         {file.name}
                       </p>
                     </div>
@@ -451,10 +451,10 @@ export function BookPhotoTester({
                       />
                       <div className="p-2">
                         <p className="font-semibold">Book photo {number}</p>
-                        <p className="truncate text-muted-foreground">
+                        <p className="truncate text-xs text-muted-foreground">
                           {photo.name}
                         </p>
-                        <p className="mt-2 font-semibold text-green-700">
+                        <p className="mt-1 font-semibold text-green-700">
                           ✓ Recognition Done
                         </p>
                       </div>
@@ -475,10 +475,10 @@ export function BookPhotoTester({
                     />
                     <div className="p-2.5">
                       <p className="font-semibold">Book photo {index + 1}</p>
-                      <p className="truncate text-sm text-muted-foreground">
+                      <p className="truncate text-xs text-muted-foreground">
                         {photo.name}
                       </p>
-                      <p className="mt-2 font-semibold text-green-700">
+                      <p className="mt-1 font-semibold text-green-700">
                         ✓ Recognition Done
                       </p>
                     </div>
@@ -496,7 +496,7 @@ export function BookPhotoTester({
                       <p className="font-semibold">
                         Book photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="truncate text-sm text-muted-foreground">
+                      <p className="truncate text-xs text-muted-foreground">
                         {file.name}
                       </p>
                     </div>
