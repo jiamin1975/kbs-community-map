@@ -1207,7 +1207,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                         <p className="truncate text-[10px] leading-tight text-muted-foreground">
                           {bookPhotoPreview.name}
                         </p>
-                        <p className="mt-2 text-[9px] font-semibold leading-tight text-green-700">
+                        <p className="mt-1 text-[9px] font-semibold leading-tight text-green-700">
                           ✓ Recognition Done
                         </p>
                       </div>
@@ -1262,12 +1262,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 : "pointer-events-none bg-gray-50 opacity-50"
             }`}
           >
-            <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-              <p className="text-xs text-muted-foreground">
+            <div className="flex flex-col items-start gap-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+              <p className="text-xs leading-normal text-muted-foreground max-sm:!text-sm">
                 AI will recognize the visible titles.
               </p>
               {recognizedBooks.length > 0 && (
-                <p className="text-xs font-medium text-green-700">
+                <p className="text-xs font-medium leading-normal text-green-700 max-sm:!text-sm">
                   ✓ {recognizedBooks.length} book
                   {recognizedBooks.length === 1 ? "" : "s"} found
                 </p>
@@ -1322,8 +1322,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <p className="font-semibold">
                         Book photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="text-amber-700">
-                        Click “Recognize Books”
+                      <p className="truncate text-xs text-muted-foreground">
+                        {bookPhoto.name}
                       </p>
                     </div>
                   </div>
@@ -1347,10 +1347,10 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       />
                       <div className="p-2">
                         <p className="font-semibold">Book photo {number}</p>
-                        <p className="truncate text-muted-foreground">
+                        <p className="truncate text-xs text-muted-foreground">
                           {bookPhotoPreview.name}
                         </p>
-                        <p className="mt-2 font-semibold text-green-700">
+                        <p className="mt-1 font-semibold text-green-700">
                           ✓ Recognition Done
                         </p>
                       </div>
