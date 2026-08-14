@@ -930,11 +930,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         </div>
 
         <ol
-          className="sticky top-0 z-30 -mx-3 mt-2 grid grid-cols-1 gap-1 border-y border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur sm:-mx-4 sm:mt-3 sm:grid-cols-3 sm:px-4"
+          className="sticky top-0 z-30 -mx-3 mt-2 grid grid-cols-1 justify-items-start gap-0.5 border-y border-border bg-card/95 px-3 py-1.5 shadow-sm backdrop-blur sm:-mx-4 sm:mt-3 sm:grid-cols-3 sm:justify-items-stretch sm:gap-1 sm:px-4 sm:py-2"
           aria-label="Add library progress"
         >
           <li
-            className={`flex min-w-0 items-center gap-1 border py-2 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
+            className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
               stepOneComplete
                 ? "border-green-200 bg-green-50 text-green-900"
                 : "border-blue-300 bg-blue-50 text-blue-950"
@@ -952,7 +952,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex min-w-0 items-center gap-1 border py-2 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
+            className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               stepTwoComplete
                 ? "border-green-200 bg-green-50 text-green-900"
                 : stepOneComplete
@@ -972,7 +972,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex min-w-0 items-center gap-1 border py-2 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
+            className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               stepThreeComplete
                 ? "border-green-200 bg-green-50 text-green-900"
                 : stepTwoComplete
@@ -998,7 +998,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               type="button"
               onClick={useCurrentLocation}
               disabled={locating || saving}
-              className="inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10"
+              className="inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10 sm:text-sm"
             >
               <span aria-hidden="true">📍</span>
               <span className="truncate">
@@ -1245,7 +1245,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                           Book photo {processedBookPhotos.length + 1}
                         </p>
                         <p className="truncate text-[10px] leading-tight text-amber-700">
-                          Select “Recognize Books”
+                          Select Recognize Books
                         </p>
                       </div>
                     </div>
