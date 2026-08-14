@@ -453,13 +453,15 @@ export function CommunityMap({
       return;
     }
 
-    onUploadPhoto(nearbyMatch.library);
+    setSelectedLibrary(nearbyMatch.library);
+    setLibraryPhotoUrl(null);
     setNearbyMatch(null);
   }
 
   function cancelNearbyLibrary() {
     setNearbyMatch(null);
     setSelectedLibrary(null);
+    setUserLocation(null);
   }
 
   function openLibraryFromSearch(library: Library) {
@@ -548,155 +550,159 @@ export function CommunityMap({
   return (
     <div>
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
-        <div className="flex flex-wrap gap-3">
+        <div className="grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-end">
           <button
             type="button"
             onClick={findNearbyLibrary}
             disabled={locating}
-            className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2.5 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {locating
               ? "Finding Nearby Library…"
-              : "📍 Update a Nearby Library"}
+              : "📍 Find Nearby Libraries"}
           </button>
+
+          <div ref={bookSearchAreaRef} className="relative min-w-0">
+            <label
+              htmlFor="book-search"
+              className="sr-only"
+            >
+              Search books by title or author
+            </label>
+
+            <div className="relative">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg"
+              >
+                🔎
+              </span>
+
+              <input
+                id="book-search"
+                type="search"
+                value={bookSearchQuery}
+                onFocus={() => {
+                  if (bookSearchQuery.trim()) {
+                    setIsBookSearchOpen(true);
+                  }
+                }}
+                onChange={(event) => {
+                  setBookSearchQuery(event.target.value);
+                  setIsBookSearchOpen(Boolean(event.target.value.trim()));
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    setIsBookSearchOpen(false);
+                    event.currentTarget.blur();
+                  }
+                }}
+                placeholder="Search books by title or author"
+                className="h-12 w-full rounded-xl border border-border bg-background pl-12 pr-4 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              />
+            </div>
+
+            {bookSearchQuery.trim() && isBookSearchOpen && (
+              <div className="mt-2 max-h-72 overflow-y-auto rounded-xl border border-border bg-background p-2 shadow-sm sm:absolute sm:left-0 sm:right-0 sm:z-20">
+                {bookSearchResults.length === 0 ? (
+                  <p className="px-3 py-4 text-base text-muted-foreground">
+                    No matching books found.
+                  </p>
+                ) : (
+                  <>
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {bookSearchLibraryResults.length}{" "}
+                        {bookSearchLibraryResults.length === 1
+                          ? "library"
+                          : "libraries"}{" "}
+                        · {bookSearchResults.length}{" "}
+                        {bookSearchResults.length === 1 ? "book" : "books"}
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={sortBookSearchByDistance}
+                        disabled={locatingForBookSearch}
+                        className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {locatingForBookSearch
+                          ? "Finding location…"
+                          : userLocation
+                            ? "✓ Sorted by distance"
+                            : "📍 Sort by Distance"}
+                      </button>
+                    </div>
+
+                    {bookSearchLocationError && (
+                      <p className="mx-3 mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                        {bookSearchLocationError}
+                      </p>
+                    )}
+
+                    <ul className="mt-1 space-y-2">
+                      {bookSearchLibraryResults.map((result) => (
+                        <li key={result.library.id}>
+                          <button
+                            type="button"
+                            onClick={() => openLibraryFromSearch(result.library)}
+                            className="w-full min-w-0 rounded-lg bg-secondary/60 px-3 py-3 text-left transition hover:bg-secondary focus:bg-secondary focus:outline-none"
+                          >
+                            <span className="flex max-w-full flex-wrap items-start justify-between gap-2">
+                              <span className="min-w-0 flex-1 break-words text-base font-semibold leading-tight text-blue-700 [overflow-wrap:anywhere]">
+                                📍 {result.library.name}
+                              </span>
+
+                              {result.distanceMeters !== null && (
+                                <span className="shrink-0 rounded-full bg-white px-2 py-1 text-sm font-semibold text-gray-700">
+                                  {(result.distanceMeters / 1609.344).toFixed(1)} mi
+                                </span>
+                              )}
+                            </span>
+
+                            {result.library.address && (
+                              <span className="mt-1 block max-w-full break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+                                {result.library.address}
+                              </span>
+                            )}
+
+                            <span className="mt-2 block space-y-1 border-t border-border pt-2">
+                              {result.books.map((book) => (
+                                <span key={book.key} className="block">
+                                  <span className="block max-w-full break-words text-base font-medium leading-tight text-foreground [overflow-wrap:anywhere]">
+                                    {book.title}
+                                  </span>
+
+                                  {book.author && (
+                                    <span className="mt-0.5 block max-w-full break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
+                                      {book.author}
+                                    </span>
+                                  )}
+                                </span>
+                              ))}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
 
           <button
             type="button"
             onClick={onAddLibrary}
-            className="inline-flex items-center justify-center rounded-xl border border-border bg-background px-4 py-2.5 font-medium text-foreground hover:bg-secondary"
+            className="inline-flex h-12 items-center justify-self-end px-1 text-sm font-medium text-muted-foreground underline-offset-4 transition hover:text-foreground hover:underline sm:whitespace-nowrap"
           >
-            ＋ Add a New Library
+            ＋ Add Library
           </button>
         </div>
 
-        <div ref={bookSearchAreaRef} className="mt-4">
-          <label
-            htmlFor="book-search"
-            className="block text-base font-semibold text-foreground"
-          >
-            Search the Library Inventories
-          </label>
-
-          <div className="relative mt-2">
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg"
-            >
-              🔎
-            </span>
-
-            <input
-              id="book-search"
-              type="search"
-              value={bookSearchQuery}
-              onFocus={() => {
-                if (bookSearchQuery.trim()) {
-                  setIsBookSearchOpen(true);
-                }
-              }}
-              onChange={(event) => {
-                setBookSearchQuery(event.target.value);
-                setIsBookSearchOpen(Boolean(event.target.value.trim()));
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Escape") {
-                  setIsBookSearchOpen(false);
-                  event.currentTarget.blur();
-                }
-              }}
-              placeholder="Search by book title or author"
-              className="h-12 w-full rounded-xl border border-border bg-background pl-12 pr-4 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-            />
-          </div>
-
-          {bookSearchQuery.trim() && isBookSearchOpen && (
-            <div className="mt-2 max-h-72 overflow-y-auto rounded-xl border border-border bg-background p-2 shadow-sm">
-              {bookSearchResults.length === 0 ? (
-                <p className="px-3 py-4 text-base text-muted-foreground">
-                  No matching books found.
-                </p>
-              ) : (
-                <>
-                  <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {bookSearchLibraryResults.length}{" "}
-                      {bookSearchLibraryResults.length === 1
-                        ? "library"
-                        : "libraries"}{" "}
-                      · {bookSearchResults.length}{" "}
-                      {bookSearchResults.length === 1 ? "book" : "books"}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={sortBookSearchByDistance}
-                      disabled={locatingForBookSearch}
-                      className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {locatingForBookSearch
-                        ? "Finding location…"
-                        : userLocation
-                          ? "✓ Sorted by distance"
-                          : "📍 Sort by Distance"}
-                    </button>
-                  </div>
-
-                  {bookSearchLocationError && (
-                    <p className="mx-3 mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                      {bookSearchLocationError}
-                    </p>
-                  )}
-
-                  <ul className="mt-1 space-y-2">
-                    {bookSearchLibraryResults.map((result) => (
-                      <li key={result.library.id}>
-                        <button
-                          type="button"
-                          onClick={() => openLibraryFromSearch(result.library)}
-                          className="w-full min-w-0 rounded-lg bg-secondary/60 px-3 py-3 text-left transition hover:bg-secondary focus:bg-secondary focus:outline-none"
-                        >
-                          <span className="flex max-w-full flex-wrap items-start justify-between gap-2">
-                            <span className="min-w-0 flex-1 break-words text-base font-semibold leading-tight text-blue-700 [overflow-wrap:anywhere]">
-                              📍 {result.library.name}
-                            </span>
-
-                            {result.distanceMeters !== null && (
-                              <span className="shrink-0 rounded-full bg-white px-2 py-1 text-sm font-semibold text-gray-700">
-                                {(result.distanceMeters / 1609.344).toFixed(1)} mi
-                              </span>
-                            )}
-                          </span>
-
-                          {result.library.address && (
-                            <span className="mt-1 block max-w-full break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
-                              {result.library.address}
-                            </span>
-                          )}
-
-                          <span className="mt-2 block space-y-1 border-t border-border pt-2">
-                            {result.books.map((book) => (
-                              <span key={book.key} className="block">
-                                <span className="block max-w-full break-words text-base font-medium leading-tight text-foreground [overflow-wrap:anywhere]">
-                                  {book.title}
-                                </span>
-
-                                {book.author && (
-                                  <span className="mt-0.5 block max-w-full break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">
-                                    {book.author}
-                                  </span>
-                                )}
-                              </span>
-                            ))}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
-          )}
-        </div>
+        <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
+          Or select a library directly on the map.
+        </p>
 
         {locationError && (
           <div
@@ -708,9 +714,9 @@ export function CommunityMap({
             <button
               type="button"
               onClick={onAddLibrary}
-              className="mt-3 inline-flex rounded-lg bg-primary px-3 py-2 font-medium text-primary-foreground"
+              className="mt-3 inline-flex text-sm font-medium text-amber-900 underline underline-offset-4"
             >
-              Add a New Library
+              ＋ Add Library
             </button>
           </div>
         )}
@@ -732,9 +738,9 @@ export function CommunityMap({
               <AdvancedMarker
                 position={userLocation}
                 title="You are here"
-                zIndex={1000}
+                zIndex={0}
               >
-                <div className="relative flex size-8 items-center justify-center">
+                <div className="pointer-events-none relative flex size-8 items-center justify-center">
                   <span className="absolute size-8 animate-ping rounded-full bg-blue-500 opacity-40" />
 
                   <span className="relative size-4 rounded-full border-2 border-white bg-blue-600 shadow-lg" />
@@ -820,7 +826,7 @@ export function CommunityMap({
                             onClick={() => onUploadPhoto(selectedLibrary)}
                             className="inline-flex h-11 w-full items-center justify-center gap-1 rounded-xl bg-blue-600 px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:h-8"
                           >
-                            📷 Update Inventory
+                            📷 Update This Inventory
                           </button>
 
                           <p className="max-w-full break-words rounded-lg bg-gray-100 px-2.5 py-2 text-xs font-medium text-gray-700">
@@ -1058,18 +1064,13 @@ export function CommunityMap({
               from your current location.
             </p>
 
-            <p className="mt-2 text-sm">
-              Confirm that the red library marker matches the blue “You are
-              here” dot.
-            </p>
-
             <div className="mt-4 flex flex-wrap gap-3">
               <button
                 type="button"
                 onClick={confirmNearbyLibrary}
                 className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               >
-                Yes, Update This Library
+                Choose It!
               </button>
 
               <button

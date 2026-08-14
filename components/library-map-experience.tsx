@@ -104,11 +104,6 @@ export function LibraryMapExperience() {
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Add a New Library</DialogTitle>
-
-            <DialogDescription>
-              Add the library&apos;s location, a photo of the library box, and
-              photos of its books to create the first inventory.
-            </DialogDescription>
           </DialogHeader>
 
           <AddLibraryForm onLibraryAdded={handleLibraryAdded} />
