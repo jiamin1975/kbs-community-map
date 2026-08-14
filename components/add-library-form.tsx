@@ -930,7 +930,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         </div>
 
         <ol
-          className="sticky top-0 z-30 -mx-3 mt-2 grid grid-cols-3 gap-1 border-y border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur sm:-mx-4 sm:mt-3 sm:px-4"
+          className="sticky top-0 z-30 -mx-3 mt-2 grid grid-cols-1 gap-1 border-y border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur sm:-mx-4 sm:mt-3 sm:grid-cols-3 sm:px-4"
           aria-label="Add library progress"
         >
           <li
@@ -943,9 +943,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
               ①
             </span>
-            <span className="min-w-0 flex-1 truncate text-xs font-semibold sm:text-sm">
-              <span className="sm:hidden">Location</span>
-              <span className="hidden sm:inline">Confirm Location</span>
+            <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
+              Confirm Location
             </span>
             {stepOneComplete && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
@@ -953,7 +952,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex min-w-0 items-center gap-1 border py-2 pl-4 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 ${
+            className={`flex min-w-0 items-center gap-1 border py-2 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               stepTwoComplete
                 ? "border-green-200 bg-green-50 text-green-900"
                 : stepOneComplete
@@ -964,9 +963,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
               ②
             </span>
-            <span className="min-w-0 flex-1 truncate text-xs font-semibold sm:text-sm">
-              <span className="sm:hidden">Photo</span>
-              <span className="hidden sm:inline">Add Library Photo</span>
+            <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
+              Add Library Photo
             </span>
             {stepTwoComplete && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
@@ -974,7 +972,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex min-w-0 items-center gap-1 border py-2 pl-4 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 ${
+            className={`flex min-w-0 items-center gap-1 border py-2 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               stepThreeComplete
                 ? "border-green-200 bg-green-50 text-green-900"
                 : stepTwoComplete
@@ -985,9 +983,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
               ③
             </span>
-            <span className="min-w-0 flex-1 truncate text-xs font-semibold sm:text-sm">
-              <span className="sm:hidden">Books</span>
-              <span className="hidden sm:inline">Add Book Photos</span>
+            <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
+              Add Book Photos
             </span>
             {stepThreeComplete && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
