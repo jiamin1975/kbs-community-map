@@ -358,12 +358,12 @@ export function BookPhotoTester({
 
       {!saved && (
         <div className="mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl bg-violet-50/50 p-3">
-          <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-            <p className="text-xs text-muted-foreground max-sm:!text-base">
+          <div className="flex flex-col items-start gap-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            <p className="text-xs leading-tight text-muted-foreground max-sm:!text-sm">
               AI will recognize the visible titles.
             </p>
             {sessionBooks.length > 0 && (
-              <p className="text-xs font-medium text-green-700 max-sm:!text-base">
+              <p className="text-xs font-medium leading-tight text-green-700 max-sm:!text-sm">
                 ✓ {sessionBooks.length} book
                 {sessionBooks.length === 1 ? "" : "s"} found
               </p>
