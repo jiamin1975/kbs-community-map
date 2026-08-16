@@ -31,7 +31,6 @@ type RecognitionResult = {
 }
 
 type ProcessedBookPhoto = {
-  name: string
   url: string
 }
 
@@ -238,7 +237,6 @@ export function BookPhotoTester({
         setProcessedBookPhotos((currentPhotos) => [
           ...currentPhotos,
           {
-            name: file.name,
             url: previewUrl,
           },
         ])
@@ -386,7 +384,7 @@ export function BookPhotoTester({
               htmlFor="update-book-photo"
               className="inline-flex h-12 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-blue-700 bg-blue-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:px-2 sm:text-sm"
             >
-              📚 {photosProcessed > 0 ? "Choose Another Photo" : "Choose Book Photo"}
+              📚 {photosProcessed > 0 ? "Add Another Photo" : "Add a Shelf Photo"}
             </label>
 
             <button
@@ -425,11 +423,8 @@ export function BookPhotoTester({
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2">
-                      <p className="font-semibold">
+                      <p className="text-sm font-medium">
                         Book photo {processedBookPhotos.length + 1}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {file.name}
                       </p>
                     </div>
                   </div>
@@ -452,11 +447,8 @@ export function BookPhotoTester({
                         className="h-40 w-full bg-gray-100 object-cover"
                       />
                       <div className="p-2">
-                        <p className="font-semibold">Book photo {number}</p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {photo.name}
-                        </p>
-                        <p className="mt-1 font-semibold text-green-700">
+                        <p className="text-sm font-medium">Book photo {number}</p>
+                        <p className="mt-0.5 text-xs font-medium text-green-700">
                           ✓ Recognition Done
                         </p>
                       </div>
@@ -476,11 +468,8 @@ export function BookPhotoTester({
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2.5">
-                      <p className="font-semibold">Book photo {index + 1}</p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {photo.name}
-                      </p>
-                      <p className="mt-1 font-semibold text-green-700">
+                      <p className="text-sm font-medium">Book photo {index + 1}</p>
+                      <p className="mt-0.5 text-xs font-medium text-green-700">
                         ✓ Recognition Done
                       </p>
                     </div>
@@ -495,11 +484,8 @@ export function BookPhotoTester({
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2.5">
-                      <p className="font-semibold">
+                      <p className="text-sm font-medium">
                         Book photo {processedBookPhotos.length + 1}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {file.name}
                       </p>
                     </div>
                   </div>
@@ -520,14 +506,22 @@ export function BookPhotoTester({
                   .sort((firstBook, secondBook) =>
                     firstBook.title.localeCompare(secondBook.title),
                   )
-                  .map((book) => (
-                    <li key={normalizeBookTitle(book.title)} className="px-3 py-2 sm:px-2 sm:py-1">
-                      <p className="text-base font-semibold leading-tight sm:text-[11px]">{book.title}</p>
-                      {book.author && (
-                        <p className="mt-1 text-sm leading-tight text-green-800 sm:mt-0 sm:text-[10px]">
-                          {book.author}
-                        </p>
-                      )}
+                  .map((book, index) => (
+                    <li
+                      key={normalizeBookTitle(book.title)}
+                      className="flex items-start gap-2 px-3 py-2 sm:px-2 sm:py-1"
+                    >
+                      <span className="w-5 shrink-0 pt-0.5 text-right text-xs font-bold text-green-700 sm:w-4 sm:text-[10px]">
+                        {index + 1}.
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-base font-semibold leading-tight sm:text-[11px]">{book.title}</p>
+                        {book.author && (
+                          <p className="mt-1 text-sm leading-tight text-green-800 sm:mt-0 sm:text-[10px]">
+                            {book.author}
+                          </p>
+                        )}
+                      </div>
                     </li>
                   ))}
               </ul>
@@ -540,22 +534,20 @@ export function BookPhotoTester({
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <label
-              htmlFor="inventory-updated-by"
-              className="shrink-0 text-xs font-medium text-muted-foreground"
-            >
-              Contributor name <span className="font-normal">(optional)</span>
+          <div className="flex justify-end">
+            <label htmlFor="inventory-updated-by" className="sr-only">
+              Contributor name (optional)
             </label>
+
             <input
               id="inventory-updated-by"
               type="text"
               value={updatedBy}
               onChange={(event) => setUpdatedBy(event.target.value)}
               maxLength={60}
-              placeholder="Your name"
+              placeholder="Contributor name (optional)"
               disabled={saving}
-              className="h-8 w-40 rounded-lg border border-border bg-card px-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-48"
+              className="h-8 w-56 rounded-lg border border-border/80 bg-card px-2.5 text-xs text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 

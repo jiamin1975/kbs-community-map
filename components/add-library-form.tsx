@@ -936,7 +936,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
               stepOneComplete
-                ? "border-green-200 bg-green-50 text-green-900"
+                ? "border-green-500 bg-green-100 text-green-950 shadow-sm"
                 : "border-blue-300 bg-blue-50 text-blue-950"
             }`}
           >
@@ -947,14 +947,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               Confirm Location
             </span>
             {stepOneComplete && (
-              <span className="shrink-0 text-xs font-semibold">✓</span>
+              <span className="shrink-0 text-sm font-bold text-green-700">✓</span>
             )}
           </li>
 
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               stepTwoComplete
-                ? "border-green-200 bg-green-50 text-green-900"
+                ? "border-green-500 bg-green-100 text-green-950 shadow-sm"
                 : stepOneComplete
                   ? "border-blue-300 bg-blue-50 text-blue-950"
                   : "border-gray-200 bg-gray-50 text-gray-500"
@@ -964,17 +964,17 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               ②
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
-              Add Library Photo
+              Add a Library Photo
             </span>
             {stepTwoComplete && (
-              <span className="shrink-0 text-xs font-semibold">✓</span>
+              <span className="shrink-0 text-sm font-bold text-green-700">✓</span>
             )}
           </li>
 
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               stepThreeComplete
-                ? "border-green-200 bg-green-50 text-green-900"
+                ? "border-green-500 bg-green-100 text-green-950 shadow-sm"
                 : stepTwoComplete
                   ? "border-blue-300 bg-blue-50 text-blue-950"
                   : "border-gray-200 bg-gray-50 text-gray-500"
@@ -984,10 +984,10 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               ③
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
-              Add Book Photos
+              Add a Shelf Photo
             </span>
             {stepThreeComplete && (
-              <span className="shrink-0 text-xs font-semibold">✓</span>
+              <span className="shrink-0 text-sm font-bold text-green-700">✓</span>
             )}
           </li>
         </ol>
@@ -1100,15 +1100,15 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "clear" && (
             <div
-              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-normal text-green-800"
+              className="rounded-xl border border-green-400 bg-green-100 px-3 py-2 text-xs font-bold text-green-900"
               role="status"
             >
               {locationAdjusted ? (
                 <>
-                  ✓ Library location adjusted. No duplicate found. Continue to Add Library Photo.
+                  ✓ Library location adjusted. No duplicate found. Continue to Add a Library Photo.
                 </>
               ) : (
-                <>✓ No duplicate found. Continue to Add Library Photo.</>
+                <>✓ No duplicate found. Continue to Add a Library Photo.</>
               )}
             </div>
           )}
@@ -1162,7 +1162,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   aria-disabled={!stepOneComplete}
                   className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:text-sm"
                 >
-                  📷 Choose Library Photo
+                  📷 Add a Library Photo
                 </label>
               </>
             ) : (
@@ -1182,9 +1182,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
                     <div className="p-1.5">
                       <p className="text-[11px] font-semibold leading-tight">Library photo</p>
-                      <p className="truncate text-[9px] leading-tight text-muted-foreground max-sm:!text-[11px]">
-                        {photo?.name}
-                      </p>
 
                       <div className="mt-1 flex items-center gap-2.5">
                         <label
@@ -1222,9 +1219,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <div className="p-1.5">
                         <p className="text-[11px] font-semibold leading-tight">
                           Book photo {index + 1}
-                        </p>
-                        <p className="truncate text-[9px] leading-tight text-muted-foreground max-sm:!text-[11px]">
-                          {bookPhotoPreview.name}
                         </p>
                         <p className="mt-1 text-[9px] font-semibold leading-tight text-green-700">
                           ✓ Recognition Done
@@ -1290,8 +1284,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               >
                 📚{" "}
                 {bookPhotosProcessed > 0
-                  ? "Choose Another Photo"
-                  : "Choose Book Photo"}
+                  ? "Add Another Shelf Photo"
+                  : "Add a Shelf Photo"}
               </label>
 
               <button
@@ -1322,9 +1316,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <p className="font-semibold">
                         Book photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="truncate text-[9px] text-muted-foreground max-sm:!text-[11px]">
-                        {bookPhoto.name}
-                      </p>
                     </div>
                   </div>
                 )}
@@ -1347,9 +1338,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       />
                       <div className="p-2">
                         <p className="font-semibold">Book photo {number}</p>
-                        <p className="truncate text-[9px] text-muted-foreground max-sm:!text-[11px]">
-                          {bookPhotoPreview.name}
-                        </p>
                         <p className="mt-1 font-semibold text-green-700">
                           ✓ Recognition Done
                         </p>
