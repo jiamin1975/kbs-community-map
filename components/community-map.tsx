@@ -1089,7 +1089,7 @@ export function CommunityMap({
         )}
 
         {nearbyMatch && (
-          <div className="absolute inset-x-3 bottom-3 z-20 rounded-2xl border border-blue-300 bg-white/95 p-4 text-blue-950 shadow-xl backdrop-blur sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2">
+          <div className="absolute inset-x-3 bottom-14 z-20 rounded-2xl border border-blue-300 bg-white/95 p-4 text-blue-950 shadow-xl backdrop-blur sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2">
             <p className="text-sm font-semibold">Nearest library found</p>
 
             <p className="mt-1 text-lg font-semibold">
