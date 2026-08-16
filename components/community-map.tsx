@@ -800,7 +800,7 @@ export function CommunityMap({
                         <img
                           src={libraryPhotoUrl}
                           alt={selectedLibrary.name}
-                          className="-mt-2 mb-3 block max-h-44 w-full max-w-full rounded-lg bg-gray-100 object-contain brightness-110 contrast-105 sm:mt-0 sm:mb-0 sm:h-56 sm:max-h-none"
+                          className="-mt-2 mb-3 block max-h-44 w-full max-w-full rounded-lg bg-transparent object-contain brightness-110 contrast-105 sm:mt-0 sm:mb-0 sm:h-56 sm:max-h-none"
                         />
                       )}
 
@@ -958,7 +958,7 @@ export function CommunityMap({
                 <img
                   src={libraryPhotoUrl}
                   alt={selectedLibrary.name}
-                  className="mb-3 block h-48 w-full rounded-xl bg-gray-100 object-contain brightness-110 contrast-105"
+                  className="mb-3 block h-48 w-full rounded-xl bg-transparent object-contain brightness-110 contrast-105"
                 />
               )}
 
