@@ -36,6 +36,10 @@ function convertLibrary(
               .toDate()
               .toLocaleString()
           : "Not yet updated",
+    updatedBy:
+      typeof data.updatedBy === "string" && data.updatedBy.trim()
+        ? data.updatedBy.trim()
+        : undefined,
     verified: data.verified ?? false,
 
     photoFile:

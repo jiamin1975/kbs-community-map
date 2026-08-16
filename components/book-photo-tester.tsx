@@ -122,6 +122,7 @@ export function BookPhotoTester({
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [updatedBy, setUpdatedBy] = useState("")
 
   useEffect(() => {
     return () => {
@@ -304,6 +305,7 @@ export function BookPhotoTester({
                 ? ""
                 : "s"
             }.`,
+          updatedBy: updatedBy.trim() || null,
         },
       )
 
@@ -536,6 +538,25 @@ export function BookPhotoTester({
                 </p>
               </div>
             )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <label
+              htmlFor="inventory-updated-by"
+              className="shrink-0 text-xs font-medium text-muted-foreground"
+            >
+              Contributor name <span className="font-normal">(optional)</span>
+            </label>
+            <input
+              id="inventory-updated-by"
+              type="text"
+              value={updatedBy}
+              onChange={(event) => setUpdatedBy(event.target.value)}
+              maxLength={60}
+              placeholder="Your name"
+              disabled={saving}
+              className="h-8 w-40 rounded-lg border border-border bg-card px-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-48"
+            />
           </div>
 
           <button

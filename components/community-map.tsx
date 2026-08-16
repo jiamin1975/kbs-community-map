@@ -559,7 +559,7 @@ export function CommunityMap({
           >
             {locating
               ? "Finding Nearby Library…"
-              : "📍 Find Nearby Libraries"}
+              : "📍 Find a Library to Update"}
           </button>
 
           <div ref={bookSearchAreaRef} className="relative min-w-0">
@@ -701,7 +701,7 @@ export function CommunityMap({
         </div>
 
         <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-          Or select a library directly on the map.
+          Every photo helps someone discover a free educational resource.
         </p>
 
         {locationError && (
@@ -834,6 +834,12 @@ export function CommunityMap({
                             <span className="font-semibold">Last updated:</span>{" "}
                             {selectedLibrary.lastUpdated}
                           </p>
+                          {"updatedBy" in selectedLibrary && selectedLibrary.updatedBy && (
+                            <p className="max-w-full break-words px-1 text-xs text-gray-600">
+                              <span className="font-semibold">Updated by:</span>{" "}
+                              {String(selectedLibrary.updatedBy)}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -892,17 +898,22 @@ export function CommunityMap({
                             return (
                               <li
                                 key={`${title}-${index}`}
-                                className="w-full min-w-0 max-w-full overflow-hidden rounded-lg bg-gray-100 px-3 py-2 sm:rounded-md sm:px-2.5 sm:py-1.5"
+                                className="flex w-full min-w-0 max-w-full items-start gap-2 overflow-hidden rounded-lg bg-gray-100 px-3 py-2 sm:rounded-md sm:px-2.5 sm:py-1.5"
                               >
-                                <p className="w-full min-w-0 max-w-full whitespace-normal break-words text-base font-medium leading-tight [overflow-wrap:anywhere] sm:text-sm">
-                                  {title}
-                                </p>
-
-                                {author && (
-                                  <p className="mt-1 w-full min-w-0 max-w-full whitespace-normal break-words text-sm leading-tight text-gray-500 [overflow-wrap:anywhere] sm:mt-0.5 sm:text-[11px]">
-                                    {author}
+                                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-gray-500 shadow-sm sm:size-5 sm:text-[10px]">
+                                  {index + 1}
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <p className="w-full min-w-0 max-w-full whitespace-normal break-words text-base font-medium leading-tight [overflow-wrap:anywhere] sm:text-sm">
+                                    {title}
                                   </p>
-                                )}
+
+                                  {author && (
+                                    <p className="mt-1 w-full min-w-0 max-w-full whitespace-normal break-words text-sm leading-tight text-gray-500 [overflow-wrap:anywhere] sm:mt-0.5 sm:text-[11px]">
+                                      {author}
+                                    </p>
+                                  )}
+                                </div>
                               </li>
                             );
                           })}
@@ -974,6 +985,12 @@ export function CommunityMap({
                 <span className="font-semibold">Last updated:</span>{" "}
                 {selectedLibrary.lastUpdated}
               </p>
+              {"updatedBy" in selectedLibrary && selectedLibrary.updatedBy && (
+                <p className="mt-1 max-w-full whitespace-normal break-words px-1 text-sm text-gray-600 [overflow-wrap:anywhere]">
+                  <span className="font-semibold">Updated by:</span>{" "}
+                  {String(selectedLibrary.updatedBy)}
+                </p>
+              )}
 
               <p className="mt-5 text-xl font-semibold">Current Inventory</p>
 
@@ -1026,17 +1043,22 @@ export function CommunityMap({
                       return (
                         <li
                           key={`${title}-${index}`}
-                          className="min-w-0 overflow-hidden rounded-xl bg-gray-100 px-4 py-3"
+                          className="flex min-w-0 items-start gap-3 overflow-hidden rounded-xl bg-gray-100 px-4 py-3"
                         >
-                          <p className="max-w-full whitespace-normal break-words text-lg font-medium leading-tight [overflow-wrap:anywhere]">
-                            {title}
-                          </p>
-
-                          {author && (
-                            <p className="mt-1 max-w-full whitespace-normal break-words text-base leading-tight text-gray-500 [overflow-wrap:anywhere]">
-                              {author}
+                          <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-gray-500 shadow-sm">
+                            {index + 1}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="max-w-full whitespace-normal break-words text-lg font-medium leading-tight [overflow-wrap:anywhere]">
+                              {title}
                             </p>
-                          )}
+
+                            {author && (
+                              <p className="mt-1 max-w-full whitespace-normal break-words text-base leading-tight text-gray-500 [overflow-wrap:anywhere]">
+                                {author}
+                              </p>
+                            )}
+                          </div>
                         </li>
                       );
                     })}

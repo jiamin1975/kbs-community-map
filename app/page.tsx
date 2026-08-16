@@ -1,9 +1,4 @@
-import {
-  BookOpen,
-  Camera,
-  MapPinned,
-  ScanLine,
-} from "lucide-react"
+import { Camera, MapPinned, ScanLine, Search } from "lucide-react"
 
 import { LibraryMapExperience } from "@/components/library-map-experience"
 import { SiteHeader } from "@/components/site-header"
@@ -14,33 +9,36 @@ export default function Page() {
       <SiteHeader />
 
       <main className="flex-1">
-        <section className="mx-auto grid max-w-6xl gap-5 px-4 pb-7 pt-8 sm:px-6 lg:grid-cols-[1.35fr_1fr] lg:items-center lg:gap-x-10 lg:gap-y-5">
+        <section className="mx-auto grid max-w-6xl gap-5 px-4 pb-7 pt-4 sm:px-6 sm:pt-5 lg:grid-cols-[1.35fr_1fr] lg:items-center lg:gap-x-10 lg:gap-y-5">
           <h1 className="max-w-full text-balance font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl lg:col-span-2 lg:whitespace-nowrap">
-            Make Hidden Educational Resources Easier to Find
+            Make Community Library Resources Easier to Discover
           </h1>
 
-          <p className="max-w-3xl text-pretty text-sm font-medium leading-relaxed text-muted-foreground sm:text-base">
-            Photograph the books inside a community library. AI identifies
-            the titles and updates a shared inventory so more families can
-            discover and use them.
-          </p>
+          <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-violet-50 px-4 py-3">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
+              Community-Powered Discovery
+            </p>
+            <p className="mt-2 text-base font-semibold leading-snug text-foreground sm:text-lg">
+              One shelf photo helps the whole community discover its books.
+            </p>
+          </div>
 
           <ul className="grid grid-cols-1 gap-2 text-sm text-foreground min-[420px]:grid-cols-2">
             <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
               <MapPinned className="size-4 shrink-0 text-blue-600" aria-hidden="true" />
-              <span>Find nearby libraries</span>
+              <span>Find a nearby library</span>
             </li>
             <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
               <Camera className="size-4 shrink-0 text-blue-600" aria-hidden="true" />
-              <span>Photograph library books</span>
+              <span>Photograph its books</span>
             </li>
             <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
               <ScanLine className="size-4 shrink-0 text-violet-600" aria-hidden="true" />
-              <span>AI recognizes books</span>
+              <span>AI updates the inventory</span>
             </li>
             <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-              <BookOpen className="size-4 shrink-0 text-green-600" aria-hidden="true" />
-              <span>Find free books</span>
+              <Search className="size-4 shrink-0 text-green-600" aria-hidden="true" />
+              <span>Search and find books</span>
             </li>
           </ul>
         </section>
