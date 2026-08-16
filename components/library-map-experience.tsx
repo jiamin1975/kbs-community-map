@@ -80,9 +80,14 @@ export function LibraryMapExperience() {
           <DialogHeader>
             <DialogTitle>Update Library Inventory</DialogTitle>
 
-            <DialogDescription>
-              Add current photos of the books on the shelf. AI will recognize
-              the visible titles and update this library&apos;s inventory.
+            <DialogDescription asChild>
+              <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                <li>Add current photos of the books on the shelf.</li>
+                <li>
+                  AI will recognize the visible titles and update this
+                  library&apos;s inventory.
+                </li>
+              </ul>
             </DialogDescription>
           </DialogHeader>
 

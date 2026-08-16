@@ -55,6 +55,14 @@ function calculateDistanceMeters(
   return earthRadiusMeters * angularDistance;
 }
 
+function getSearchWords(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase()
+    .match(/[\p{L}\p{N}]+/gu) ?? [];
+}
+
 export function CommunityMap({
   onUploadPhoto,
   onAddLibrary,
@@ -98,9 +106,9 @@ export function CommunityMap({
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   const bookSearchResults = useMemo(() => {
-    const normalizedQuery = bookSearchQuery.trim().toLocaleLowerCase();
+    const queryWords = getSearchWords(bookSearchQuery);
 
-    if (!normalizedQuery) {
+    if (queryWords.length === 0) {
       return [];
     }
 
@@ -132,11 +140,13 @@ export function CommunityMap({
           };
         }),
       )
-      .filter(
-        ({ title, author }) =>
-          title.toLocaleLowerCase().includes(normalizedQuery) ||
-          author?.toLocaleLowerCase().includes(normalizedQuery),
-      )
+      .filter(({ title, author }) => {
+        const searchableWords = new Set(
+          getSearchWords(`${title} ${author ?? ""}`),
+        );
+
+        return queryWords.every((queryWord) => searchableWords.has(queryWord));
+      })
       .sort((firstResult, secondResult) =>
         firstResult.title.localeCompare(secondResult.title),
       );
@@ -666,9 +676,9 @@ export function CommunityMap({
                               </span>
                             )}
 
-                            <span className="mt-2 block space-y-1 border-t border-border pt-2">
+                            <span className="mt-2 block divide-y divide-border border-t border-border">
                               {result.books.map((book) => (
-                                <span key={book.key} className="block">
+                                <span key={book.key} className="block py-2 first:pt-2 last:pb-0">
                                   <span className="block max-w-full break-words text-base font-medium leading-tight text-foreground [overflow-wrap:anywhere]">
                                     {book.title}
                                   </span>

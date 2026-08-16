@@ -31,6 +31,7 @@ type RecognitionResult = {
 }
 
 type ProcessedBookPhoto = {
+  name: string
   url: string
 }
 
@@ -237,6 +238,7 @@ export function BookPhotoTester({
         setProcessedBookPhotos((currentPhotos) => [
           ...currentPhotos,
           {
+            name: file.name,
             url: previewUrl,
           },
         ])
@@ -358,17 +360,14 @@ export function BookPhotoTester({
 
       {!saved && (
         <div className="mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl bg-violet-50/50 p-3">
-          <div className="flex flex-col items-start gap-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-            <p className="text-xs leading-normal text-muted-foreground max-sm:!text-sm">
-              AI will recognize the visible titles.
-            </p>
-            {sessionBooks.length > 0 && (
+          {sessionBooks.length > 0 && (
+            <div className="flex justify-end">
               <p className="text-xs font-medium leading-normal text-green-700 max-sm:!text-sm">
                 ✓ {sessionBooks.length} book
                 {sessionBooks.length === 1 ? "" : "s"} found
               </p>
-            )}
-          </div>
+            </div>
+          )}
 
           <input
             id="update-book-photo"
@@ -384,7 +383,9 @@ export function BookPhotoTester({
               htmlFor="update-book-photo"
               className="inline-flex h-12 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-blue-700 bg-blue-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:px-2 sm:text-sm"
             >
-              📚 {photosProcessed > 0 ? "Add Another Photo" : "Add a Shelf Photo"}
+              📚 {photosProcessed > 0
+                ? "Add Another Shelf Photo"
+                : "Add a Shelf Photo"}
             </label>
 
             <button
@@ -423,8 +424,11 @@ export function BookPhotoTester({
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2">
-                      <p className="text-sm font-medium">
+                      <p className="font-semibold">
                         Book photo {processedBookPhotos.length + 1}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {file.name}
                       </p>
                     </div>
                   </div>
@@ -447,8 +451,11 @@ export function BookPhotoTester({
                         className="h-40 w-full bg-gray-100 object-cover"
                       />
                       <div className="p-2">
-                        <p className="text-sm font-medium">Book photo {number}</p>
-                        <p className="mt-0.5 text-xs font-medium text-green-700">
+                        <p className="font-semibold">Book photo {number}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {photo.name}
+                        </p>
+                        <p className="mt-1 font-semibold text-green-700">
                           ✓ Recognition Done
                         </p>
                       </div>
@@ -468,8 +475,11 @@ export function BookPhotoTester({
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2.5">
-                      <p className="text-sm font-medium">Book photo {index + 1}</p>
-                      <p className="mt-0.5 text-xs font-medium text-green-700">
+                      <p className="font-semibold">Book photo {index + 1}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {photo.name}
+                      </p>
+                      <p className="mt-1 font-semibold text-green-700">
                         ✓ Recognition Done
                       </p>
                     </div>
@@ -484,8 +494,11 @@ export function BookPhotoTester({
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2.5">
-                      <p className="text-sm font-medium">
+                      <p className="font-semibold">
                         Book photo {processedBookPhotos.length + 1}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {file.name}
                       </p>
                     </div>
                   </div>
@@ -500,35 +513,27 @@ export function BookPhotoTester({
             </p>
 
             {sessionBooks.length > 0 ? (
-              <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto text-green-950 sm:max-h-52">
+              <ol className="max-h-64 list-decimal divide-y divide-green-200 overflow-y-auto pl-9 pr-2 text-green-950 marker:font-bold marker:text-green-700 sm:max-h-52 sm:pl-8">
                 {sessionBooks
                   .slice()
                   .sort((firstBook, secondBook) =>
                     firstBook.title.localeCompare(secondBook.title),
                   )
-                  .map((book, index) => (
-                    <li
-                      key={normalizeBookTitle(book.title)}
-                      className="flex items-start gap-2 px-3 py-2 sm:px-2 sm:py-1"
-                    >
-                      <span className="w-5 shrink-0 pt-0.5 text-right text-xs font-bold text-green-700 sm:w-4 sm:text-[10px]">
-                        {index + 1}.
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-base font-semibold leading-tight sm:text-[11px]">{book.title}</p>
-                        {book.author && (
-                          <p className="mt-1 text-sm leading-tight text-green-800 sm:mt-0 sm:text-[10px]">
-                            {book.author}
-                          </p>
-                        )}
-                      </div>
+                  .map((book) => (
+                    <li key={normalizeBookTitle(book.title)} className="py-2 pl-1 sm:py-1">
+                      <p className="text-base font-semibold leading-tight sm:text-[11px]">{book.title}</p>
+                      {book.author && (
+                        <p className="mt-1 text-sm leading-tight text-green-800 sm:mt-0 sm:text-[10px]">
+                          {book.author}
+                        </p>
+                      )}
                     </li>
                   ))}
-              </ul>
+              </ol>
             ) : (
               <div className="flex h-24 items-center justify-center px-3 text-center">
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Choose a book photo, then select Recognize Books.
+                  Add a shelf photo, then select Recognize Books.
                 </p>
               </div>
             )}
@@ -538,7 +543,6 @@ export function BookPhotoTester({
             <label htmlFor="inventory-updated-by" className="sr-only">
               Contributor name (optional)
             </label>
-
             <input
               id="inventory-updated-by"
               type="text"
