@@ -19,7 +19,7 @@ export default function Page() {
               Community-Powered Discovery
             </p>
             <p className="mt-2 text-base font-semibold leading-snug text-foreground sm:text-lg">
-              One shelf photo helps the whole community discover its books.
+              Photograph shelves regularly. Keep their books discoverable for everyone.
             </p>
           </div>
 
@@ -30,7 +30,7 @@ export default function Page() {
             </li>
             <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
               <Camera className="size-4 shrink-0 text-blue-600" aria-hidden="true" />
-              <span>Photograph its books</span>
+              <span>Photograph the shelf</span>
             </li>
             <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
               <ScanLine className="size-4 shrink-0 text-violet-600" aria-hidden="true" />
