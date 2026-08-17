@@ -1,7 +1,25 @@
-import { Camera, MapPinned, ScanLine, Search } from "lucide-react"
+import { Camera, MapPinned, ScanLine } from "lucide-react"
 
 import { LibraryMapExperience } from "@/components/library-map-experience"
 import { SiteHeader } from "@/components/site-header"
+
+const discoverySteps = [
+  {
+    label: "Find a nearby library",
+    icon: MapPinned,
+    iconClassName: "text-blue-600",
+  },
+  {
+    label: "Photograph the shelf",
+    icon: Camera,
+    iconClassName: "text-blue-600",
+  },
+  {
+    label: "AI updates the inventory",
+    icon: ScanLine,
+    iconClassName: "text-violet-600",
+  },
+]
 
 export default function Page() {
   return (
@@ -18,29 +36,59 @@ export default function Page() {
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
               Community-Powered Discovery
             </p>
-            <p className="mt-2 text-base font-semibold leading-snug text-foreground sm:text-lg">
-              One shelf photo. The whole community can discover its books.
-            </p>
+           <p className="mt-1.5 text-sm font-medium leading-snug text-foreground sm:text-base">
+  <span className="font-bold text-blue-700">One</span> shelf photo helps the{" "}
+  <span className="font-bold text-blue-700">whole</span> community.
+</p>
           </div>
 
-          <ul className="grid grid-cols-1 gap-2 text-sm text-foreground min-[420px]:grid-cols-2">
-            <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-              <MapPinned className="size-4 shrink-0 text-blue-600" aria-hidden="true" />
-              <span>Find a nearby library</span>
-            </li>
-            <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-              <Camera className="size-4 shrink-0 text-blue-600" aria-hidden="true" />
-              <span>Photograph the shelf</span>
-            </li>
-            <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-              <ScanLine className="size-4 shrink-0 text-violet-600" aria-hidden="true" />
-              <span>AI updates the inventory</span>
-            </li>
-            <li className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm">
-              <Search className="size-4 shrink-0 text-green-600" aria-hidden="true" />
-              <span>Search and find books</span>
-            </li>
-          </ul>
+          <div className="rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3.5">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
+              How It Works
+            </p>
+
+            <ol className="relative mt-3 grid gap-3 sm:grid-cols-3 sm:gap-2">
+              {discoverySteps.map((step, index) => {
+                const Icon = step.icon
+
+                return (
+                  <li
+                    key={step.label}
+                    className="relative flex items-center gap-3 sm:flex-col sm:gap-1.5 sm:text-center"
+                  >
+                    {index < discoverySteps.length - 1 && (
+                      <>
+                        <span
+                          className="absolute left-[17px] top-9 h-[calc(100%+0.75rem)] w-px bg-blue-200 sm:hidden"
+                          aria-hidden="true"
+                        />
+                        <span
+                          className="absolute left-[calc(50%+18px)] top-[18px] hidden h-px w-[calc(100%-28px)] bg-blue-200 sm:block"
+                          aria-hidden="true"
+                        />
+                      </>
+                    )}
+
+                    <span className="relative z-10 flex size-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white shadow-sm">
+                      <Icon
+                        className={`size-4.5 ${step.iconClassName}`}
+                        aria-hidden="true"
+                      />
+                    </span>
+
+                    <span>
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                        Step {index + 1}
+                      </span>
+                      <span className="block text-sm font-medium leading-snug text-foreground">
+                        {step.label}
+                      </span>
+                    </span>
+                  </li>
+                )
+              })}
+            </ol>
+          </div>
         </section>
 
         <LibraryMapExperience />
