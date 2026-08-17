@@ -19,7 +19,7 @@ export default function Page() {
               Community-Powered Discovery
             </p>
             <p className="mt-2 text-base font-semibold leading-snug text-foreground sm:text-lg">
-              Photograph shelves regularly. Keep their books discoverable for everyone.
+              One shelf photo. The whole community can discover its books.
             </p>
           </div>
 
