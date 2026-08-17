@@ -32,7 +32,14 @@ export function SiteHeader() {
             KBS
           </span>
           <span className="font-display text-base font-semibold leading-tight text-foreground sm:text-lg">
-            Community-Powered, AI-Assisted Book Sharing
+            <span className="sm:hidden">
+              Community-Powered,
+              <br />
+              <span className="whitespace-nowrap">AI-Assisted Book Sharing</span>
+            </span>
+            <span className="hidden sm:inline">
+              Community-Powered, AI-Assisted Book Sharing
+            </span>
           </span>
         </div>
       </div>

@@ -859,9 +859,18 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     return (
       <div className="grid gap-4 rounded-2xl border border-border bg-card p-5">
         <div>
-          <h2 className="font-semibold">Add a New Library</h2>
+          <p className="text-sm font-medium text-foreground">
+            Sign in with Google to continue.
+          </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Authorized KBS volunteers can sign in with Google to add a library.
+            To become an authorized KBS volunteer, email{" "}
+            <a
+              href="mailto:kitsbeyondsound@gmail.com"
+              className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700"
+            >
+              kitsbeyondsound@gmail.com
+            </a>
+            .
           </p>
         </div>
 
@@ -936,7 +945,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
               stepOneComplete
-                ? "border-green-500 bg-green-100 text-green-950 shadow-sm"
+                ? "border-green-200 bg-green-50 text-green-900"
                 : "border-blue-300 bg-blue-50 text-blue-950"
             }`}
           >
@@ -947,14 +956,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               Confirm Location
             </span>
             {stepOneComplete && (
-              <span className="shrink-0 text-sm font-bold text-green-700">✓</span>
+              <span className="shrink-0 text-xs font-semibold">✓</span>
             )}
           </li>
 
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               stepTwoComplete
-                ? "border-green-500 bg-green-100 text-green-950 shadow-sm"
+                ? "border-green-200 bg-green-50 text-green-900"
                 : stepOneComplete
                   ? "border-blue-300 bg-blue-50 text-blue-950"
                   : "border-gray-200 bg-gray-50 text-gray-500"
@@ -967,14 +976,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               Add a Library Photo
             </span>
             {stepTwoComplete && (
-              <span className="shrink-0 text-sm font-bold text-green-700">✓</span>
+              <span className="shrink-0 text-xs font-semibold">✓</span>
             )}
           </li>
 
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               stepThreeComplete
-                ? "border-green-500 bg-green-100 text-green-950 shadow-sm"
+                ? "border-green-200 bg-green-50 text-green-900"
                 : stepTwoComplete
                   ? "border-blue-300 bg-blue-50 text-blue-950"
                   : "border-gray-200 bg-gray-50 text-gray-500"
@@ -987,7 +996,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               Add a Shelf Photo
             </span>
             {stepThreeComplete && (
-              <span className="shrink-0 text-sm font-bold text-green-700">✓</span>
+              <span className="shrink-0 text-xs font-semibold">✓</span>
             )}
           </li>
         </ol>
@@ -1100,15 +1109,15 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "clear" && (
             <div
-              className="rounded-xl border border-green-400 bg-green-100 px-3 py-2 text-xs font-bold text-green-900"
+              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-normal text-green-800"
               role="status"
             >
               {locationAdjusted ? (
                 <>
-                  ✓ Library location adjusted. No duplicate found. Continue to Add a Library Photo.
+                  ✓ Library location adjusted. No duplicate found. Continue to Add Library Photo.
                 </>
               ) : (
-                <>✓ No duplicate found. Continue to Add a Library Photo.</>
+                <>✓ No duplicate found. Continue to Add Library Photo.</>
               )}
             </div>
           )}
@@ -1182,6 +1191,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
                     <div className="p-1.5">
                       <p className="text-[11px] font-semibold leading-tight">Library photo</p>
+                      <p className="truncate text-[9px] leading-tight text-muted-foreground max-sm:!text-[11px]">
+                        {photo?.name}
+                      </p>
 
                       <div className="mt-1 flex items-center gap-2.5">
                         <label
@@ -1219,6 +1231,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <div className="p-1.5">
                         <p className="text-[11px] font-semibold leading-tight">
                           Book photo {index + 1}
+                        </p>
+                        <p className="truncate text-[9px] leading-tight text-muted-foreground max-sm:!text-[11px]">
+                          {bookPhotoPreview.name}
                         </p>
                         <p className="mt-1 text-[9px] font-semibold leading-tight text-green-700">
                           ✓ Recognition Done
@@ -1316,6 +1331,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <p className="font-semibold">
                         Book photo {processedBookPhotos.length + 1}
                       </p>
+                      <p className="truncate text-[9px] text-muted-foreground max-sm:!text-[11px]">
+                        {bookPhoto.name}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1338,6 +1356,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       />
                       <div className="p-2">
                         <p className="font-semibold">Book photo {number}</p>
+                        <p className="truncate text-[9px] text-muted-foreground max-sm:!text-[11px]">
+                          {bookPhotoPreview.name}
+                        </p>
                         <p className="mt-1 font-semibold text-green-700">
                           ✓ Recognition Done
                         </p>
