@@ -704,7 +704,7 @@ export function CommunityMap({
           <button
             type="button"
             onClick={onAddLibrary}
-            className="inline-flex h-12 items-center justify-self-end px-1 text-base sm:text-lg font-bold text-muted-foreground underline-offset-4 transition hover:text-foreground hover:underline sm:whitespace-nowrap"
+            className="-mt-2 inline-flex h-12 items-center justify-self-end px-1 text-base font-bold text-muted-foreground underline underline-offset-4 transition hover:text-foreground sm:mt-0 sm:whitespace-nowrap"
           >
             ＋ Add Book Box
           </button>

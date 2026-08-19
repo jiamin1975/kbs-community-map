@@ -36,7 +36,7 @@ export default function Page() {
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
               Community-Powered Discovery
             </p>
-            <p className="mt-3 text-base font-semibold leading-tight text-foreground sm:text-lg">
+            <p className="mt-1.5 text-base font-semibold leading-tight text-foreground sm:mt-3 sm:text-lg">
               <span className="font-bold text-blue-700">One</span>{" "}
               shelf photo helps the{" "}
               <span className="font-bold text-blue-700">whole</span> community.
@@ -48,7 +48,7 @@ export default function Page() {
               How It Works
             </p>
 
-            <ol className="relative mt-3 grid gap-5 sm:grid-cols-4 sm:gap-2">
+            <ol className="relative mt-3 grid gap-4 sm:grid-cols-4 sm:gap-2">
               {discoverySteps.map((step, index) => {
                 const Icon = step.icon
 
@@ -59,7 +59,7 @@ export default function Page() {
                   >
                     {index < discoverySteps.length - 1 ? (
                       <ArrowDown
-                        className="absolute left-[9px] top-[calc(100%+2px)] z-10 size-4 text-blue-500 sm:hidden"
+                        className="absolute left-[10px] top-[calc(100%+1px)] z-10 size-3.5 text-blue-500 sm:hidden"
                         strokeWidth={2}
                         aria-hidden="true"
                       />
