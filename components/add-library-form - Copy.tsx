@@ -146,7 +146,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [verified, setVerified] = useState(false);
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
 
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
@@ -301,32 +300,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
   const stepOneComplete = stepOneReady && duplicateCheckStatus === "clear";
   const stepTwoComplete = stepOneComplete && photo !== null;
   const stepThreeComplete = stepTwoComplete && recognizedBooks.length > 0;
-
-  const stepOneHeadingRef = useRef<HTMLHeadingElement>(null);
-  const stepTwoHeadingRef = useRef<HTMLHeadingElement>(null);
-  const stepThreeHeadingRef = useRef<HTMLHeadingElement>(null);
-  const stepNavigationStarted = useRef(false);
-
-  function goToStep(step: 1 | 2 | 3) {
-    stepNavigationStarted.current = true;
-    setCurrentStep(step);
-    setError("");
-  }
-
-  useEffect(() => {
-    if (!stepNavigationStarted.current) return;
-
-    const heading = {
-      1: stepOneHeadingRef.current,
-      2: stepTwoHeadingRef.current,
-      3: stepThreeHeadingRef.current,
-    }[currentStep];
-
-    window.requestAnimationFrame(() => {
-      heading?.scrollIntoView({ behavior: "smooth", block: "start" });
-      heading?.focus({ preventScroll: true });
-    });
-  }, [currentStep]);
 
   function handleCameraChanged(event: MapCameraChangedEvent) {
     setMapCenter(event.detail.center);
@@ -837,7 +810,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
       setLatitude("");
       setLongitude("");
       setVerified(false);
-      setCurrentStep(1);
       setPhoto(null);
       setPhotoPreviewUrl(null);
       setBookPhoto(null);
@@ -860,9 +832,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
       setMapZoom(18);
 
-      setMessage(
-        "Book-sharing location, photo, and book list added successfully.",
-      );
+      setMessage("Library, photo, and book inventory added successfully.");
     } catch (caughtError) {
       console.error("Could not add library:", caughtError);
 
@@ -970,7 +940,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
         <ol
           className="sticky top-0 z-30 -mx-3 mt-2 grid grid-cols-1 justify-items-start gap-0.5 border-y border-border bg-card/95 px-3 py-1.5 shadow-sm backdrop-blur sm:-mx-4 sm:mt-3 sm:grid-cols-3 sm:justify-items-stretch sm:gap-1 sm:px-4 sm:py-2"
-          aria-label="Add book-sharing location progress"
+          aria-label="Add library progress"
         >
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
@@ -1003,7 +973,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               ②
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
-              Add a Location Photo
+              Add a Library Photo
             </span>
             {stepTwoComplete && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
@@ -1032,27 +1002,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         </ol>
 
         <div className="mt-4 grid gap-3">
-          <section
-            className={currentStep === 1 ? "grid gap-3" : "hidden"}
-            aria-labelledby="add-location-step"
-          >
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                Step 1 of 3
-              </p>
-              <h2
-                id="add-location-step"
-                ref={stepOneHeadingRef}
-                tabIndex={-1}
-                className="scroll-mt-28 text-lg font-bold text-foreground outline-none"
-              >
-                Confirm the location
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Use your current location, then adjust the marker if needed.
-              </p>
-            </div>
-
           <div className="grid gap-2 sm:grid-cols-2 sm:items-end">
             <button
               type="button"
@@ -1133,11 +1082,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       position={markerPosition}
                       draggable
                       onDragEnd={handleMarkerDragEnd}
-                      title="Drag to the exact book-sharing location"
+                      title="Drag to the exact library location"
                     >
                       <div className="flex flex-col items-center">
                         <div className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-lg">
-                          Book box
+                          Library
                         </div>
 
                         <div className="h-3 w-3 -translate-y-0.5 rotate-45 bg-red-600" />
@@ -1165,10 +1114,10 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             >
               {locationAdjusted ? (
                 <>
-                  ✓ Location adjusted. No duplicate found. Continue to Location Photo.
+                  ✓ Library location adjusted. No duplicate found. Continue to Add Library Photo.
                 </>
               ) : (
-                <>✓ No duplicate found. Continue to Location Photo.</>
+                <>✓ No duplicate found. Continue to Add Library Photo.</>
               )}
             </div>
           )}
@@ -1190,37 +1139,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             </div>
           )}
 
-            <button
-              type="button"
-              onClick={() => goToStep(2)}
-              disabled={!stepOneComplete || locating || saving}
-              className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
-            >
-              Continue to Location Photo →
-            </button>
-          </section>
-
-          <section
-            className={currentStep === 2 ? "grid gap-3" : "hidden"}
-            aria-labelledby="add-photo-step"
-          >
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                Step 2 of 3
-              </p>
-              <h2
-                id="add-photo-step"
-                ref={stepTwoHeadingRef}
-                tabIndex={-1}
-                className="scroll-mt-28 text-lg font-bold text-foreground outline-none"
-              >
-                Add a location photo
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Show the entire book-sharing box so visitors can recognize it.
-              </p>
-            </div>
-
           <div
             className={`grid min-w-0 max-w-full gap-2 overflow-hidden rounded-xl p-2.5 transition sm:p-3 ${
               stepOneComplete
@@ -1241,7 +1159,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs text-muted-foreground">
-                    Photo of the book-sharing location
+                    Photo of library box
                   </p>
                   <p className="text-[11px] text-muted-foreground">
                     10 MB max
@@ -1253,13 +1171,13 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   aria-disabled={!stepOneComplete}
                   className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:text-sm"
                 >
-                  📷 Add a Location Photo
+                  📷 Add a Library Photo
                 </label>
               </>
             ) : (
               <div className="w-full min-w-0 max-w-full overflow-hidden">
                 <p className="mb-2 text-xs font-medium text-muted-foreground">
-                  <span className="sm:hidden">Location photo</span>
+                  <span className="sm:hidden">Library photo</span>
                   <span className="hidden sm:inline">Photos added</span>
                 </p>
 
@@ -1267,12 +1185,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   <div className="w-full overflow-hidden rounded-xl border border-blue-200 bg-background sm:w-48 sm:shrink-0">
                     <img
                       src={photoPreviewUrl}
-                      alt="Preview of the book-sharing location"
+                      alt="Preview of the library"
                       className="h-40 w-full bg-gray-100 object-cover brightness-110 contrast-105 sm:h-36"
                     />
 
                     <div className="p-1.5">
-                      <p className="text-[11px] font-semibold leading-tight">Location photo</p>
+                      <p className="text-[11px] font-semibold leading-tight">Library photo</p>
                       <p className="truncate text-[9px] leading-tight text-muted-foreground max-sm:!text-[11px]">
                         {photo?.name}
                       </p>
@@ -1345,56 +1263,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               </div>
             )}
           </div>
-
-            <div className="grid grid-cols-[auto_1fr] gap-2">
-              <button
-                type="button"
-                onClick={() => goToStep(1)}
-                disabled={saving}
-                className="h-12 rounded-xl border border-border bg-background px-4 text-base font-semibold text-foreground transition hover:bg-secondary disabled:opacity-50"
-              >
-                ← Back
-              </button>
-              <button
-                type="button"
-                onClick={() => goToStep(3)}
-                disabled={!stepTwoComplete || saving}
-                className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
-              >
-                Continue to Shelf Photo →
-              </button>
-            </div>
-          </section>
-
-          <section
-            className={currentStep === 3 ? "grid gap-3" : "hidden"}
-            aria-labelledby="add-shelf-step"
-          >
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                Step 3 of 3
-              </p>
-              <h2
-                id="add-shelf-step"
-                ref={stepThreeHeadingRef}
-                tabIndex={-1}
-                className="scroll-mt-28 text-lg font-bold text-foreground outline-none"
-              >
-                Add a shelf photo
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Photograph the visible book spines, then let AI create the book list.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => goToStep(2)}
-              disabled={saving || analyzingBooks}
-              className="w-fit text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground disabled:opacity-50"
-            >
-              ← Back to Location Photo
-            </button>
 
           <div
             className={`grid min-w-0 gap-2 overflow-hidden rounded-xl p-3 transition ${
@@ -1569,12 +1437,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             {uploadingPhoto
               ? "Uploading Photo…"
               : saving
-                ? "Adding Location…"
-                : `Add Book-Sharing Location with ${recognizedBooks.length} Book${
+                ? "Adding Library…"
+                : `Create Library with ${recognizedBooks.length} Book${
                     recognizedBooks.length === 1 ? "" : "s"
                   }`}
           </button>
-          </section>
 
           {message && (
             <div
