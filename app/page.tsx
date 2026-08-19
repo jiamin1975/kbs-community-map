@@ -90,7 +90,7 @@ export default function Page() {
                       />
                     </span>
 
-                    <span className="block text-sm font-medium leading-snug text-foreground">
+                    <span className="block text-base font-medium leading-snug text-foreground sm:text-sm">
                       {step.label}
                     </span>
                   </li>
@@ -105,7 +105,7 @@ export default function Page() {
                   />
                 </span>
 
-                <span className="block text-sm font-semibold leading-snug text-green-700">
+                <span className="block text-base font-semibold leading-snug text-green-700 sm:text-sm">
                   Search Books
                 </span>
               </li>
