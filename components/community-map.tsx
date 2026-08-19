@@ -719,15 +719,16 @@ export function CommunityMap({
             className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
             role="alert"
           >
-            <p>{locationError}</p>
-
-            <button
-              type="button"
-              onClick={onAddLibrary}
-              className="mt-3 inline-flex text-sm font-medium text-amber-900 underline underline-offset-4"
-            >
-              ＋ Add Library
-            </button>
+            <p>
+              {locationError}{" "}
+              <button
+                type="button"
+                onClick={onAddLibrary}
+                className="inline font-medium text-amber-900 underline underline-offset-4"
+              >
+                ＋ Add Library
+              </button>
+            </p>
           </div>
         )}
       </div>

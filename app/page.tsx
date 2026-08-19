@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header"
 
 const discoverySteps = [
   {
-    label: "Find a nearby library",
+    label: "Find a nearby book-sharing box",
     icon: MapPinned,
     iconClassName: "text-blue-600",
   },
@@ -15,7 +15,7 @@ const discoverySteps = [
     iconClassName: "text-blue-600",
   },
   {
-    label: "AI updates the inventory",
+    label: "AI updates the book list",
     icon: ScanLine,
     iconClassName: "text-violet-600",
   },
@@ -29,17 +29,18 @@ export default function Page() {
       <main className="flex-1">
         <section className="mx-auto grid max-w-6xl gap-5 px-4 pb-7 pt-4 sm:px-6 sm:pt-5 lg:grid-cols-[1.35fr_1fr] lg:items-center lg:gap-x-10 lg:gap-y-5">
           <h1 className="max-w-full text-balance font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl lg:col-span-2 lg:whitespace-nowrap">
-            Make Community Library Resources Easier to Discover
+            Make Community-Shared Books Easier to Discover
           </h1>
 
           <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-violet-50 px-4 py-3">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
               Community-Powered Discovery
             </p>
-           <p className="mt-1.5 text-sm font-medium leading-snug text-foreground sm:text-base">
-  <span className="font-bold text-blue-700">One</span> shelf photo helps the{" "}
-  <span className="font-bold text-blue-700">whole</span> community.
-</p>
+            <p className="mt-2 text-base font-semibold leading-snug text-foreground sm:text-lg">
+              <span className="font-bold text-blue-700">One</span>{" "}
+              shelf photo helps the{" "}
+              <span className="font-bold text-blue-700">whole</span> community.
+            </p>
           </div>
 
           <div className="rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3.5">
