@@ -1,4 +1,4 @@
-import { Camera, MapPinned, ScanLine, Search } from "lucide-react"
+import { ArrowDown, Camera, MapPinned, ScanLine, Search } from "lucide-react"
 
 import { LibraryMapExperience } from "@/components/library-map-experience"
 import { SiteHeader } from "@/components/site-header"
@@ -48,7 +48,7 @@ export default function Page() {
               How It Works
             </p>
 
-            <ol className="relative mt-3 grid gap-3 sm:grid-cols-4 sm:gap-2">
+            <ol className="relative mt-3 grid gap-5 sm:grid-cols-4 sm:gap-2">
               {discoverySteps.map((step, index) => {
                 const Icon = step.icon
 
@@ -57,18 +57,18 @@ export default function Page() {
                     key={step.label}
                     className="relative flex items-center gap-3 sm:flex-col sm:gap-1.5 sm:text-center"
                   >
-                    <span
-                      className={`absolute left-[17px] top-9 h-[calc(100%+0.75rem)] w-px sm:hidden ${
-                        index === discoverySteps.length - 1
-                          ? "border-l-2 border-dashed border-green-400"
-                          : "bg-blue-300"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      {index < discoverySteps.length - 1 && (
-                        <span className="absolute -bottom-px -left-[3px] size-2 rotate-45 border-b border-r border-blue-400" />
-                      )}
-                    </span>
+                    {index < discoverySteps.length - 1 ? (
+                      <ArrowDown
+                        className="absolute left-[9px] top-[calc(100%+2px)] z-10 size-4 text-blue-500 sm:hidden"
+                        strokeWidth={2}
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <span
+                        className="absolute left-[17px] top-9 h-[calc(100%+1.25rem)] border-l-2 border-dashed border-green-400 sm:hidden"
+                        aria-hidden="true"
+                      />
+                    )}
 
                     <span
                       className={`absolute left-[calc(50%+18px)] top-[18px] hidden h-px w-[calc(100%-34px)] sm:block ${
