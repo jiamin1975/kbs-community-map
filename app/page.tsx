@@ -1,4 +1,4 @@
-import { Camera, MapPinned, ScanLine } from "lucide-react"
+import { Camera, MapPinned, ScanLine, Search } from "lucide-react"
 
 import { LibraryMapExperience } from "@/components/library-map-experience"
 import { SiteHeader } from "@/components/site-header"
@@ -27,28 +27,28 @@ export default function Page() {
       <SiteHeader />
 
       <main className="flex-1">
-        <section className="mx-auto grid max-w-6xl gap-5 px-4 pb-7 pt-4 sm:px-6 sm:pt-5 lg:grid-cols-[1.35fr_1fr] lg:items-center lg:gap-x-10 lg:gap-y-5">
+        <section className="mx-auto grid max-w-6xl gap-5 px-4 pb-7 pt-4 sm:px-6 sm:pt-5 lg:grid-cols-[1fr_1.2fr] lg:items-center lg:gap-x-8 lg:gap-y-5">
           <h1 className="max-w-full text-balance font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl lg:col-span-2 lg:whitespace-nowrap">
             Make Community-Shared Books Easier to Discover
           </h1>
 
-          <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-violet-50 px-4 py-3">
+          <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-violet-50 px-4 py-2.5">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
               Community-Powered Discovery
             </p>
-            <p className="mt-2 text-base font-semibold leading-snug text-foreground sm:text-lg">
+            <p className="mt-3 text-base font-semibold leading-tight text-foreground sm:text-lg">
               <span className="font-bold text-blue-700">One</span>{" "}
               shelf photo helps the{" "}
               <span className="font-bold text-blue-700">whole</span> community.
             </p>
           </div>
 
-          <div className="rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3.5">
+          <div className="rounded-xl border border-blue-100 bg-blue-50/60 px-3 py-3">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
               How It Works
             </p>
 
-            <ol className="relative mt-3 grid gap-3 sm:grid-cols-3 sm:gap-2">
+            <ol className="relative mt-3 grid gap-3 sm:grid-cols-4 sm:gap-2">
               {discoverySteps.map((step, index) => {
                 const Icon = step.icon
 
@@ -57,18 +57,31 @@ export default function Page() {
                     key={step.label}
                     className="relative flex items-center gap-3 sm:flex-col sm:gap-1.5 sm:text-center"
                   >
-                    {index < discoverySteps.length - 1 && (
-                      <>
-                        <span
-                          className="absolute left-[17px] top-9 h-[calc(100%+0.75rem)] w-px bg-blue-200 sm:hidden"
-                          aria-hidden="true"
-                        />
-                        <span
-                          className="absolute left-[calc(50%+18px)] top-[18px] hidden h-px w-[calc(100%-28px)] bg-blue-200 sm:block"
-                          aria-hidden="true"
-                        />
-                      </>
-                    )}
+                    <span
+                      className={`absolute left-[17px] top-9 h-[calc(100%+0.75rem)] w-px sm:hidden ${
+                        index === discoverySteps.length - 1
+                          ? "border-l-2 border-dashed border-green-400"
+                          : "bg-blue-300"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      {index < discoverySteps.length - 1 && (
+                        <span className="absolute -bottom-px -left-[3px] size-2 rotate-45 border-b border-r border-blue-400" />
+                      )}
+                    </span>
+
+                    <span
+                      className={`absolute left-[calc(50%+18px)] top-[18px] hidden h-px w-[calc(100%-34px)] sm:block ${
+                        index === discoverySteps.length - 1
+                          ? "border-t-2 border-dashed border-green-400"
+                          : "bg-blue-300"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      {index < discoverySteps.length - 1 && (
+                        <span className="absolute -right-px -top-[3px] size-2 rotate-45 border-r border-t border-blue-400" />
+                      )}
+                    </span>
 
                     <span className="relative z-10 flex size-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white shadow-sm">
                       <Icon
@@ -77,17 +90,25 @@ export default function Page() {
                       />
                     </span>
 
-                    <span>
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-blue-600">
-                        Step {index + 1}
-                      </span>
-                      <span className="block text-sm font-medium leading-snug text-foreground">
-                        {step.label}
-                      </span>
+                    <span className="block text-sm font-medium leading-snug text-foreground">
+                      {step.label}
                     </span>
                   </li>
                 )
               })}
+
+              <li className="relative flex items-center gap-3 sm:flex-col sm:gap-1.5 sm:text-center">
+                <span className="relative z-10 flex size-9 shrink-0 items-center justify-center rounded-full border border-green-300 bg-white shadow-sm">
+                  <Search
+                    className="size-4.5 text-green-600"
+                    aria-hidden="true"
+                  />
+                </span>
+
+                <span className="block text-sm font-semibold leading-snug text-green-700">
+                  Search Books
+                </span>
+              </li>
             </ol>
           </div>
         </section>

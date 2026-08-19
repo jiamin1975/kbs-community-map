@@ -568,8 +568,8 @@ export function CommunityMap({
             className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {locating
-              ? "Finding Nearby Library…"
-              : "📍 Find a Book Box to Update"}
+              ? "Finding Nearby Box…"
+              : "📍 Find a Nearby Box to Update"}
           </button>
 
           <div ref={bookSearchAreaRef} className="relative min-w-0">
@@ -704,7 +704,7 @@ export function CommunityMap({
           <button
             type="button"
             onClick={onAddLibrary}
-            className="inline-flex h-12 items-center justify-self-end px-1 text-sm font-medium text-muted-foreground underline-offset-4 transition hover:text-foreground hover:underline sm:whitespace-nowrap"
+            className="inline-flex h-12 items-center justify-self-end px-1 text-base sm:text-lg font-bold text-muted-foreground underline-offset-4 transition hover:text-foreground hover:underline sm:whitespace-nowrap"
           >
             ＋ Add Book Box
           </button>
