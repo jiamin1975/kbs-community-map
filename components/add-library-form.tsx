@@ -24,6 +24,7 @@ import {
   Map as GoogleMap,
   type MapCameraChangedEvent,
 } from "@vis.gl/react-google-maps";
+import { Camera, MapPinned, ScanLine } from "lucide-react";
 
 import { auth, db, storage } from "@/lib/firebase";
 import type { Library } from "@/lib/libraries";
@@ -979,8 +980,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 : "border-blue-200 bg-blue-50 text-blue-900"
             }`}
           >
-            <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
-              ①
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
+              <MapPinned className="size-3.5" />
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
               Confirm Location
@@ -999,8 +1000,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-gray-200 bg-gray-50 text-gray-500"
             }`}
           >
-            <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
-              ②
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
+              <Camera className="size-3.5" />
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
               Add Box Photo
@@ -1017,8 +1018,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 : "border-gray-200 bg-gray-50 text-gray-500"
             }`}
           >
-            <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
-              ③
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
+              <ScanLine className="size-3.5" />
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
               Add Shelf Photo
