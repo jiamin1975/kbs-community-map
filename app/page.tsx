@@ -48,7 +48,7 @@ export default function Page() {
               How It Works
             </p>
 
-            <ol className="relative mt-3 grid gap-4 sm:grid-cols-4 sm:gap-2">
+            <ol className="relative mt-2 grid gap-3 sm:mt-3 sm:grid-cols-4 sm:gap-2">
               {discoverySteps.map((step, index) => {
                 const Icon = step.icon
 
@@ -59,13 +59,13 @@ export default function Page() {
                   >
                     {index < discoverySteps.length - 1 ? (
                       <ArrowDown
-                        className="absolute left-[10px] top-[calc(100%+1px)] z-10 size-3.5 text-blue-500 sm:hidden"
+                        className="absolute left-3 top-full z-10 size-3 text-blue-500 sm:hidden"
                         strokeWidth={2}
                         aria-hidden="true"
                       />
                     ) : (
                       <span
-                        className="absolute left-[17px] top-9 h-[calc(100%-20px)] border-l-2 border-dashed border-green-400 sm:hidden"
+                        className="absolute left-[17px] top-9 h-[calc(100%-24px)] border-l-2 border-dashed border-green-400 sm:hidden"
                         aria-hidden="true"
                       />
                     )}
