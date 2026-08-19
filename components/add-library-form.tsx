@@ -1473,7 +1473,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span>Verified by a KBS volunteer</span>
           </label>
 
-          <div className="sticky bottom-0 z-20 -mx-1 grid grid-cols-[auto_minmax(0,1fr)] gap-2 bg-card/95 p-1 backdrop-blur">
+          <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
             <button
               type="button"
               onClick={() => goToStep(2)}
@@ -1495,9 +1495,15 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 ? "Uploading Photo…"
                 : saving
                   ? "Adding Location…"
-                  : `Add This Book Box with ${recognizedBooks.length} Book${
-                      recognizedBooks.length === 1 ? "" : "s"
-                    }`}
+                  : (
+                      <>
+                        <span className="block">Add this Book Box</span>
+                        <span className="block">
+                          with {recognizedBooks.length} Book
+                          {recognizedBooks.length === 1 ? "" : "s"}
+                        </span>
+                      </>
+                    )}
             </button>
           </div>
           </section>
