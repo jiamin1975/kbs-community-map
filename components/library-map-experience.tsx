@@ -15,11 +15,11 @@ import {
 import type { Library } from "@/lib/libraries"
 
 export function LibraryMapExperience() {
-  // Used when refreshing an existing library's inventory
+  // Used when refreshing an existing book box's inventory
   const [selectedLibrary, setSelectedLibrary] =
     useState<Library | null>(null)
 
-  // Tells CommunityMap which library card to open
+  // Tells CommunityMap which book box card to open
   const [newlyAddedLibrary, setNewlyAddedLibrary] =
     useState<Library | null>(null)
 
@@ -48,7 +48,7 @@ export function LibraryMapExperience() {
 
   function handleLibraryAdded(library: Library) {
     // Step 3 already created the first inventory.
-    // Close the form and open the new library's
+    // Close the form and open the new book box's
     // information card on the map.
     setNewlyAddedLibrary(library)
     setAddLibraryDialogOpen(false)
@@ -61,7 +61,7 @@ export function LibraryMapExperience() {
   return (
     <>
       <section
-        aria-label="Search and update community library inventories"
+        aria-label="Search and update community book box inventories"
         className="border-y border-border"
       >
         <CommunityMap
@@ -71,17 +71,17 @@ export function LibraryMapExperience() {
         />
       </section>
 
-      {/* Update the inventory for an existing library */}
+      {/* Update the inventory for an existing book box */}
       <Dialog
         open={uploadDialogOpen}
         onOpenChange={handleUploadDialogChange}
       >
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Update Library Inventory</DialogTitle>
+            <DialogTitle>Update Book Box Inventory</DialogTitle>
 
             <DialogDescription className="text-xs leading-tight">
-              Add shelf photos—AI will update the library inventory.
+              Add shelf photos—AI will update the book box inventory.
             </DialogDescription>
           </DialogHeader>
 
@@ -95,14 +95,14 @@ export function LibraryMapExperience() {
         </DialogContent>
       </Dialog>
 
-      {/* Create a library and its first inventory */}
+      {/* Create a book box and its first inventory */}
       <Dialog
         open={addLibraryDialogOpen}
         onOpenChange={handleAddLibraryDialogChange}
       >
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Add a New Library</DialogTitle>
+            <DialogTitle>Add a New Book Box</DialogTitle>
           </DialogHeader>
 
           <AddLibraryForm onLibraryAdded={handleLibraryAdded} />

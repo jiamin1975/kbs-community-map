@@ -36,7 +36,7 @@ export function AddLibraryExperience() {
         >
           <div className="mb-5 rounded-xl border border-green-300 bg-green-50 p-4 text-green-900">
             <p className="font-semibold">
-              Library added successfully
+              Book Box added successfully
             </p>
 
             <p className="mt-1 text-sm">

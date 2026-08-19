@@ -315,7 +315,7 @@ export function CommunityMap({
           setLibraryPhotoUrl(url);
         }
       } catch (caughtError) {
-        console.error("Could not load library photo:", caughtError);
+        console.error("Could not load book box photo:", caughtError);
 
         if (!cancelled) {
           setLibraryPhotoUrl(null);
@@ -393,7 +393,7 @@ export function CommunityMap({
 
         if (closestMatch.distanceMeters > 150) {
           setLocationError(
-            `No library was found within 150 meters. The closest library is about ${Math.round(
+            `No book box was found within 150 meters. The closest box is about ${Math.round(
               closestMatch.distanceMeters,
             )} meters away.`,
           );
@@ -569,7 +569,7 @@ export function CommunityMap({
           >
             {locating
               ? "Finding Nearby Library…"
-              : "📍 Find a Library to Update"}
+              : "📍 Find a Book Box to Update"}
           </button>
 
           <div ref={bookSearchAreaRef} className="relative min-w-0">
@@ -706,7 +706,7 @@ export function CommunityMap({
             onClick={onAddLibrary}
             className="inline-flex h-12 items-center justify-self-end px-1 text-sm font-medium text-muted-foreground underline-offset-4 transition hover:text-foreground hover:underline sm:whitespace-nowrap"
           >
-            ＋ Add Library
+            ＋ Add Book Box
           </button>
         </div>
 
@@ -726,7 +726,7 @@ export function CommunityMap({
                 onClick={onAddLibrary}
                 className="inline font-medium text-amber-900 underline underline-offset-4"
               >
-                ＋ Add Library
+                ＋ Add Book Box
               </button>
             </p>
           </div>
@@ -861,7 +861,7 @@ export function CommunityMap({
                   {/* Current inventory */}
                   <div className="mt-3 overflow-hidden rounded-lg border border-green-200 bg-green-50 sm:mt-0">
                     <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 sm:py-1.5 sm:text-sm sm:font-semibold">
-                      Library Inventory
+                      Box Inventory
                     </p>
 
                     {selectedLibrary.books.length === 0 ? (
@@ -915,7 +915,7 @@ export function CommunityMap({
                                 key={`${title}-${index}`}
                                 className="flex w-full min-w-0 max-w-full items-start gap-2 overflow-hidden px-3 py-2 sm:px-2 sm:py-1"
                               >
-                                <span className="w-5 shrink-0 pt-0.5 text-right text-xs font-bold text-green-700 sm:w-4 sm:text-xs">
+                                <span className="w-8 shrink-0 whitespace-nowrap pt-0.5 text-right text-xs font-bold tabular-nums text-green-700">
                                   {index + 1}.
                                 </span>
                                 <div className="min-w-0 flex-1">
@@ -948,7 +948,7 @@ export function CommunityMap({
           <div className="absolute inset-4 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-4 text-black shadow-2xl">
             <button
               type="button"
-              aria-label="Close library details"
+              aria-label="Close box details"
               onClick={() => {
                 setSelectedLibrary(null);
                 setLibraryPhotoUrl(null);
@@ -1011,7 +1011,7 @@ export function CommunityMap({
 
               <div className="mt-5 overflow-hidden rounded-lg border border-green-200 bg-green-50">
                 <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950">
-                  Library Inventory
+                  Box Inventory
                 </p>
 
                 {selectedLibrary.books.length === 0 ? (
@@ -1065,7 +1065,7 @@ export function CommunityMap({
                           key={`${title}-${index}`}
                           className="flex min-w-0 items-start gap-2 overflow-hidden px-3 py-2"
                         >
-                          <span className="w-5 shrink-0 pt-0.5 text-right text-xs font-bold text-green-700">
+                          <span className="w-8 shrink-0 whitespace-nowrap pt-0.5 text-right text-xs font-bold tabular-nums text-green-700">
                             {index + 1}.
                           </span>
                           <div className="min-w-0 flex-1">
@@ -1091,7 +1091,7 @@ export function CommunityMap({
 
         {nearbyMatch && (
           <div className="absolute inset-x-3 bottom-14 z-20 rounded-2xl border border-blue-300 bg-white/95 p-4 text-blue-950 shadow-xl backdrop-blur sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2">
-            <p className="text-sm font-semibold">Nearest library found</p>
+            <p className="text-sm font-semibold">Nearest book box found</p>
 
             <p className="mt-1 text-lg font-semibold">
               {nearbyMatch.library.name}
@@ -1113,7 +1113,7 @@ export function CommunityMap({
                 onClick={confirmNearbyLibrary}
                 className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               >
-                Choose It!
+                Choose It !
               </button>
 
               <button
@@ -1121,7 +1121,7 @@ export function CommunityMap({
                 onClick={cancelNearbyLibrary}
                 className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium"
               >
-                Choose Another Library
+                Choose Another Book Box
               </button>
             </div>
           </div>

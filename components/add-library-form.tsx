@@ -94,8 +94,8 @@ function generateLibraryName(address: string) {
   const streetWithoutNumber = streetAddress.replace(/^\d+\s+/, "").trim();
 
   return streetWithoutNumber
-    ? `${streetWithoutNumber} Little Library`
-    : "Community Little Library";
+    ? `${streetWithoutNumber} Book Box`
+    : "Community Book Box";
 }
 
 function normalizeBookTitle(title: string) {
@@ -515,7 +515,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
       if (!closestLibrary || distanceMeters < closestLibrary.distanceMeters) {
         closestLibrary = {
           id: documentSnapshot.id,
-          name: data.name ?? "Unnamed library",
+          name: data.name ?? "Unnamed book box",
           address: data.address ?? "",
           distanceMeters,
         };
@@ -698,7 +698,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     const longitudeNumber = Number(longitude);
 
     if (!name.trim()) {
-      setError("Library name is required.");
+      setError("Book box name is required.");
       return;
     }
 
@@ -708,7 +708,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     }
 
     if (!photo) {
-      setError("Please add a photo of the library.");
+      setError("Please add a photo of the book box.");
       return;
     }
 
@@ -751,7 +751,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         setDuplicateCheckStatus("duplicate");
 
         setError(
-          `A library already exists about ${Math.round(
+          `A book box already exists about ${Math.round(
             closestLibrary.distanceMeters,
           )} meters from this location.`,
         );
@@ -807,7 +807,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
       } catch (firestoreError) {
         await deleteObject(photoReference).catch((cleanupError) => {
           console.error(
-            "Could not remove uploaded photo after the library save failed:",
+            "Could not remove uploaded photo after the book box save failed:",
             cleanupError,
           );
         });
@@ -864,12 +864,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         "Book-sharing location, photo, and book list added successfully.",
       );
     } catch (caughtError) {
-      console.error("Could not add library:", caughtError);
+      console.error("Could not add book box:", caughtError);
 
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Could not add the library.",
+          : "Could not add the book box.",
       );
     } finally {
       setUploadingPhoto(false);
@@ -1055,7 +1055,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
             <label className="grid min-w-0 gap-1">
               <span className="flex items-center justify-between gap-1 text-xs font-medium">
-                <span>Library Name</span>
+                <span>Book Box Name</span>
                 <span className="text-[10px] font-normal text-muted-foreground">
                   Auto
                 </span>
@@ -1141,7 +1141,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800"
               role="status"
             >
-              Checking for an existing library near this location…
+              Checking for an existing book box near this location…
             </div>
           )}
 
@@ -1172,7 +1172,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               )}
               <p className="mt-1 text-xs">
                 About {Math.round(nearbyLibrary.distanceMeters)} meters away.
-                {" "}<strong>Adjust the marker if this is a different library.</strong>
+                {" "}<strong>Adjust the marker if this is a different book box.</strong>
               </p>
             </div>
           )}
@@ -1425,7 +1425,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               recognizedBooks.length > 0 ? (
                 <div className="overflow-hidden rounded-lg border border-green-200 bg-green-50">
                   <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
-                    Library Inventory
+                    Book Box Inventory
                   </p>
                   <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto text-green-950 sm:max-h-52">
                     {recognizedBooks
