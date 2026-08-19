@@ -1385,6 +1385,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <p className="font-semibold">
                         Shelf photo {processedBookPhotos.length + 1}
                       </p>
+                      <p className="mt-1 font-semibold text-amber-700" role="status">
+                        {analyzingBooks
+                          ? "Recognizing Books…"
+                          : "Waiting for Recognize Books…"}
+                      </p>
                     </div>
                   </div>
                 )}
