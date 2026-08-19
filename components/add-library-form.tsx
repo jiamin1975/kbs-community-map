@@ -625,7 +625,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
     if (selectedPhoto.size > 10 * 1024 * 1024) {
       event.target.value = "";
-      setBookRecognitionError("The book photo must be smaller than 10 MB.");
+      setBookRecognitionError("The shelf photo must be smaller than 10 MB.");
       return;
     }
 
@@ -635,7 +635,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
   async function analyzeBookPhoto() {
     if (!bookPhoto) {
-      setBookRecognitionError("Choose a book photo first.");
+      setBookRecognitionError("Choose a shelf photo first.");
       return;
     }
 
@@ -713,7 +713,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     }
 
     if (recognizedBooks.length === 0) {
-      setError("Please analyze at least one book photo.");
+      setError("Please analyze at least one shelf photo.");
       return;
     }
 
@@ -794,7 +794,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           books: recognizedBooks,
           bookCount: recognizedBooks.length,
-          recognitionNotes: `Inventory created from ${bookPhotosProcessed} book photo${
+          recognitionNotes: `Inventory created from ${bookPhotosProcessed} shelf photo${
             bookPhotosProcessed === 1 ? "" : "s"
           }.`,
 
@@ -974,9 +974,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         >
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
-              stepOneComplete
-                ? "border-green-200 bg-green-50 text-green-900"
-                : "border-blue-300 bg-blue-50 text-blue-950"
+              currentStep === 1
+                ? "border-green-300 bg-green-100 text-green-950"
+                : "border-blue-200 bg-blue-50 text-blue-900"
             }`}
           >
             <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
@@ -985,17 +985,17 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
               Confirm Location
             </span>
-            {stepOneComplete && (
+            {currentStep > 1 && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
             )}
           </li>
 
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
-              stepTwoComplete
-                ? "border-green-200 bg-green-50 text-green-900"
-                : stepOneComplete
-                  ? "border-blue-300 bg-blue-50 text-blue-950"
+              currentStep === 2
+                ? "border-green-300 bg-green-100 text-green-950"
+                : currentStep > 2
+                  ? "border-blue-200 bg-blue-50 text-blue-900"
                   : "border-gray-200 bg-gray-50 text-gray-500"
             }`}
           >
@@ -1003,31 +1003,26 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               ②
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
-              Add a Location Photo
+              Add Box Photo
             </span>
-            {stepTwoComplete && (
+            {currentStep > 2 && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
             )}
           </li>
 
           <li
             className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
-              stepThreeComplete
-                ? "border-green-200 bg-green-50 text-green-900"
-                : stepTwoComplete
-                  ? "border-blue-300 bg-blue-50 text-blue-950"
-                  : "border-gray-200 bg-gray-50 text-gray-500"
+              currentStep === 3
+                ? "border-green-300 bg-green-100 text-green-950"
+                : "border-gray-200 bg-gray-50 text-gray-500"
             }`}
           >
             <span className="shrink-0 text-base font-bold sm:text-lg" aria-hidden="true">
               ③
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
-              Add a Shelf Photo
+              Add Shelf Photo
             </span>
-            {stepThreeComplete && (
-              <span className="shrink-0 text-xs font-semibold">✓</span>
-            )}
           </li>
         </ol>
 
@@ -1036,22 +1031,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             className={currentStep === 1 ? "grid gap-3" : "hidden"}
             aria-labelledby="add-location-step"
           >
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                Step 1 of 3
-              </p>
-              <h2
-                id="add-location-step"
-                ref={stepOneHeadingRef}
-                tabIndex={-1}
-                className="scroll-mt-28 text-lg font-bold text-foreground outline-none"
-              >
-                Confirm the location
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Use your current location, then adjust the marker if needed.
-              </p>
-            </div>
+            <h2
+              id="add-location-step"
+              ref={stepOneHeadingRef}
+              tabIndex={-1}
+              className="sr-only scroll-mt-28"
+            >
+              Confirm location
+            </h2>
 
           <div className="grid gap-2 sm:grid-cols-2 sm:items-end">
             <button
@@ -1165,10 +1152,10 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             >
               {locationAdjusted ? (
                 <>
-                  ✓ Location adjusted. No duplicate found. Continue to Location Photo.
+                  ✓ Location adjusted. No duplicate found. Select Continue.
                 </>
               ) : (
-                <>✓ No duplicate found. Continue to Location Photo.</>
+                <>✓ No duplicate found. Select Continue.</>
               )}
             </div>
           )}
@@ -1196,7 +1183,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               disabled={!stepOneComplete || locating || saving}
               className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
             >
-              Continue to Location Photo →
+              Continue →
             </button>
           </section>
 
@@ -1204,22 +1191,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             className={currentStep === 2 ? "grid gap-3" : "hidden"}
             aria-labelledby="add-photo-step"
           >
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                Step 2 of 3
-              </p>
-              <h2
-                id="add-photo-step"
-                ref={stepTwoHeadingRef}
-                tabIndex={-1}
-                className="scroll-mt-28 text-lg font-bold text-foreground outline-none"
-              >
-                Add a location photo
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Show the entire book-sharing box so visitors can recognize it.
-              </p>
-            </div>
+            <h2
+              id="add-photo-step"
+              ref={stepTwoHeadingRef}
+              tabIndex={-1}
+              className="sr-only scroll-mt-28"
+            >
+              Add box photo
+            </h2>
 
           <div
             className={`grid min-w-0 max-w-full gap-2 overflow-hidden rounded-xl p-2.5 transition sm:p-3 ${
@@ -1241,7 +1220,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs text-muted-foreground">
-                    Photo of the book-sharing location
+                    Add a photo of book-sharing box
                   </p>
                   <p className="text-[11px] text-muted-foreground">
                     10 MB max
@@ -1253,17 +1232,17 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   aria-disabled={!stepOneComplete}
                   className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:text-sm"
                 >
-                  📷 Add a Location Photo
+                  📷 Add Box Photo
                 </label>
               </>
             ) : (
               <div className="w-full min-w-0 max-w-full overflow-hidden">
                 <p className="mb-2 text-xs font-medium text-muted-foreground">
-                  <span className="sm:hidden">Location photo</span>
-                  <span className="hidden sm:inline">Photos added</span>
+                  <span className="sm:hidden">Book box photo</span>
+                  <span className="hidden sm:inline">Book box photo</span>
                 </p>
 
-                <div className="flex w-full min-w-0 max-w-full gap-2 overflow-x-hidden pb-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
+                <div className="flex w-full min-w-0 max-w-full justify-center gap-2 overflow-x-hidden pb-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
                   <div className="w-full overflow-hidden rounded-xl border border-blue-200 bg-background sm:w-48 sm:shrink-0">
                     <img
                       src={photoPreviewUrl}
@@ -1272,11 +1251,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     />
 
                     <div className="p-1.5">
-                      <p className="text-[11px] font-semibold leading-tight">Location photo</p>
-                      <p className="truncate text-[9px] leading-tight text-muted-foreground max-sm:!text-[11px]">
-                        {photo?.name}
-                      </p>
-
+                      <p className="text-[11px] font-semibold leading-tight">Book box photo</p>
                       <div className="mt-1 flex items-center gap-2.5">
                         <label
                           htmlFor="library-photo"
@@ -1300,47 +1275,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     </div>
                   </div>
 
-                  {processedBookPhotos.map((bookPhotoPreview, index) => (
-                    <div
-                      key={bookPhotoPreview.url}
-                      className="hidden overflow-hidden rounded-xl border border-violet-200 bg-background sm:block sm:w-48 sm:shrink-0"
-                    >
-                      <img
-                        src={bookPhotoPreview.url}
-                        alt={`Book photo ${index + 1}`}
-                        className="h-40 w-full bg-gray-100 object-cover sm:h-36"
-                      />
-                      <div className="p-1.5">
-                        <p className="text-[11px] font-semibold leading-tight">
-                          Book photo {index + 1}
-                        </p>
-                        <p className="truncate text-[9px] leading-tight text-muted-foreground max-sm:!text-[11px]">
-                          {bookPhotoPreview.name}
-                        </p>
-                        <p className="mt-1 text-[9px] font-semibold leading-tight text-green-700">
-                          ✓ Recognition Done
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-
-                  {bookPhoto && bookPreviewUrl && (
-                    <div className="hidden overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:block sm:w-48 sm:shrink-0">
-                      <img
-                        src={bookPreviewUrl}
-                        alt="Book photo awaiting recognition"
-                        className="h-40 w-full bg-gray-100 object-cover sm:h-36"
-                      />
-                      <div className="p-1.5">
-                        <p className="text-[11px] font-semibold leading-tight">
-                          Book photo {processedBookPhotos.length + 1}
-                        </p>
-                        <p className="truncate text-[10px] leading-tight text-amber-700">
-                          Select Recognize Books
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -1361,7 +1295,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 disabled={!stepTwoComplete || saving}
                 className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
               >
-                Continue to Shelf Photo →
+                Continue →
               </button>
             </div>
           </section>
@@ -1370,31 +1304,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             className={currentStep === 3 ? "grid gap-3" : "hidden"}
             aria-labelledby="add-shelf-step"
           >
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                Step 3 of 3
-              </p>
-              <h2
-                id="add-shelf-step"
-                ref={stepThreeHeadingRef}
-                tabIndex={-1}
-                className="scroll-mt-28 text-lg font-bold text-foreground outline-none"
-              >
-                Add a shelf photo
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Photograph the visible book spines, then let AI create the book list.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => goToStep(2)}
-              disabled={saving || analyzingBooks}
-              className="w-fit text-sm font-semibold text-muted-foreground underline underline-offset-4 hover:text-foreground disabled:opacity-50"
+            <h2
+              id="add-shelf-step"
+              ref={stepThreeHeadingRef}
+              tabIndex={-1}
+              className="sr-only scroll-mt-28"
             >
-              ← Back to Location Photo
-            </button>
+              Add shelf photo
+            </h2>
 
           <div
             className={`grid min-w-0 gap-2 overflow-hidden rounded-xl p-3 transition ${
@@ -1427,7 +1344,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <div className="grid gap-2 sm:grid-cols-2">
               <label
                 htmlFor="book-photo"
-                className="inline-flex h-12 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-blue-700 bg-blue-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:px-2 sm:text-sm"
+                aria-disabled={analyzingBooks || saving}
+                className={`inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition sm:h-10 sm:px-2 sm:text-sm ${
+                  analyzingBooks || saving
+                    ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
+                    : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
+                }`}
               >
                 📚{" "}
                 {bookPhotosProcessed > 0
@@ -1447,24 +1369,21 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
             {(processedBookPhotos.length > 0 ||
               (bookPhoto && bookPreviewUrl)) && (
-              <div className="grid gap-3 sm:hidden">
-                <p className="text-sm font-semibold text-muted-foreground">
-                  Book photos
+              <div className="grid gap-3 sm:grid-cols-2">
+                <p className="text-sm font-semibold text-muted-foreground sm:col-span-2">
+                  Shelf photos
                 </p>
 
                 {bookPhoto && bookPreviewUrl && (
-                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:order-last">
                     <img
                       src={bookPreviewUrl}
-                      alt="Book photo awaiting recognition"
+                      alt="Shelf photo awaiting recognition"
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2">
                       <p className="font-semibold">
-                        Book photo {processedBookPhotos.length + 1}
-                      </p>
-                      <p className="truncate text-[9px] text-muted-foreground max-sm:!text-[11px]">
-                        {bookPhoto.name}
+                        Shelf photo {processedBookPhotos.length + 1}
                       </p>
                     </div>
                   </div>
@@ -1475,7 +1394,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     bookPhotoPreview,
                     number: index + 1,
                   }))
-                  .reverse()
                   .map(({ bookPhotoPreview, number }) => (
                     <div
                       key={bookPhotoPreview.url}
@@ -1483,14 +1401,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     >
                       <img
                         src={bookPhotoPreview.url}
-                        alt={`Book photo ${number}`}
+                        alt={`Shelf photo ${number}`}
                         className="h-40 w-full bg-gray-100 object-cover"
                       />
                       <div className="p-2">
-                        <p className="font-semibold">Book photo {number}</p>
-                        <p className="truncate text-[9px] text-muted-foreground max-sm:!text-[11px]">
-                          {bookPhotoPreview.name}
-                        </p>
+                        <p className="font-semibold">Shelf photo {number}</p>
                         <p className="mt-1 font-semibold text-green-700">
                           ✓ Recognition Done
                         </p>
@@ -1558,22 +1473,33 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span>Verified by a KBS volunteer</span>
           </label>
 
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={
-              saving || locating || analyzingBooks || !stepThreeComplete
-            }
-            className="h-12 rounded-xl border border-green-800 bg-green-700 px-4 text-base font-bold text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {uploadingPhoto
-              ? "Uploading Photo…"
-              : saving
-                ? "Adding Location…"
-                : `Add Book-Sharing Location with ${recognizedBooks.length} Book${
-                    recognizedBooks.length === 1 ? "" : "s"
-                  }`}
-          </button>
+          <div className="sticky bottom-0 z-20 -mx-1 grid grid-cols-[auto_minmax(0,1fr)] gap-2 bg-card/95 p-1 backdrop-blur">
+            <button
+              type="button"
+              onClick={() => goToStep(2)}
+              disabled={saving || analyzingBooks}
+              className="min-h-12 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50"
+            >
+              ← Back
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={
+                saving || locating || analyzingBooks || !stepThreeComplete
+              }
+              className="min-h-12 rounded-xl border border-green-800 bg-green-700 px-2 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
+            >
+              {uploadingPhoto
+                ? "Uploading Photo…"
+                : saving
+                  ? "Adding Location…"
+                  : `Add This Book Box with ${recognizedBooks.length} Book${
+                      recognizedBooks.length === 1 ? "" : "s"
+                    }`}
+            </button>
+          </div>
           </section>
 
           {message && (
