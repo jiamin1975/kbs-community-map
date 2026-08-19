@@ -65,7 +65,7 @@ export default function Page() {
                       />
                     ) : (
                       <span
-                        className="absolute left-[17px] top-9 h-[calc(100%+1.25rem)] border-l-2 border-dashed border-green-400 sm:hidden"
+                        className="absolute left-[17px] top-9 h-[calc(100%-20px)] border-l-2 border-dashed border-green-400 sm:hidden"
                         aria-hidden="true"
                       />
                     )}

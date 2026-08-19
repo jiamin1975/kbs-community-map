@@ -704,13 +704,13 @@ export function CommunityMap({
           <button
             type="button"
             onClick={onAddLibrary}
-            className="-mt-2 inline-flex h-12 items-center justify-self-end px-1 text-base font-bold text-muted-foreground underline-offset-4 transition hover:text-foreground sm:mt-0 sm:whitespace-nowrap"
+            className="-mt-2 inline-flex h-12 items-center justify-self-end px-1 text-base font-bold text-muted-foreground underline underline-offset-4 transition hover:text-foreground sm:mt-0 sm:whitespace-nowrap"
           >
             ＋ Add Book Box
           </button>
         </div>
 
-        <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
+        <p className="mt-0 text-xs text-muted-foreground sm:mt-2 sm:text-sm">
           Every photo helps someone find a book.
         </p>
 
