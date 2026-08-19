@@ -1148,15 +1148,13 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "clear" && (
             <div
-              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-normal text-green-800"
+              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-bold text-green-800"
               role="status"
             >
               {locationAdjusted ? (
-                <>
-                  ✓ Location adjusted. No duplicate found. Select Continue.
-                </>
+                <>Location adjusted. No duplicate book box found. Select Continue.</>
               ) : (
-                <>✓ No duplicate found. Select Continue.</>
+                <>No duplicate book box found. Select Continue.</>
               )}
             </div>
           )}
@@ -1221,7 +1219,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs text-muted-foreground">
-                    Add a photo of book-sharing box
+                    Add a photo of book box
                   </p>
                   <p className="text-[11px] text-muted-foreground">
                     10 MB max
@@ -1413,7 +1411,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <div className="p-2">
                         <p className="font-semibold">Shelf photo {number}</p>
                         <p className="mt-1 font-semibold text-green-700">
-                          ✓ Recognition Done
+                          Recognition Done
                         </p>
                       </div>
                     </div>
