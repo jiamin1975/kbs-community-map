@@ -422,7 +422,7 @@ export function BookPhotoTester({
                     <img
                       src={previewUrl}
                       alt="Shelf photo awaiting recognition"
-                      className="h-40 w-full bg-gray-100 object-cover"
+                      className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2">
                       <p className="font-semibold">
@@ -451,7 +451,7 @@ export function BookPhotoTester({
                       <img
                         src={photo.url}
                         alt={`Shelf photo ${number}`}
-                        className="h-40 w-full bg-gray-100 object-cover"
+                        className="h-40 w-full bg-gray-100 object-contain"
                       />
                       <div className="p-2">
                         <p className="font-semibold">Shelf photo {number}</p>
@@ -472,7 +472,7 @@ export function BookPhotoTester({
                     <img
                       src={photo.url}
                       alt={`Shelf photo ${index + 1}`}
-                      className="h-40 w-full bg-gray-100 object-cover"
+                      className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2.5">
                       <p className="font-semibold">Shelf photo {index + 1}</p>
@@ -488,7 +488,7 @@ export function BookPhotoTester({
                     <img
                       src={previewUrl}
                       alt="Shelf photo awaiting recognition"
-                      className="h-40 w-full bg-gray-100 object-cover"
+                      className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2.5">
                       <p className="font-semibold">

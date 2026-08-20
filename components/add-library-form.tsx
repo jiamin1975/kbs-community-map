@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { createPortal } from "react-dom";
 import {
   browserPopupRedirectResolver,
   GoogleAuthProvider,
@@ -25,6 +26,7 @@ import {
   type MapCameraChangedEvent,
 } from "@vis.gl/react-google-maps";
 import { Camera, MapPin, MapPinned, ScanLine } from "lucide-react";
+import Cropper, { type Area } from "react-easy-crop";
 
 import { auth, db, storage } from "@/lib/firebase";
 import type { Library } from "@/lib/libraries";
@@ -58,6 +60,119 @@ type RecognitionResult = {
 type DuplicateCheckStatus = "idle" | "checking" | "clear" | "duplicate";
 
 const duplicateDistanceMeters = 5;
+const maximumPhotoSize = 10 * 1024 * 1024;
+
+async function downsamplePhotoIfNeeded(photo: File) {
+  if (photo.size <= maximumPhotoSize) {
+    return photo;
+  }
+
+  const sourceUrl = URL.createObjectURL(photo);
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const sourceImage = new Image();
+      sourceImage.onload = () => resolve(sourceImage);
+      sourceImage.onerror = () => reject(new Error("The photo could not be opened."));
+      sourceImage.src = sourceUrl;
+    });
+
+    const maximumDimension = 2400;
+    const scale = Math.min(
+      1,
+      maximumDimension / Math.max(image.naturalWidth, image.naturalHeight),
+    );
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      throw new Error("The photo could not be resized.");
+    }
+
+    context.drawImage(image, 0, 0, width, height);
+
+    const resizedBlob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("The photo could not be resized."));
+          }
+        },
+        "image/jpeg",
+        0.82,
+      );
+    });
+
+    const baseName = photo.name.replace(/\.[^.]+$/, "") || "book-box-photo";
+
+    return new File([resizedBlob], `${baseName}.jpg`, {
+      type: "image/jpeg",
+      lastModified: Date.now(),
+    });
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
+
+async function createCroppedPhoto(
+  sourcePhoto: File,
+  sourceUrl: string,
+  cropArea: Area,
+) {
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const sourceImage = new Image();
+    sourceImage.onload = () => resolve(sourceImage);
+    sourceImage.onerror = () => reject(new Error("The photo could not be opened."));
+    sourceImage.src = sourceUrl;
+  });
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(cropArea.width));
+  canvas.height = Math.max(1, Math.round(cropArea.height));
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("The photo could not be cropped.");
+  }
+
+  context.drawImage(
+    image,
+    cropArea.x,
+    cropArea.y,
+    cropArea.width,
+    cropArea.height,
+    0,
+    0,
+    canvas.width,
+    canvas.height,
+  );
+
+  const croppedBlob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("The photo could not be cropped."));
+        }
+      },
+      "image/jpeg",
+      0.9,
+    );
+  });
+  const baseName = sourcePhoto.name.replace(/\.[^.]+$/, "") || "book-box-photo";
+
+  return new File([croppedBlob], `${baseName}-cropped.jpg`, {
+    type: "image/jpeg",
+    lastModified: Date.now(),
+  });
+}
 
 type AddLibraryFormProps = {
   onLibraryAdded?: (library: Library) => void;
@@ -178,6 +293,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
 
+  const [processingPhoto, setProcessingPhoto] = useState(false);
+  const [cropSourcePhoto, setCropSourcePhoto] = useState<File | null>(null);
+  const [cropSourceUrl, setCropSourceUrl] = useState<string | null>(null);
+  const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
+  const [cropZoom, setCropZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [pendingLibraryId, setPendingLibraryId] = useState(
     () => doc(collection(db, "libraries")).id,
@@ -200,6 +321,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
       }
     };
   }, [photoPreviewUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (cropSourceUrl) {
+        URL.revokeObjectURL(cropSourceUrl);
+      }
+    };
+  }, [cropSourceUrl]);
 
   useEffect(() => {
     return () => {
@@ -575,6 +704,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
   function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
     const selectedPhoto = event.target.files?.[0] ?? null;
+    event.target.value = "";
 
     setMessage("");
     setError("");
@@ -588,25 +718,54 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     const allowedPhotoTypes = ["image/jpeg", "image/png", "image/webp"];
 
     if (!allowedPhotoTypes.includes(selectedPhoto.type)) {
-      event.target.value = "";
       setPhoto(null);
       setPhotoPreviewUrl(null);
       setError("Please choose a JPG, PNG, or WebP image.");
       return;
     }
 
-    const maximumPhotoSize = 10 * 1024 * 1024;
+    setCropSourcePhoto(selectedPhoto);
+    setCropSourceUrl(URL.createObjectURL(selectedPhoto));
+    setCropPosition({ x: 0, y: 0 });
+    setCropZoom(1);
+    setCroppedAreaPixels(null);
+  }
 
-    if (selectedPhoto.size > maximumPhotoSize) {
-      event.target.value = "";
-      setPhoto(null);
-      setPhotoPreviewUrl(null);
-      setError("The photo must be smaller than 10 MB.");
+  function closeCropEditor() {
+    setCropSourcePhoto(null);
+    setCropSourceUrl(null);
+    setCroppedAreaPixels(null);
+    setCropPosition({ x: 0, y: 0 });
+    setCropZoom(1);
+  }
+
+  async function useCroppedPhoto() {
+    if (!cropSourcePhoto || !cropSourceUrl || !croppedAreaPixels) {
       return;
     }
 
-    setPhoto(selectedPhoto);
-    setPhotoPreviewUrl(URL.createObjectURL(selectedPhoto));
+    setProcessingPhoto(true);
+    setError("");
+
+    try {
+      const croppedPhoto = await createCroppedPhoto(
+        cropSourcePhoto,
+        cropSourceUrl,
+        croppedAreaPixels,
+      );
+      const preparedPhoto = await downsamplePhotoIfNeeded(croppedPhoto);
+      setPhoto(preparedPhoto);
+      setPhotoPreviewUrl(URL.createObjectURL(preparedPhoto));
+      closeCropEditor();
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "The photo could not be cropped.",
+      );
+    } finally {
+      setProcessingPhoto(false);
+    }
   }
 
   function handleBookPhotoChange(event: ChangeEvent<HTMLInputElement>) {
@@ -1239,7 +1398,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={handlePhotoChange}
-              disabled={saving || !stepOneComplete}
+              disabled={saving || processingPhoto || !stepOneComplete}
               className="hidden"
             />
 
@@ -1250,16 +1409,20 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     Add a photo of book box
                   </p>
                   <p className="text-[11px] text-muted-foreground">
-                    10 MB max
+                    Crop for privacy; large photos are resized
                   </p>
                 </div>
 
                 <label
                   htmlFor="library-photo"
-                  aria-disabled={!stepOneComplete}
-                  className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:text-sm"
+                  aria-disabled={!stepOneComplete || processingPhoto}
+                  className={`inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border px-4 text-base font-bold transition sm:h-10 sm:text-sm ${
+                    processingPhoto
+                      ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
+                      : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
+                  }`}
                 >
-                  📷 Add Box Photo
+                  {processingPhoto ? "Optimizing Photo…" : "📷 Add Box Photo"}
                 </label>
               </>
             ) : (
@@ -1270,11 +1433,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 </p>
 
                 <div className="flex w-full min-w-0 max-w-full justify-center gap-2 overflow-x-hidden pb-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
-                  <div className="w-full overflow-hidden rounded-xl border border-blue-200 bg-background sm:w-48 sm:shrink-0">
+                  <div className="w-48 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-background">
                     <img
                       src={photoPreviewUrl}
                       alt="Preview of the book-sharing location"
-                      className="h-40 w-full bg-gray-100 object-cover brightness-110 contrast-105 sm:h-36"
+                      className="aspect-[4/5] w-full bg-gray-100 object-contain"
                     />
 
                     <div className="p-1.5">
@@ -1406,7 +1569,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     <img
                       src={bookPreviewUrl}
                       alt="Shelf photo awaiting recognition"
-                      className="h-40 w-full bg-gray-100 object-cover"
+                      className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2">
                       <p className="font-semibold">
@@ -1434,7 +1597,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <img
                         src={bookPhotoPreview.url}
                         alt={`Shelf photo ${number}`}
-                        className="h-40 w-full bg-gray-100 object-cover"
+                        className="h-40 w-full bg-gray-100 object-contain"
                       />
                       <div className="p-2">
                         <p className="font-semibold">Shelf photo {number}</p>
@@ -1565,6 +1728,76 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           )}
         </div>
       </div>
+
+      {cropSourceUrl && createPortal(
+        <div
+          data-book-box-crop-editor
+          className="pointer-events-auto fixed inset-0 z-[100] flex items-center justify-center bg-black/65 p-3"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="crop-box-photo-title"
+        >
+          <div className="grid max-h-[95dvh] w-full max-w-lg gap-3 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl">
+            <div>
+              <h2 id="crop-box-photo-title" className="text-lg font-bold text-foreground">
+                Crop Book Box Photo
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Crop closely around the book box and exclude private property when possible.
+              </p>
+            </div>
+
+            <div className="relative h-[55dvh] max-h-[480px] min-h-72 overflow-hidden rounded-xl bg-black">
+              <Cropper
+                image={cropSourceUrl}
+                crop={cropPosition}
+                zoom={cropZoom}
+                aspect={4 / 5}
+                objectFit="contain"
+                showGrid
+                onCropChange={setCropPosition}
+                onZoomChange={setCropZoom}
+                onCropComplete={(_, croppedPixels) =>
+                  setCroppedAreaPixels(croppedPixels)
+                }
+              />
+            </div>
+
+            <label className="grid gap-1 text-sm font-medium text-foreground">
+              Zoom
+              <input
+                type="range"
+                min={1}
+                max={3}
+                step={0.05}
+                value={cropZoom}
+                onChange={(event) => setCropZoom(Number(event.target.value))}
+                className="w-full accent-blue-600"
+              />
+            </label>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={closeCropEditor}
+                disabled={processingPhoto}
+                className="h-12 rounded-xl border border-border bg-white px-4 font-semibold text-foreground hover:bg-secondary disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={useCroppedPhoto}
+                disabled={processingPhoto || !croppedAreaPixels}
+                className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {processingPhoto ? "Preparing Photo…" : "Use This Crop"}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

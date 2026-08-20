@@ -54,6 +54,13 @@ export function LibraryMapExperience() {
   }
 
   function handleAddLibraryDialogChange(open: boolean) {
+    if (
+      !open &&
+      document.querySelector("[data-book-box-crop-editor]")
+    ) {
+      return
+    }
+
     setAddLibraryDialogOpen(open)
   }
 
@@ -95,7 +102,19 @@ export function LibraryMapExperience() {
         open={addLibraryDialogOpen}
         onOpenChange={handleAddLibraryDialogChange}
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+        <DialogContent
+          className="max-h-[90vh] overflow-y-auto sm:max-w-3xl"
+          onInteractOutside={(event) => {
+            const target = event.target
+
+            if (
+              target instanceof Element &&
+              target.closest("[data-book-box-crop-editor]")
+            ) {
+              event.preventDefault()
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Add a New Book Box</DialogTitle>
           </DialogHeader>
