@@ -1404,14 +1404,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
             {!photoPreviewUrl ? (
               <>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs text-muted-foreground">
-                    Add a photo of book box
-                  </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    Crop for privacy; large photos are resized
-                  </p>
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  Crop for privacy
+                </p>
 
                 <label
                   htmlFor="library-photo"
@@ -1560,10 +1555,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             {(processedBookPhotos.length > 0 ||
               (bookPhoto && bookPreviewUrl)) && (
               <div className="grid gap-3 sm:grid-cols-2">
-                <p className="text-sm font-semibold text-muted-foreground sm:col-span-2">
-                  Shelf photos
-                </p>
-
                 {bookPhoto && bookPreviewUrl && (
                   <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:order-last">
                     <img
@@ -1763,7 +1754,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               />
             </div>
 
-            <label className="grid gap-1 text-sm font-medium text-foreground">
+            <label className="hidden gap-1 text-sm font-medium text-foreground sm:grid">
               Zoom
               <input
                 type="range"
