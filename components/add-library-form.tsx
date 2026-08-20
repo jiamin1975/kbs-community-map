@@ -1152,24 +1152,24 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               role="status"
             >
               {locationAdjusted ? (
-                <>Location adjusted. No duplicate book box found. Select Continue.</>
+                <>Location adjusted. No duplicate box found.</>
               ) : (
-                <>No duplicate book box found. Select Continue.</>
+                <>No duplicate box found.</>
               )}
             </div>
           )}
 
           {duplicateCheckStatus === "duplicate" && nearbyLibrary && (
             <div
-              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 max-sm:order-3 max-sm:font-bold max-sm:leading-snug"
+              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 max-sm:order-3 max-sm:leading-snug"
               role="alert"
             >
-              <p className="font-semibold">Possible Duplicate Found</p>
-              <p className="mt-1">{nearbyLibrary.name}</p>
+              <p className="font-bold">Possible Duplicate Found!</p>
+              <p className="mt-1 text-xs font-normal max-sm:!text-xs">{nearbyLibrary.name}</p>
               {nearbyLibrary.address && (
-                <p className="text-xs">{nearbyLibrary.address}</p>
+                <p className="text-xs font-normal max-sm:!text-xs">{nearbyLibrary.address}</p>
               )}
-              <p className="mt-1 text-xs">
+              <p className="mt-1 text-xs font-normal max-sm:!text-xs">
                 About {Math.round(nearbyLibrary.distanceMeters)} meters away.
                 {" "}<strong>Adjust the marker if this is a different book box.</strong>
               </p>
