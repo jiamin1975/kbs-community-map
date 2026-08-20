@@ -982,15 +982,17 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 : "border-blue-200 bg-blue-50 text-blue-900"
             }`}
           >
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
+            <span className="relative flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
               <MapPinned className="size-3.5" />
+              {currentStep > 1 && (
+                <span className="absolute -right-1 -top-1 flex size-3.5 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold leading-none text-white ring-1 ring-white">
+                  ✓
+                </span>
+              )}
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
               Confirm Box Location
             </span>
-            {currentStep > 1 && (
-              <span className="shrink-0 text-xs font-semibold">✓</span>
-            )}
           </li>
 
           <li
@@ -1002,15 +1004,17 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   : "border-gray-200 bg-gray-50 text-gray-500"
             }`}
           >
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
+            <span className="relative flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
               <Camera className="size-3.5" />
+              {currentStep > 2 && (
+                <span className="absolute -right-1 -top-1 flex size-3.5 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold leading-none text-white ring-1 ring-white">
+                  ✓
+                </span>
+              )}
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
               Add Box Photo
             </span>
-            {currentStep > 2 && (
-              <span className="shrink-0 text-xs font-semibold">✓</span>
-            )}
           </li>
 
           <li
@@ -1145,16 +1149,16 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                         zIndex={20}
                       >
                         <div
-                          className="pointer-events-none relative flex size-9 items-start justify-center"
+                          className="pointer-events-none relative flex size-7 items-start justify-center"
                           aria-label="Existing book box"
                         >
                           <MapPin
-                            className="size-9 fill-blue-600 text-blue-700 drop-shadow-md"
+                            className="size-7 fill-blue-600 text-blue-700 drop-shadow-md"
                             strokeWidth={1.75}
                             aria-hidden="true"
                           />
                           <span
-                            className="absolute top-[8px] size-2.5 rounded-full bg-white"
+                            className="absolute top-[6px] size-2 rounded-full bg-white"
                             aria-hidden="true"
                           />
                         </div>
@@ -1517,21 +1521,15 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               disabled={
                 saving || locating || analyzingBooks || !stepThreeComplete
               }
-              className="min-h-12 rounded-xl border border-green-800 bg-green-700 px-2 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
+              className="min-h-12 whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
             >
               {uploadingPhoto
                 ? "Uploading Photo…"
                 : saving
                   ? "Adding Location…"
-                  : (
-                      <>
-                        <span className="block">Add this Book Box</span>
-                        <span className="block">
-                          with {recognizedBooks.length} Book
-                          {recognizedBooks.length === 1 ? "" : "s"}
-                        </span>
-                      </>
-                    )}
+                  : `Add This Book Box with ${recognizedBooks.length} Book${
+                      recognizedBooks.length === 1 ? "" : "s"
+                    }`}
             </button>
           </div>
           </section>
