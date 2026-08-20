@@ -974,7 +974,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           aria-label="Add book-sharing location progress"
         >
           <li
-            className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
+            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
               currentStep === 1
                 ? "border-green-300 bg-green-100 text-green-950"
                 : "border-blue-200 bg-blue-50 text-blue-900"
@@ -992,7 +992,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
+            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               currentStep === 2
                 ? "border-green-300 bg-green-100 text-green-950"
                 : currentStep > 2
@@ -1012,7 +1012,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex w-[13rem] max-w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
+            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
               currentStep === 3
                 ? "border-green-300 bg-green-100 text-green-950"
                 : "border-gray-200 bg-gray-50 text-gray-500"
@@ -1071,7 +1071,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             </label>
           </div>
 
-          <div className="grid gap-1 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:gap-2">
+          <div className="-mt-2 grid gap-1 sm:mt-0 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:gap-2">
             <label className="grid min-w-0 gap-0 sm:gap-1">
               <span className="text-xs font-medium">Address</span>
 
