@@ -984,7 +984,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <MapPinned className="size-3.5" />
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
-              Confirm Location
+              Confirm Box Location
             </span>
             {currentStep > 1 && (
               <span className="shrink-0 text-xs font-semibold">✓</span>
@@ -1041,7 +1041,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               Confirm location
             </h2>
 
-          <div className="grid gap-1.5 sm:grid-cols-2 sm:items-end sm:gap-2">
+          <div className="grid gap-1 sm:grid-cols-2 sm:items-end sm:gap-2">
             <button
               type="button"
               onClick={useCurrentLocation}
@@ -1054,7 +1054,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               </span>
             </button>
 
-            <label className="grid min-w-0 gap-0.5 sm:gap-1">
+            <label className="grid min-w-0 gap-0 sm:gap-1">
               <span className="flex items-center justify-between gap-1 text-xs font-medium">
                 <span>Book Box Name</span>
                 <span className="text-[10px] font-normal text-muted-foreground">
@@ -1065,31 +1065,31 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="h-10 min-w-0 rounded-lg border border-border bg-background px-2.5 text-base sm:h-9 sm:text-xs"
+                className="h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
                 placeholder="Generated from location"
               />
             </label>
           </div>
 
-          <div className="grid gap-1.5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:gap-2">
-            <label className="grid min-w-0 gap-0.5 sm:gap-1">
+          <div className="grid gap-1 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:gap-2">
+            <label className="grid min-w-0 gap-0 sm:gap-1">
               <span className="text-xs font-medium">Address</span>
 
               <input
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
-                className="h-10 min-w-0 rounded-lg border border-border bg-background px-2.5 text-base sm:h-9 sm:text-xs"
+                className="h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
                 placeholder="123 Main St, Rockville, MD"
               />
             </label>
 
-            <label className="grid min-w-0 gap-0.5 sm:gap-1">
+            <label className="grid min-w-0 gap-0 sm:gap-1">
               <span className="text-xs font-medium">Neighborhood</span>
 
               <input
                 value={neighborhood}
                 onChange={(event) => setNeighborhood(event.target.value)}
-                className="h-10 min-w-0 rounded-lg border border-border bg-background px-2.5 text-base sm:h-9 sm:text-xs"
+                className="h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
                 placeholder="Town Center"
               />
             </label>
