@@ -1340,7 +1340,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "clear" && (
             <div
-              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-bold text-green-800 max-sm:order-3 max-sm:!text-sm max-sm:leading-snug"
+              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-bold text-green-800 max-sm:order-3 max-sm:!text-base max-sm:leading-snug"
               role="status"
             >
               Location confirmed!
@@ -1353,10 +1353,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               role="alert"
             >
               <p className="font-bold">Possible Duplicate Found!</p>
-              <p className="mt-1 text-xs font-normal max-sm:!text-xs">{nearbyLibrary.name}</p>
-              {nearbyLibrary.address && (
-                <p className="text-xs font-normal max-sm:!text-xs">{nearbyLibrary.address}</p>
-              )}
               <p className="mt-1 text-xs font-normal max-sm:!text-xs">
                 <strong>Adjust the marker if this is a different book box.</strong>
               </p>
@@ -1404,7 +1400,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
             {!photoPreviewUrl ? (
               <>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-right text-xs text-muted-foreground">
                   Crop for privacy
                 </p>
 
@@ -1422,11 +1418,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               </>
             ) : (
               <div className="w-full min-w-0 max-w-full overflow-hidden">
-                <p className="mb-2 text-xs font-medium text-muted-foreground">
-                  <span className="sm:hidden">Book box photo</span>
-                  <span className="hidden sm:inline">Book box photo</span>
-                </p>
-
                 <div className="flex w-full min-w-0 max-w-full justify-center gap-2 overflow-x-hidden pb-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
                   <div className="w-48 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-background">
                     <img
@@ -1436,8 +1427,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     />
 
                     <div className="p-1.5">
-                      <p className="text-[11px] font-semibold leading-tight">Book box photo</p>
-                      <div className="mt-1 flex items-center gap-2.5">
+                      <div className="flex items-center gap-2.5">
                         <label
                           htmlFor="library-photo"
                           className="cursor-pointer text-[10px] font-medium text-muted-foreground underline underline-offset-2 hover:text-blue-700 max-sm:!text-sm"
@@ -1530,7 +1520,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <label
                 htmlFor="book-photo"
                 aria-disabled={analyzingBooks || saving}
-                className={`inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition sm:h-10 sm:px-2 sm:text-sm ${
+                className={`inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition max-sm:!text-base sm:h-10 sm:px-2 sm:text-sm ${
                   analyzingBooks || saving
                     ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
                     : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
