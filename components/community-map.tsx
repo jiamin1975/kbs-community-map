@@ -463,7 +463,14 @@ export function CommunityMap({
       return;
     }
 
-    setSelectedLibrary(nearbyMatch.library);
+    const nearbyLibrary = nearbyMatch.library;
+
+    setMapCenter({
+      lat: nearbyLibrary.latitude,
+      lng: nearbyLibrary.longitude,
+    });
+    setMapZoom(18);
+    setSelectedLibrary(nearbyLibrary);
     setLibraryPhotoUrl(null);
     setNearbyMatch(null);
   }
