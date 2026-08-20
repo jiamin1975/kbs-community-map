@@ -1527,9 +1527,21 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 ? "Uploading Photo…"
                 : saving
                   ? "Adding Location…"
-                  : `Add This Book Box with ${recognizedBooks.length} Book${
-                      recognizedBooks.length === 1 ? "" : "s"
-                    }`}
+                  : (
+                      <>
+                        <span className="sm:hidden">
+                          <span className="block">Add This Book Box</span>
+                          <span className="block">
+                            with {recognizedBooks.length} Book
+                            {recognizedBooks.length === 1 ? "" : "s"}
+                          </span>
+                        </span>
+                        <span className="hidden sm:inline">
+                          Add This Book Box with {recognizedBooks.length} Book
+                          {recognizedBooks.length === 1 ? "" : "s"}
+                        </span>
+                      </>
+                    )}
             </button>
           </div>
           </section>
