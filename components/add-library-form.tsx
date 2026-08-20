@@ -1096,7 +1096,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </div>
 
           {markerPosition && (
-            <div className="overflow-hidden rounded-xl border border-border">
+            <div className="overflow-hidden rounded-xl border border-border max-sm:order-4">
               <div className="border-b border-border bg-secondary px-3 py-2">
                 <p className="text-sm font-bold text-foreground">
                   Drag to adjust
@@ -1139,7 +1139,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "checking" && (
             <div
-              className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800"
+              className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800 max-sm:order-3"
               role="status"
             >
               Checking for an existing book box near this location…
@@ -1148,7 +1148,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "clear" && (
             <div
-              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-bold text-green-800"
+              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-bold text-green-800 max-sm:order-3"
               role="status"
             >
               {locationAdjusted ? (
@@ -1161,7 +1161,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "duplicate" && nearbyLibrary && (
             <div
-              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 max-sm:order-3"
               role="alert"
             >
               <p className="font-semibold">Possible Duplicate Found</p>
@@ -1180,7 +1180,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               type="button"
               onClick={() => goToStep(2)}
               disabled={!stepOneComplete || locating || saving}
-              className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
+              className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none max-sm:order-5"
             >
               Continue →
             </button>
