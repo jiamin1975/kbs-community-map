@@ -1151,11 +1151,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-bold text-green-800 max-sm:order-3 max-sm:!text-sm max-sm:leading-snug"
               role="status"
             >
-              {locationAdjusted ? (
-                <>Location adjusted. No duplicate box found.</>
-              ) : (
-                <>No duplicate box found.</>
-              )}
+              Location confirmed!
             </div>
           )}
 
