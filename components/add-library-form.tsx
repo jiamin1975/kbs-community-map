@@ -972,11 +972,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
         </div>
 
         <ol
-          className="sticky top-0 z-30 -mx-3 mt-2 grid grid-cols-1 justify-items-start gap-0.5 border-y border-border bg-card/95 px-3 py-1.5 shadow-sm backdrop-blur sm:-mx-4 sm:mt-3 sm:grid-cols-3 sm:justify-items-stretch sm:gap-1 sm:px-4 sm:py-2"
+          className="sticky top-0 z-30 -mx-3 mt-2 grid cursor-default select-none grid-cols-1 justify-items-start gap-0.5 border-y border-border bg-card/95 px-3 py-1.5 shadow-sm backdrop-blur sm:-mx-4 sm:mt-3 sm:grid-cols-3 sm:justify-items-stretch sm:gap-1 sm:px-4 sm:py-2"
           aria-label="Add book-sharing location progress"
         >
           <li
-            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-6 ${
+            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-6 [clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-8 ${
               currentStep === 1
                 ? "border-green-300 bg-green-100 text-green-950"
                 : "border-blue-200 bg-blue-50 text-blue-900"
@@ -994,7 +994,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
+            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-6 [clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-7 sm:pr-8 sm:[clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%,22px_50%)] ${
               currentStep === 2
                 ? "border-green-300 bg-green-100 text-green-950"
                 : currentStep > 2
@@ -1014,7 +1014,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </li>
 
           <li
-            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-4 [clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-5 sm:pr-6 sm:[clip-path:polygon(0_0,calc(100%_-_12px)_0,100%_50%,calc(100%_-_12px)_100%,0_100%,12px_50%)] ${
+            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-6 [clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-7 sm:pr-8 sm:[clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%,22px_50%)] ${
               currentStep === 3
                 ? "border-green-300 bg-green-100 text-green-950"
                 : "border-gray-200 bg-gray-50 text-gray-500"
@@ -1151,7 +1151,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                         zIndex={20}
                       >
                         <div
-                          className="size-4 rounded-full border-2 border-white bg-green-600 shadow-lg ring-2 ring-green-300"
+                          className="size-4 rounded-full border-2 border-white bg-blue-600 shadow-lg ring-2 ring-blue-300"
                           aria-label="Existing book box"
                         />
                       </AdvancedMarker>
