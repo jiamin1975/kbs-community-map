@@ -983,7 +983,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
               <MapPinned className="size-3.5" />
             </span>
-            <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
+            <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
               Confirm Location
             </span>
             {currentStep > 1 && (
@@ -1003,7 +1003,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
               <Camera className="size-3.5" />
             </span>
-            <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
+            <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
               Add Box Photo
             </span>
             {currentStep > 2 && (
@@ -1021,7 +1021,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
               <ScanLine className="size-3.5" />
             </span>
-            <span className="min-w-0 flex-1 whitespace-nowrap text-sm font-semibold">
+            <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
               Add Shelf Photo
             </span>
           </li>
@@ -1041,20 +1041,20 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               Confirm location
             </h2>
 
-          <div className="grid gap-2 sm:grid-cols-2 sm:items-end">
+          <div className="grid gap-1.5 sm:grid-cols-2 sm:items-end sm:gap-2">
             <button
               type="button"
               onClick={useCurrentLocation}
               disabled={locating || saving}
-              className="inline-flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10 sm:text-sm"
+              className="inline-flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-3 font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm sm:h-10 sm:px-4 sm:text-sm"
             >
               <span aria-hidden="true">📍</span>
-              <span className="truncate">
+              <span className="truncate max-sm:!text-sm">
                 {locating ? "Finding Location…" : "Use My Current Location"}
               </span>
             </button>
 
-            <label className="grid min-w-0 gap-1">
+            <label className="grid min-w-0 gap-0.5 sm:gap-1">
               <span className="flex items-center justify-between gap-1 text-xs font-medium">
                 <span>Book Box Name</span>
                 <span className="text-[10px] font-normal text-muted-foreground">
@@ -1065,31 +1065,31 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-base sm:h-9 sm:px-2.5 sm:text-xs"
+                className="h-10 min-w-0 rounded-lg border border-border bg-background px-2.5 text-base sm:h-9 sm:text-xs"
                 placeholder="Generated from location"
               />
             </label>
           </div>
 
-          <div className="grid gap-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <label className="grid min-w-0 gap-1">
+          <div className="grid gap-1.5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:gap-2">
+            <label className="grid min-w-0 gap-0.5 sm:gap-1">
               <span className="text-xs font-medium">Address</span>
 
               <input
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
-                className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-base sm:h-9 sm:px-2.5 sm:text-xs"
+                className="h-10 min-w-0 rounded-lg border border-border bg-background px-2.5 text-base sm:h-9 sm:text-xs"
                 placeholder="123 Main St, Rockville, MD"
               />
             </label>
 
-            <label className="grid min-w-0 gap-1">
+            <label className="grid min-w-0 gap-0.5 sm:gap-1">
               <span className="text-xs font-medium">Neighborhood</span>
 
               <input
                 value={neighborhood}
                 onChange={(event) => setNeighborhood(event.target.value)}
-                className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-base sm:h-9 sm:px-2.5 sm:text-xs"
+                className="h-10 min-w-0 rounded-lg border border-border bg-background px-2.5 text-base sm:h-9 sm:text-xs"
                 placeholder="Town Center"
               />
             </label>
@@ -1139,7 +1139,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "checking" && (
             <div
-              className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800 max-sm:order-3"
+              className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800 max-sm:order-3 max-sm:!text-sm max-sm:font-bold max-sm:leading-snug"
               role="status"
             >
               Checking for an existing book box near this location…
@@ -1148,7 +1148,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "clear" && (
             <div
-              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-bold text-green-800 max-sm:order-3"
+              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-bold text-green-800 max-sm:order-3 max-sm:!text-sm max-sm:leading-snug"
               role="status"
             >
               {locationAdjusted ? (
@@ -1161,7 +1161,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "duplicate" && nearbyLibrary && (
             <div
-              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 max-sm:order-3"
+              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 max-sm:order-3 max-sm:font-bold max-sm:leading-snug"
               role="alert"
             >
               <p className="font-semibold">Possible Duplicate Found</p>
