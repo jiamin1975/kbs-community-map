@@ -508,7 +508,7 @@ export function BookPhotoTester({
 
           <div className="overflow-hidden rounded-lg border border-green-200 bg-green-50" aria-live="polite">
             <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
-              Library Inventory
+              Box Inventory
             </p>
 
             {sessionBooks.length > 0 ? (
@@ -566,7 +566,7 @@ export function BookPhotoTester({
                 Saving Inventory…
               </>
             ) : (
-              `Update Library with ${sessionBooks.length} Book${
+              `Update Book Box with ${sessionBooks.length} Book${
                 sessionBooks.length === 1 ? "" : "s"
               }`
             )}

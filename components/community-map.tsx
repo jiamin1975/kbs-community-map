@@ -897,7 +897,7 @@ export function CommunityMap({
                             onClick={() => onUploadPhoto(selectedLibrary)}
                             className="inline-flex h-11 w-full items-center justify-center gap-1 rounded-xl bg-blue-600 px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:h-8"
                           >
-                            📷 Update This Inventory
+                            📷 Update Inventory
                           </button>
 
                           <div className="max-w-full break-words rounded-lg bg-gray-100 px-2.5 py-2 text-xs text-gray-700">
