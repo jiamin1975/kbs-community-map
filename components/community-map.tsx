@@ -127,6 +127,7 @@ export function CommunityMap({
   const [locatingForBookSearch, setLocatingForBookSearch] = useState(false);
   const [bookSearchLocationError, setBookSearchLocationError] = useState("");
   const bookSearchAreaRef = useRef<HTMLDivElement>(null);
+  const mapAreaRef = useRef<HTMLDivElement>(null);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -453,6 +454,16 @@ export function CommunityMap({
           zoom: 18,
           requestId: Date.now(),
         });
+
+        if (window.matchMedia("(max-width: 639px)").matches) {
+          window.requestAnimationFrame(() => {
+            mapAreaRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          });
+        }
+
         setLocating(false);
       },
       (geolocationError) => {
@@ -777,7 +788,10 @@ export function CommunityMap({
         )}
       </div>
 
-      <div className="relative h-[600px] w-full">
+      <div
+        ref={mapAreaRef}
+        className="relative h-[600px] w-full scroll-mt-3"
+      >
         <APIProvider apiKey={apiKey}>
           <Map
             center={mapCenter}
