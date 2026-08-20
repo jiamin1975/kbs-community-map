@@ -8,6 +8,7 @@ import {
   Map,
   Marker,
   type MapCameraChangedEvent,
+  useMap,
 } from "@vis.gl/react-google-maps";
 import { getDownloadURL, ref } from "firebase/storage";
 
@@ -25,6 +26,28 @@ type NearbyLibraryMatch = {
   library: Library;
   distanceMeters: number;
 };
+
+type MapCameraTarget = {
+  lat: number;
+  lng: number;
+  zoom: number;
+  requestId: number;
+};
+
+function MapCameraController({ target }: { target: MapCameraTarget | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || !target) {
+      return;
+    }
+
+    map.panTo({ lat: target.lat, lng: target.lng });
+    map.setZoom(target.zoom);
+  }, [map, target]);
+
+  return null;
+}
 
 function calculateDistanceMeters(
   latitude1: number,
@@ -87,6 +110,8 @@ export function CommunityMap({
   });
 
   const [mapZoom, setMapZoom] = useState(11);
+  const [mapCameraTarget, setMapCameraTarget] =
+    useState<MapCameraTarget | null>(null);
 
   const [userLocation, setUserLocation] = useState<{
     lat: number;
@@ -422,6 +447,12 @@ export function CommunityMap({
         });
 
         setMapZoom(18);
+        setMapCameraTarget({
+          lat: closestMatch.library.latitude,
+          lng: closestMatch.library.longitude,
+          zoom: 18,
+          requestId: Date.now(),
+        });
         setLocating(false);
       },
       (geolocationError) => {
@@ -470,6 +501,12 @@ export function CommunityMap({
       lng: nearbyLibrary.longitude,
     });
     setMapZoom(18);
+    setMapCameraTarget({
+      lat: nearbyLibrary.latitude,
+      lng: nearbyLibrary.longitude,
+      zoom: 18,
+      requestId: Date.now(),
+    });
     setSelectedLibrary(nearbyLibrary);
     setLibraryPhotoUrl(null);
     setNearbyMatch(null);
@@ -752,6 +789,8 @@ export function CommunityMap({
             streetViewControl={false}
             fullscreenControl
           >
+            <MapCameraController target={mapCameraTarget} />
+
             {userLocation && (
               <AdvancedMarker
                 position={userLocation}
