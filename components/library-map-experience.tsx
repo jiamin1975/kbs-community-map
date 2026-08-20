@@ -8,7 +8,6 @@ import { CommunityMap } from "@/components/community-map"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -79,10 +78,6 @@ export function LibraryMapExperience() {
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Update Book Box Inventory</DialogTitle>
-
-            <DialogDescription className="text-xs leading-tight">
-              Add shelf photos—AI will update the book box inventory.
-            </DialogDescription>
           </DialogHeader>
 
           {selectedLibrary && (

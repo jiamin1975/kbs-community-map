@@ -24,7 +24,7 @@ import {
   Map as GoogleMap,
   type MapCameraChangedEvent,
 } from "@vis.gl/react-google-maps";
-import { Camera, MapPinned, ScanLine } from "lucide-react";
+import { Camera, MapPin, MapPinned, ScanLine } from "lucide-react";
 
 import { auth, db, storage } from "@/lib/firebase";
 import type { Library } from "@/lib/libraries";
@@ -57,7 +57,7 @@ type RecognitionResult = {
 
 type DuplicateCheckStatus = "idle" | "checking" | "clear" | "duplicate";
 
-const duplicateDistanceMeters = 15;
+const duplicateDistanceMeters = 5;
 
 type AddLibraryFormProps = {
   onLibraryAdded?: (library: Library) => void;
@@ -1126,9 +1126,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       title="Drag to the exact book-sharing location"
                       zIndex={10}
                     >
-                        <div className="flex flex-col items-center">
+                      <div className="flex flex-col items-center">
                         <div className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-lg">
-                          Book box
+                          New Box
                         </div>
 
                         <div className="h-3 w-3 -translate-y-0.5 rotate-45 bg-red-600" />
@@ -1145,9 +1145,19 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                         zIndex={20}
                       >
                         <div
-                          className="size-4 rounded-full border-2 border-white bg-blue-600 shadow-lg ring-2 ring-blue-300"
+                          className="pointer-events-none relative flex size-9 items-start justify-center"
                           aria-label="Existing book box"
-                        />
+                        >
+                          <MapPin
+                            className="size-9 fill-blue-600 text-blue-700 drop-shadow-md"
+                            strokeWidth={1.75}
+                            aria-hidden="true"
+                          />
+                          <span
+                            className="absolute top-[8px] size-2.5 rounded-full bg-white"
+                            aria-hidden="true"
+                          />
+                        </div>
                       </AdvancedMarker>
                     )}
                   </GoogleMap>
@@ -1185,8 +1195,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 <p className="text-xs font-normal max-sm:!text-xs">{nearbyLibrary.address}</p>
               )}
               <p className="mt-1 text-xs font-normal max-sm:!text-xs">
-                About {Math.round(nearbyLibrary.distanceMeters)} meters away.
-                {" "}<strong>Adjust the marker if this is a different book box.</strong>
+                <strong>Adjust the marker if this is a different book box.</strong>
               </p>
             </div>
           )}

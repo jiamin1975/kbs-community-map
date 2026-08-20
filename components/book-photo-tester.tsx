@@ -31,7 +31,6 @@ type RecognitionResult = {
 }
 
 type ProcessedBookPhoto = {
-  name: string
   url: string
 }
 
@@ -238,7 +237,6 @@ export function BookPhotoTester({
         setProcessedBookPhotos((currentPhotos) => [
           ...currentPhotos,
           {
-            name: file.name,
             url: previewUrl,
           },
         ])
@@ -381,7 +379,12 @@ export function BookPhotoTester({
           <div className="grid gap-2 sm:grid-cols-2">
             <label
               htmlFor="update-book-photo"
-              className="inline-flex h-12 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-blue-700 bg-blue-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-blue-700 sm:h-10 sm:px-2 sm:text-sm"
+              aria-disabled={loading || saving}
+              className={`inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition sm:h-10 sm:px-2 sm:text-sm ${
+                loading || saving
+                  ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
+                  : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
+              }`}
             >
               📚 {photosProcessed > 0
                 ? "Add Another Shelf Photo"
@@ -399,8 +402,6 @@ export function BookPhotoTester({
                   <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
                   Recognizing…
                 </>
-              ) : result ? (
-                "✓ Recognition Done"
               ) : (
                 "✨ Recognize Books"
               )}
@@ -411,7 +412,7 @@ export function BookPhotoTester({
             <>
               <div className="grid min-w-0 gap-3 sm:hidden">
                 <p className="text-sm font-semibold text-muted-foreground">
-                  Book photos
+                  Shelf photos
                 </p>
 
                 {previewUrl && file && (
@@ -420,15 +421,17 @@ export function BookPhotoTester({
                   >
                     <img
                       src={previewUrl}
-                      alt="Book photo awaiting recognition"
+                      alt="Shelf photo awaiting recognition"
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2">
                       <p className="font-semibold">
-                        Book photo {processedBookPhotos.length + 1}
+                        Shelf photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {file.name}
+                      <p className="mt-1 font-semibold text-amber-700" role="status">
+                        {loading
+                          ? "Recognizing Books…"
+                          : "Waiting for Recognize Books…"}
                       </p>
                     </div>
                   </div>
@@ -447,16 +450,13 @@ export function BookPhotoTester({
                     >
                       <img
                         src={photo.url}
-                        alt={`Book photo ${number}`}
+                        alt={`Shelf photo ${number}`}
                         className="h-40 w-full bg-gray-100 object-cover"
                       />
                       <div className="p-2">
-                        <p className="font-semibold">Book photo {number}</p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {photo.name}
-                        </p>
+                        <p className="font-semibold">Shelf photo {number}</p>
                         <p className="mt-1 font-semibold text-green-700">
-                          ✓ Recognition Done
+                          Recognition Done
                         </p>
                       </div>
                     </div>
@@ -471,16 +471,13 @@ export function BookPhotoTester({
                   >
                     <img
                       src={photo.url}
-                      alt={`Book photo ${index + 1}`}
+                      alt={`Shelf photo ${index + 1}`}
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2.5">
-                      <p className="font-semibold">Book photo {index + 1}</p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {photo.name}
-                      </p>
+                      <p className="font-semibold">Shelf photo {index + 1}</p>
                       <p className="mt-1 font-semibold text-green-700">
-                        ✓ Recognition Done
+                        Recognition Done
                       </p>
                     </div>
                   </div>
@@ -490,15 +487,17 @@ export function BookPhotoTester({
                   <div className="w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
                     <img
                       src={previewUrl}
-                      alt="Book photo awaiting recognition"
+                      alt="Shelf photo awaiting recognition"
                       className="h-40 w-full bg-gray-100 object-cover"
                     />
                     <div className="p-2.5">
                       <p className="font-semibold">
-                        Book photo {processedBookPhotos.length + 1}
+                        Shelf photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {file.name}
+                      <p className="mt-1 font-semibold text-amber-700" role="status">
+                        {loading
+                          ? "Recognizing Books…"
+                          : "Waiting for Recognize Books…"}
                       </p>
                     </div>
                   </div>
