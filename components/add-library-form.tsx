@@ -57,7 +57,7 @@ type RecognitionResult = {
 
 type DuplicateCheckStatus = "idle" | "checking" | "clear" | "duplicate";
 
-const duplicateDistanceMeters = 5;
+const duplicateDistanceMeters = 15;
 
 type AddLibraryFormProps = {
   onLibraryAdded?: (library: Library) => void;
@@ -1126,13 +1126,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       title="Drag to the exact book-sharing location"
                       zIndex={10}
                     >
-                      <div
-                        className={`flex flex-col items-center ${
-                          nearbyLibrary
-                            ? "-translate-x-8"
-                            : ""
-                        }`}
-                      >
+                        <div className="flex flex-col items-center">
                         <div className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-lg">
                           Book box
                         </div>
