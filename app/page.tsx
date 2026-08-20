@@ -38,7 +38,9 @@ export default function Page() {
             </p>
             <p className="mt-1.5 text-base font-semibold leading-tight text-foreground sm:mt-3 sm:text-lg">
               <span className="font-bold text-blue-700">One</span>{" "}
-              shelf photo helps the{" "}
+              shelf photo helps the
+              <span className="hidden sm:inline"> </span>
+              <br className="sm:hidden" />
               <span className="font-bold text-blue-700">whole</span> community.
             </p>
           </div>
