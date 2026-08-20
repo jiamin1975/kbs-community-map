@@ -1211,7 +1211,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               type="button"
               onClick={useCurrentLocation}
               disabled={locating || saving}
-              className="inline-flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-3 font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm sm:h-10 sm:px-4 sm:text-sm"
+              className="inline-flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-3 font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 max-sm:mb-2 max-sm:!text-sm sm:h-10 sm:px-4 sm:text-sm"
             >
               <span aria-hidden="true">📍</span>
               <span className="truncate max-sm:!text-sm">
@@ -1639,7 +1639,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             )}
           </div>
 
-          <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <label className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
             <input
               type="checkbox"
               checked={verified}
