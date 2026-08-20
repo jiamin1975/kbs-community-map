@@ -34,6 +34,8 @@ type NearbyLibrary = {
   name: string;
   address: string;
   distanceMeters: number;
+  latitude: number;
+  longitude: number;
 };
 
 type BookPhotoPreview = {
@@ -400,7 +402,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     });
 
     setError("");
-    setNearbyLibrary(null);
 
     const addressUpdated = await updateAddressFromCoordinates(
       newLatitude,
@@ -519,6 +520,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           name: data.name ?? "Unnamed book box",
           address: data.address ?? "",
           distanceMeters,
+          latitude: existingLatitude,
+          longitude: existingLongitude,
         };
       }
     }
@@ -536,7 +539,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     let cancelled = false;
 
     setDuplicateCheckStatus("checking");
-    setNearbyLibrary(null);
 
     const timer = window.setTimeout(async () => {
       try {
@@ -1122,8 +1124,15 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       draggable
                       onDragEnd={handleMarkerDragEnd}
                       title="Drag to the exact book-sharing location"
+                      zIndex={10}
                     >
-                      <div className="flex flex-col items-center">
+                      <div
+                        className={`flex flex-col items-center ${
+                          nearbyLibrary
+                            ? "-translate-x-8"
+                            : ""
+                        }`}
+                      >
                         <div className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-lg">
                           Book box
                         </div>
@@ -1131,6 +1140,22 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                         <div className="h-3 w-3 -translate-y-0.5 rotate-45 bg-red-600" />
                       </div>
                     </AdvancedMarker>
+
+                    {nearbyLibrary && (
+                      <AdvancedMarker
+                        position={{
+                          lat: nearbyLibrary.latitude,
+                          lng: nearbyLibrary.longitude,
+                        }}
+                        title="Existing book box"
+                        zIndex={20}
+                      >
+                        <div
+                          className="size-4 rounded-full border-2 border-white bg-green-600 shadow-lg ring-2 ring-green-300"
+                          aria-label="Existing book box"
+                        />
+                      </AdvancedMarker>
+                    )}
                   </GoogleMap>
                 </APIProvider>
               </div>
