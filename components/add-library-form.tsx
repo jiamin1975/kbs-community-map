@@ -856,6 +856,15 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     setError("");
     setNearbyLibrary(null);
 
+    const volunteerEmail = currentUser?.email?.trim().toLowerCase();
+
+    if (!volunteerEmail) {
+      setError(
+        "Your authorized volunteer email could not be found. Please sign in again.",
+      );
+      return;
+    }
+
     const latitudeNumber = Number(latitude);
     const longitudeNumber = Number(longitude);
 
@@ -962,6 +971,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           verified,
           photoFile,
+
+          createdBy: volunteerEmail,
 
           lastUpdated: serverTimestamp(),
           createdAt: serverTimestamp(),
