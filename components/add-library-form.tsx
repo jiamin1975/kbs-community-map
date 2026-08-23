@@ -887,22 +887,20 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
       return;
     }
 
+    const previewUrl = URL.createObjectURL(selectedPhoto);
     setBookPhoto(selectedPhoto);
-    setBookPreviewUrl(URL.createObjectURL(selectedPhoto));
+    setBookPreviewUrl(previewUrl);
+    event.target.value = "";
+    void analyzeBookPhoto(selectedPhoto);
   }
 
-  async function analyzeBookPhoto() {
-    if (!bookPhoto) {
-      setBookRecognitionError("Choose a box interior photo first.");
-      return;
-    }
-
+  async function analyzeBookPhoto(photoToAnalyze: File) {
     setAnalyzingBooks(true);
     setBookRecognitionError("");
 
     try {
       const formData = new FormData();
-      formData.append("image", bookPhoto);
+      formData.append("image", photoToAnalyze);
       formData.append("libraryId", pendingLibraryId);
 
       const response = await fetch("/api/analyze-books", {
@@ -928,11 +926,11 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
       setRecognizedBooks((current) =>
         mergeBooks(current, recognitionResult.books),
       );
-      const processedPreviewUrl = URL.createObjectURL(bookPhoto);
+      const processedPreviewUrl = URL.createObjectURL(photoToAnalyze);
       processedBookPhotoUrls.current.push(processedPreviewUrl);
       setProcessedBookPhotos((current) => [
         ...current,
-        { name: bookPhoto.name, url: processedPreviewUrl },
+        { name: photoToAnalyze.name, url: processedPreviewUrl },
       ]);
       setBookPhotosProcessed((count) => count + 1);
       setBookPhoto(null);
@@ -1312,6 +1310,36 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             </label>
           </div>
 
+          {duplicateCheckStatus === "checking" && (
+            <div
+              className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800 max-sm:!text-sm max-sm:font-bold max-sm:leading-snug"
+              role="status"
+            >
+              Checking for an existing book box near this location…
+            </div>
+          )}
+
+          {duplicateCheckStatus === "clear" && (
+            <div
+              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-bold text-green-800 max-sm:!text-base max-sm:leading-snug"
+              role="status"
+            >
+              Location confirmed!
+            </div>
+          )}
+
+          {duplicateCheckStatus === "duplicate" && nearbyLibrary && (
+            <div
+              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 max-sm:leading-snug"
+              role="alert"
+            >
+              <p className="font-bold">Possible Duplicate Found!</p>
+              <p className="mt-1 text-xs font-normal max-sm:!text-xs">
+                <strong>Adjust the marker if this is a different book box.</strong>
+              </p>
+            </div>
+          )}
+
           {markerPosition && (
             <div className="overflow-hidden rounded-xl border border-border max-sm:order-4">
               <div className="border-b border-border bg-secondary px-3 py-2">
@@ -1378,36 +1406,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   </GoogleMap>
                 </APIProvider>
               </div>
-            </div>
-          )}
-
-          {duplicateCheckStatus === "checking" && (
-            <div
-              className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800 max-sm:order-3 max-sm:!text-sm max-sm:font-bold max-sm:leading-snug"
-              role="status"
-            >
-              Checking for an existing book box near this location…
-            </div>
-          )}
-
-          {duplicateCheckStatus === "clear" && (
-            <div
-              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-bold text-green-800 max-sm:order-3 max-sm:!text-base max-sm:leading-snug"
-              role="status"
-            >
-              Location confirmed!
-            </div>
-          )}
-
-          {duplicateCheckStatus === "duplicate" && nearbyLibrary && (
-            <div
-              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 max-sm:order-3 max-sm:leading-snug"
-              role="alert"
-            >
-              <p className="font-bold">Possible Duplicate Found!</p>
-              <p className="mt-1 text-xs font-normal max-sm:!text-xs">
-                <strong>Adjust the marker if this is a different book box.</strong>
-              </p>
             </div>
           )}
 
@@ -1574,7 +1572,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               className="hidden"
             />
 
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2">
               <label
                 htmlFor="book-photo"
                 aria-disabled={analyzingBooks || saving}
@@ -1589,23 +1587,47 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   ? "Add Another Interior Photo"
                   : "Add Interior Photo"}
               </label>
+            </div>
+
+            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
+              <button
+                type="button"
+                onClick={() => goToStep(2)}
+                disabled={saving || analyzingBooks}
+                className="min-h-12 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50"
+              >
+                ← Back
+              </button>
 
               <button
                 type="button"
-                onClick={analyzeBookPhoto}
-                disabled={!bookPhoto || analyzingBooks || saving}
-                className="inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-violet-700 bg-violet-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none sm:h-10 sm:px-2 sm:text-sm"
+                onClick={handleSubmit}
+                disabled={
+                  saving || locating || analyzingBooks || !stepThreeComplete
+                }
+                className="min-h-12 whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
               >
-                {analyzingBooks ? "Recognizing…" : "✨ Recognize Books"}
+                {uploadingPhoto
+                  ? "Uploading Photo…"
+                  : saving
+                    ? "Adding Location…"
+                    : (
+                        <>
+                          <span className="sm:hidden">
+                            <span className="block">Add This Book Box</span>
+                            <span className="block">
+                              with {recognizedBooks.length} Book
+                              {recognizedBooks.length === 1 ? "" : "s"}
+                            </span>
+                          </span>
+                          <span className="hidden sm:inline">
+                            Add This Book Box with {recognizedBooks.length} Book
+                            {recognizedBooks.length === 1 ? "" : "s"}
+                          </span>
+                        </>
+                      )}
               </button>
             </div>
-
-            {recognizedBooks.length > 0 && (
-              <p className="text-right text-xs font-medium leading-normal text-green-700 max-sm:!text-sm">
-                ✓ {recognizedBooks.length} book
-                {recognizedBooks.length === 1 ? "" : "s"} found in total
-              </p>
-            )}
 
             {(processedBookPhotos.length > 0 ||
               (bookPhoto && bookPreviewUrl)) && (
@@ -1624,7 +1646,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       <p className="mt-1 font-semibold text-amber-700" role="status">
                         {analyzingBooks
                           ? "Recognizing Books…"
-                          : "Waiting for Recognize Books…"}
+                          : "Waiting to recognize books…"}
                       </p>
                     </div>
                   </div>
@@ -1699,7 +1721,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               ) : (
                 <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-violet-200 bg-background px-3 text-center">
                   <p className="text-xs leading-relaxed text-muted-foreground">
-                    Select Recognize Books to generate the title list
+                    Add an interior photo to generate the title list
                   </p>
                 </div>
               )
@@ -1716,45 +1738,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             <span>Verified by a KBS volunteer</span>
           </label>
 
-          <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
-            <button
-              type="button"
-              onClick={() => goToStep(2)}
-              disabled={saving || analyzingBooks}
-              className="min-h-12 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50"
-            >
-              ← Back
-            </button>
-
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={
-                saving || locating || analyzingBooks || !stepThreeComplete
-              }
-              className="min-h-12 whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
-            >
-              {uploadingPhoto
-                ? "Uploading Photo…"
-                : saving
-                  ? "Adding Location…"
-                  : (
-                      <>
-                        <span className="sm:hidden">
-                          <span className="block">Add This Book Box</span>
-                          <span className="block">
-                            with {recognizedBooks.length} Book
-                            {recognizedBooks.length === 1 ? "" : "s"}
-                          </span>
-                        </span>
-                        <span className="hidden sm:inline">
-                          Add This Book Box with {recognizedBooks.length} Book
-                          {recognizedBooks.length === 1 ? "" : "s"}
-                        </span>
-                      </>
-                    )}
-            </button>
-          </div>
           </section>
 
           {message && (
