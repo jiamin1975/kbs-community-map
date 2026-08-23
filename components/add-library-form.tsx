@@ -879,7 +879,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     }
 
     if (!photo) {
-      setError("Please add a photo of the book box.");
+      setError("Please add an exterior photo of the book box.");
       return;
     }
 
@@ -1183,7 +1183,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               )}
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
-              Add Box Photo
+              Add Box Exterior Photo
             </span>
           </li>
 
@@ -1390,7 +1390,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               tabIndex={-1}
               className="sr-only scroll-mt-28"
             >
-              Add box photo
+              Add box exterior photo
             </h2>
 
           <div
@@ -1424,7 +1424,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                       : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
                   }`}
                 >
-                  {processingPhoto ? "Optimizing Photo…" : "📷 Add Box Photo"}
+                  {processingPhoto
+                    ? "Optimizing Photo…"
+                    : "📷 Add Box Exterior Photo"}
                 </label>
               </>
             ) : (
@@ -1433,7 +1435,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   <div className="w-48 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-background">
                     <img
                       src={photoPreviewUrl}
-                      alt="Preview of the book-sharing location"
+                      alt="Preview of the book box exterior"
                       className="aspect-[4/5] w-full bg-gray-100 object-contain"
                     />
 
@@ -1732,7 +1734,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           <div className="grid max-h-[95dvh] w-full max-w-lg gap-3 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl">
             <div>
               <h2 id="crop-box-photo-title" className="text-lg font-bold text-foreground">
-                Crop Book Box Photo
+                Crop Box Exterior Photo
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Crop closely around the book box and exclude private property when possible.
