@@ -128,6 +128,7 @@ export function CommunityMap({
   const [bookSearchLocationError, setBookSearchLocationError] = useState("");
   const bookSearchAreaRef = useRef<HTMLDivElement>(null);
   const mapAreaRef = useRef<HTMLDivElement>(null);
+  const handledEmailLinkRef = useRef(false);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -272,6 +273,57 @@ export function CommunityMap({
 
     return unsubscribe;
   }, []);
+
+  /*
+   * Email notifications link to /?box=<Firestore document ID>.
+   * After Firestore finishes loading, select that box, center and zoom
+   * the map, and bring the map into view on both desktop and mobile.
+   */
+  useEffect(() => {
+    if (loading || handledEmailLinkRef.current) {
+      return;
+    }
+
+    const bookBoxId = new URLSearchParams(window.location.search).get("box");
+
+    if (!bookBoxId) {
+      handledEmailLinkRef.current = true;
+      return;
+    }
+
+    const linkedLibrary = libraries.find(
+      (library) => library.id === bookBoxId,
+    );
+
+    handledEmailLinkRef.current = true;
+
+    if (!linkedLibrary) {
+      return;
+    }
+
+    setSelectedLibrary(linkedLibrary);
+    setNearbyMatch(null);
+    setLocationError("");
+    setLibraryPhotoUrl(null);
+    setMapCenter({
+      lat: linkedLibrary.latitude,
+      lng: linkedLibrary.longitude,
+    });
+    setMapZoom(18);
+    setMapCameraTarget({
+      lat: linkedLibrary.latitude,
+      lng: linkedLibrary.longitude,
+      zoom: 18,
+      requestId: Date.now(),
+    });
+
+    window.setTimeout(() => {
+      mapAreaRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 150);
+  }, [libraries, loading]);
 
   useEffect(() => {
     if (!selectedLibrary) {

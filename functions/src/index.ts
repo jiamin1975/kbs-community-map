@@ -117,6 +117,8 @@ async function sendBookBoxNotification(
     timeStyle: "short",
   });
   const subject = `Book Box ${actionLabel}: ${boxName}`;
+  const mapUrl =
+    `https://map.kitsbeyondsound.com/?box=${encodeURIComponent(libraryId)}`;
   const plainText = [
     `A book box was ${action}.`,
     `Book box: ${boxName}`,
@@ -126,7 +128,7 @@ async function sendBookBoxNotification(
     `Volunteer: ${volunteer}`,
     `Time: ${eventTime}`,
     `Document ID: ${libraryId}`,
-    "Map: https://map.kitsbeyondsound.com/",
+    `Map: ${mapUrl}`,
   ].join("\n");
 
   const transporter = nodemailer.createTransport({
@@ -174,8 +176,8 @@ async function sendBookBoxNotification(
           </tr>
         </table>
         <p>
-          <a href="https://map.kitsbeyondsound.com/">
-            Open the KBS Book Box Map
+          <a href="${escapeHtml(mapUrl)}">
+            Open This Book Box on the Map
           </a>
         </p>
       `,
