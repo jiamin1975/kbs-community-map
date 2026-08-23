@@ -787,7 +787,9 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
     if (selectedPhoto.size > 10 * 1024 * 1024) {
       event.target.value = "";
-      setBookRecognitionError("The shelf photo must be smaller than 10 MB.");
+      setBookRecognitionError(
+        "The box interior photo must be smaller than 10 MB.",
+      );
       return;
     }
 
@@ -797,7 +799,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
   async function analyzeBookPhoto() {
     if (!bookPhoto) {
-      setBookRecognitionError("Choose a shelf photo first.");
+      setBookRecognitionError("Choose a box interior photo first.");
       return;
     }
 
@@ -884,7 +886,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
     }
 
     if (recognizedBooks.length === 0) {
-      setError("Please analyze at least one shelf photo.");
+      setError("Please analyze at least one box interior photo.");
       return;
     }
 
@@ -965,7 +967,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           books: recognizedBooks,
           bookCount: recognizedBooks.length,
-          recognitionNotes: `Inventory created from ${bookPhotosProcessed} shelf photo${
+          recognitionNotes: `Inventory created from ${bookPhotosProcessed} box interior photo${
             bookPhotosProcessed === 1 ? "" : "s"
           }.`,
 
@@ -1198,7 +1200,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               <ScanLine className="size-3.5" />
             </span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
-              Add Shelf Photo
+              Add Box Interior Photo
             </span>
           </li>
         </ol>
@@ -1498,7 +1500,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               tabIndex={-1}
               className="sr-only scroll-mt-28"
             >
-              Add shelf photo
+              Add box interior photo
             </h2>
 
           <div
@@ -1508,17 +1510,10 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 : "pointer-events-none bg-gray-50 opacity-50"
             }`}
           >
-            <div className="flex flex-col items-start gap-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-              <p className="text-xs leading-normal text-muted-foreground max-sm:!text-sm">
-                AI will recognize the visible titles.
-              </p>
-              {recognizedBooks.length > 0 && (
-                <p className="text-xs font-medium leading-normal text-green-700 max-sm:!text-sm">
-                  ✓ {recognizedBooks.length} book
-                  {recognizedBooks.length === 1 ? "" : "s"} found in total
-                </p>
-              )}
-            </div>
+            <p className="text-xs leading-normal text-muted-foreground max-sm:!text-sm">
+              Photograph the books inside the box. AI will recognize the
+              visible titles.
+            </p>
 
             <input
               id="book-photo"
@@ -1541,8 +1536,8 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               >
                 📚{" "}
                 {bookPhotosProcessed > 0
-                  ? "Add Another Shelf Photo"
-                  : "Add a Shelf Photo"}
+                  ? "Add Another Interior Photo"
+                  : "Add Interior Photo"}
               </label>
 
               <button
@@ -1555,6 +1550,13 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               </button>
             </div>
 
+            {recognizedBooks.length > 0 && (
+              <p className="text-right text-xs font-medium leading-normal text-green-700 max-sm:!text-sm">
+                ✓ {recognizedBooks.length} book
+                {recognizedBooks.length === 1 ? "" : "s"} found in total
+              </p>
+            )}
+
             {(processedBookPhotos.length > 0 ||
               (bookPhoto && bookPreviewUrl)) && (
               <div className="grid gap-3 sm:grid-cols-2">
@@ -1562,12 +1564,12 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                   <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:order-last">
                     <img
                       src={bookPreviewUrl}
-                      alt="Shelf photo awaiting recognition"
+                      alt="Box interior photo awaiting recognition"
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2">
                       <p className="font-semibold">
-                        Shelf photo {processedBookPhotos.length + 1}
+                        Interior photo {processedBookPhotos.length + 1}
                       </p>
                       <p className="mt-1 font-semibold text-amber-700" role="status">
                         {analyzingBooks
@@ -1590,11 +1592,13 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     >
                       <img
                         src={bookPhotoPreview.url}
-                        alt={`Shelf photo ${number}`}
+                        alt={`Box interior photo ${number}`}
                         className="h-40 w-full bg-gray-100 object-contain"
                       />
                       <div className="p-2">
-                        <p className="font-semibold">Shelf photo {number}</p>
+                        <p className="font-semibold">
+                          Interior photo {number}
+                        </p>
                         <p className="mt-1 font-semibold text-green-700">
                           Recognition Done
                         </p>
