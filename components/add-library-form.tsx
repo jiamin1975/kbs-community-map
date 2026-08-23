@@ -25,7 +25,13 @@ import {
   Map as GoogleMap,
   type MapCameraChangedEvent,
 } from "@vis.gl/react-google-maps";
-import { Camera, MapPin, MapPinned, ScanLine } from "lucide-react";
+import {
+  Camera,
+  MapPin,
+  MapPinned,
+  ScanLine,
+  type LucideIcon,
+} from "lucide-react";
 import Cropper, { type Area } from "react-easy-crop";
 
 import { auth, db, storage } from "@/lib/firebase";
@@ -58,6 +64,94 @@ type RecognitionResult = {
 };
 
 type DuplicateCheckStatus = "idle" | "checking" | "clear" | "duplicate";
+
+type WizardExample = "exterior" | "interior";
+
+type WizardStepHeaderProps = {
+  step: 1 | 2 | 3;
+  title: string;
+  instruction: string;
+  icon: LucideIcon;
+  example?: WizardExample;
+};
+
+function WizardStepHeader({
+  step,
+  title,
+  instruction,
+  icon: Icon,
+  example,
+}: WizardStepHeaderProps) {
+  return (
+    <div className="grid gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5" aria-label={`Step ${step} of 3`}>
+          {[1, 2, 3].map((dotStep) => (
+            <span
+              key={dotStep}
+              className={`size-2.5 rounded-full ${
+                dotStep === step
+                  ? "bg-green-600"
+                  : dotStep < step
+                    ? "bg-blue-300"
+                    : "bg-gray-300"
+              }`}
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 max-sm:!text-xs">
+          Step {step} of 3
+        </p>
+      </div>
+
+      <div className="flex items-start gap-2.5">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-700 shadow-sm">
+          <Icon className="size-4.5" aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-lg font-bold leading-tight text-foreground max-sm:!text-lg">
+            {title}
+          </p>
+          <p className="mt-0.5 text-sm leading-snug text-muted-foreground max-sm:!text-sm">
+            {instruction}
+          </p>
+        </div>
+      </div>
+
+      {example && (
+        /* Replace this illustration with a real example image later. */
+        <div className="relative flex h-20 items-center justify-center overflow-hidden rounded-lg border border-dashed border-blue-200 bg-white/90" aria-label={`${title} example`}>
+          <span className="absolute left-2 top-1.5 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-blue-700">
+            Example
+          </span>
+
+          {example === "exterior" && (
+            <div className="relative flex h-14 w-24 items-center justify-center rounded-lg border-2 border-blue-300 bg-blue-50">
+              <div className="h-10 w-7 rounded-t-md border-2 border-amber-700 bg-amber-100">
+                <div className="mx-auto mt-2 h-5 w-4 border border-blue-300 bg-white" />
+              </div>
+              <Camera className="absolute -bottom-1 -right-2 size-6 rounded-full bg-white p-1 text-blue-700 shadow" />
+            </div>
+          )}
+
+          {example === "interior" && (
+            <div className="flex h-12 w-32 items-end justify-center gap-1 rounded-lg border-2 border-violet-200 bg-violet-50 px-3 pb-1">
+              {["h-8 bg-blue-500", "h-10 bg-amber-500", "h-7 bg-green-500", "h-9 bg-violet-500", "h-8 bg-red-400", "h-10 bg-cyan-500"].map(
+                (bookClass, index) => (
+                  <span
+                    key={`${bookClass}-${index}`}
+                    className={`w-2 rounded-sm ${bookClass}`}
+                  />
+                ),
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const duplicateDistanceMeters = 5;
 const maximumPhotoSize = 10 * 1024 * 1024;
@@ -1143,69 +1237,7 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
           </button>
         </div>
 
-        <ol
-          className="sticky top-0 z-30 -mx-3 mt-2 grid cursor-default select-none grid-cols-1 justify-items-start gap-0.5 border-y border-border bg-card/95 px-3 py-1.5 shadow-sm backdrop-blur sm:-mx-4 sm:mt-3 sm:grid-cols-3 sm:justify-items-stretch sm:gap-1 sm:px-4 sm:py-2"
-          aria-label="Add book-sharing location progress"
-        >
-          <li
-            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-6 [clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-3 sm:pr-8 ${
-              currentStep === 1
-                ? "border-green-300 bg-green-100 text-green-950"
-                : "border-blue-200 bg-blue-50 text-blue-900"
-            }`}
-          >
-            <span className="relative flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
-              <MapPinned className="size-3.5" />
-              {currentStep > 1 && (
-                <span className="absolute -right-1 -top-1 flex size-3.5 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold leading-none text-white ring-1 ring-white">
-                  ✓
-                </span>
-              )}
-            </span>
-            <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
-              Confirm Box Location
-            </span>
-          </li>
-
-          <li
-            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-6 [clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-7 sm:pr-8 sm:[clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%,22px_50%)] ${
-              currentStep === 2
-                ? "border-green-300 bg-green-100 text-green-950"
-                : currentStep > 2
-                  ? "border-blue-200 bg-blue-50 text-blue-900"
-                  : "border-gray-200 bg-gray-50 text-gray-500"
-            }`}
-          >
-            <span className="relative flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
-              <Camera className="size-3.5" />
-              {currentStep > 2 && (
-                <span className="absolute -right-1 -top-1 flex size-3.5 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold leading-none text-white ring-1 ring-white">
-                  ✓
-                </span>
-              )}
-            </span>
-            <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
-              Add Box Exterior Photo
-            </span>
-          </li>
-
-          <li
-            className={`flex w-full min-w-0 items-center gap-1 border py-1 pl-2 pr-6 [clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%)] sm:w-auto sm:gap-2 sm:py-2.5 sm:pl-7 sm:pr-8 sm:[clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_50%,calc(100%_-_22px)_100%,0_100%,22px_50%)] ${
-              currentStep === 3
-                ? "border-green-300 bg-green-100 text-green-950"
-                : "border-gray-200 bg-gray-50 text-gray-500"
-            }`}
-          >
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-current bg-white/80" aria-hidden="true">
-              <ScanLine className="size-3.5" />
-            </span>
-            <span className="min-w-0 flex-1 whitespace-nowrap text-base font-semibold sm:text-sm">
-              Add Box Interior Photo
-            </span>
-          </li>
-        </ol>
-
-        <div className="mt-4 grid gap-3">
+        <div className="mt-3 grid gap-3">
           <section
             className={currentStep === 1 ? "grid gap-3" : "hidden"}
             aria-labelledby="add-location-step"
@@ -1218,6 +1250,13 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
             >
               Confirm location
             </h2>
+
+            <WizardStepHeader
+              step={1}
+              title="Confirm Box Location"
+              instruction="Move the marker to the exact location of the book box."
+              icon={MapPinned}
+            />
 
           <div className="grid gap-1 sm:grid-cols-2 sm:items-end sm:gap-2">
             <button
@@ -1395,6 +1434,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               Add box exterior photo
             </h2>
 
+            <WizardStepHeader
+              step={2}
+              title="Add Box Exterior Photo"
+              instruction="Include the entire box and avoid surrounding private property."
+              icon={Camera}
+              example="exterior"
+            />
+
           <div
             className={`grid min-w-0 max-w-full gap-2 overflow-hidden rounded-xl p-2.5 transition sm:p-3 ${
               stepOneComplete
@@ -1503,6 +1550,14 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
               Add box interior photo
             </h2>
 
+            <WizardStepHeader
+              step={3}
+              title="Add Box Interior Photo"
+              instruction="Photograph the books inside the box so their titles are visible."
+              icon={ScanLine}
+              example="interior"
+            />
+
           <div
             className={`grid min-w-0 gap-2 overflow-hidden rounded-xl p-3 transition ${
               stepTwoComplete
@@ -1510,11 +1565,6 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                 : "pointer-events-none bg-gray-50 opacity-50"
             }`}
           >
-            <p className="text-xs leading-normal text-muted-foreground max-sm:!text-sm">
-              Photograph the books inside the box. AI will recognize the
-              visible titles.
-            </p>
-
             <input
               id="book-photo"
               type="file"
