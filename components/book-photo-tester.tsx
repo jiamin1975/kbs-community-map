@@ -359,7 +359,7 @@ export function BookPhotoTester({
       {!saved && (
         <div className="mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl bg-violet-50/50 p-3">
           {sessionBooks.length > 0 && (
-            <div className="flex justify-end">
+            <div className="hidden justify-end sm:flex">
               <p className="text-xs font-medium leading-normal text-green-700 max-sm:!text-sm">
                 ✓ {sessionBooks.length} book
                 {sessionBooks.length === 1 ? "" : "s"} found
@@ -410,11 +410,16 @@ export function BookPhotoTester({
 
           {(processedBookPhotos.length > 0 || previewUrl) && (
             <>
-              <div className="grid min-w-0 gap-3 sm:hidden">
-                <p className="text-sm font-semibold text-muted-foreground">
-                  Shelf photos
-                </p>
+              {sessionBooks.length > 0 && (
+                <div className="flex justify-end sm:hidden">
+                  <p className="text-sm font-medium leading-normal text-green-700">
+                    ✓ {sessionBooks.length} book
+                    {sessionBooks.length === 1 ? "" : "s"} found
+                  </p>
+                </div>
+              )}
 
+              <div className="grid min-w-0 gap-3 sm:hidden">
                 {previewUrl && file && (
                   <div
                     className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background"
