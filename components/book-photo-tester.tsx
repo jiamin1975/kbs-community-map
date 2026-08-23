@@ -103,9 +103,6 @@ export function BookPhotoTester({
   const [previewUrl, setPreviewUrl] =
     useState<string | null>(null)
 
-  const [result, setResult] =
-    useState<RecognitionResult | null>(null)
-
   const [sessionBooks, setSessionBooks] =
     useState<RecognizedBook[]>([])
 
@@ -145,9 +142,6 @@ export function BookPhotoTester({
 
     setFile(selectedFile)
 
-    // New file = new current recognition result,
-    // but keep all session books already found.
-    setResult(null)
     setError("")
     setSaved(false)
 
@@ -155,35 +149,31 @@ export function BookPhotoTester({
       const nextPreviewUrl = URL.createObjectURL(selectedFile)
       processedBookPhotoUrls.current.push(nextPreviewUrl)
       setPreviewUrl(nextPreviewUrl)
+      void analyzePhoto(selectedFile, nextPreviewUrl)
     } else {
       setPreviewUrl(null)
     }
   }
 
-  async function analyzePhoto() {
-    if (!file) {
-      setError(
-        "Please choose a photo first.",
-      )
-      return
-    }
-
+  async function analyzePhoto(
+    photoToAnalyze: File,
+    photoPreviewUrl: string,
+  ) {
     if (!library) {
       setError(
-        "Please select a library first.",
+        "Please select a book box first.",
       )
       return
     }
 
     setLoading(true)
     setError("")
-    setResult(null)
     setSaved(false)
 
     try {
       const formData = new FormData()
 
-      formData.append("image", file)
+      formData.append("image", photoToAnalyze)
       formData.append(
         "libraryId",
         library.id,
@@ -209,12 +199,9 @@ export function BookPhotoTester({
       const recognitionResult =
         data as RecognitionResult
 
-      setResult(recognitionResult)
-
       if (
         recognitionResult.books.length === 0
       ) {
-        setResult(null)
         setError(
           "No books were recognized clearly enough in this photo.",
         )
@@ -233,18 +220,15 @@ export function BookPhotoTester({
         (count) => count + 1,
       )
 
-      if (previewUrl) {
-        setProcessedBookPhotos((currentPhotos) => [
-          ...currentPhotos,
-          {
-            url: previewUrl,
-          },
-        ])
-      }
+      setProcessedBookPhotos((currentPhotos) => [
+        ...currentPhotos,
+        {
+          url: photoPreviewUrl,
+        },
+      ])
 
       setFile(null)
       setPreviewUrl(null)
-      setResult(null)
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -358,15 +342,6 @@ export function BookPhotoTester({
 
       {!saved && (
         <div className="mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl bg-violet-50/50 p-3">
-          {sessionBooks.length > 0 && (
-            <div className="hidden justify-end sm:flex">
-              <p className="text-xs font-medium leading-normal text-green-700 max-sm:!text-sm">
-                ✓ {sessionBooks.length} book
-                {sessionBooks.length === 1 ? "" : "s"} found
-              </p>
-            </div>
-          )}
-
           <input
             id="update-book-photo"
             type="file"
@@ -376,7 +351,7 @@ export function BookPhotoTester({
             className="hidden"
           />
 
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2">
             <label
               htmlFor="update-book-photo"
               aria-disabled={loading || saving}
@@ -387,38 +362,41 @@ export function BookPhotoTester({
               }`}
             >
               📚 {photosProcessed > 0
-                ? "Add Another Shelf Photo"
-                : "Add a Shelf Photo"}
+                ? "Add Another Interior Photo"
+                : "Add Interior Photo"}
             </label>
-
-            <button
-              type="button"
-              onClick={analyzePhoto}
-              disabled={!file || !library || loading || saving || !!result}
-              className="inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border border-violet-700 bg-violet-600 px-3 text-base font-bold text-white shadow-md transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none sm:h-10 sm:px-2 sm:text-sm"
-            >
-              {loading ? (
-                <>
-                  <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-                  Recognizing…
-                </>
-              ) : (
-                "✨ Recognize Books"
-              )}
-            </button>
           </div>
+
+          <button
+            type="button"
+            onClick={finishAndSaveInventory}
+            disabled={loading || saving || sessionBooks.length === 0}
+            className="min-h-12 whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
+          >
+            {saving ? (
+              <>
+                <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                Saving Inventory…
+              </>
+            ) : (
+              <>
+                <span className="sm:hidden">
+                  <span className="block">Update Book Box</span>
+                  <span className="block">
+                    with {sessionBooks.length} Book
+                    {sessionBooks.length === 1 ? "" : "s"}
+                  </span>
+                </span>
+                <span className="hidden sm:inline">
+                  Update Book Box with {sessionBooks.length} Book
+                  {sessionBooks.length === 1 ? "" : "s"}
+                </span>
+              </>
+            )}
+          </button>
 
           {(processedBookPhotos.length > 0 || previewUrl) && (
             <>
-              {sessionBooks.length > 0 && (
-                <div className="flex justify-end sm:hidden">
-                  <p className="text-sm font-medium leading-normal text-green-700">
-                    ✓ {sessionBooks.length} book
-                    {sessionBooks.length === 1 ? "" : "s"} found
-                  </p>
-                </div>
-              )}
-
               <div className="grid min-w-0 gap-3 sm:hidden">
                 {previewUrl && file && (
                   <div
@@ -426,17 +404,17 @@ export function BookPhotoTester({
                   >
                     <img
                       src={previewUrl}
-                      alt="Shelf photo awaiting recognition"
+                      alt="Interior photo awaiting recognition"
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2">
                       <p className="font-semibold">
-                        Shelf photo {processedBookPhotos.length + 1}
+                        Interior photo {processedBookPhotos.length + 1}
                       </p>
                       <p className="mt-1 font-semibold text-amber-700" role="status">
                         {loading
                           ? "Recognizing Books…"
-                          : "Waiting for Recognize Books…"}
+                          : "Waiting to recognize books…"}
                       </p>
                     </div>
                   </div>
@@ -455,11 +433,11 @@ export function BookPhotoTester({
                     >
                       <img
                         src={photo.url}
-                        alt={`Shelf photo ${number}`}
+                        alt={`Interior photo ${number}`}
                         className="h-40 w-full bg-gray-100 object-contain"
                       />
                       <div className="p-2">
-                        <p className="font-semibold">Shelf photo {number}</p>
+                        <p className="font-semibold">Interior photo {number}</p>
                         <p className="mt-1 font-semibold text-green-700">
                           Recognition Done
                         </p>
@@ -476,11 +454,11 @@ export function BookPhotoTester({
                   >
                     <img
                       src={photo.url}
-                      alt={`Shelf photo ${index + 1}`}
+                      alt={`Interior photo ${index + 1}`}
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2.5">
-                      <p className="font-semibold">Shelf photo {index + 1}</p>
+                      <p className="font-semibold">Interior photo {index + 1}</p>
                       <p className="mt-1 font-semibold text-green-700">
                         Recognition Done
                       </p>
@@ -492,17 +470,17 @@ export function BookPhotoTester({
                   <div className="w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
                     <img
                       src={previewUrl}
-                      alt="Shelf photo awaiting recognition"
+                      alt="Interior photo awaiting recognition"
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2.5">
                       <p className="font-semibold">
-                        Shelf photo {processedBookPhotos.length + 1}
+                        Interior photo {processedBookPhotos.length + 1}
                       </p>
                       <p className="mt-1 font-semibold text-amber-700" role="status">
                         {loading
                           ? "Recognizing Books…"
-                          : "Waiting for Recognize Books…"}
+                          : "Waiting to recognize books…"}
                       </p>
                     </div>
                   </div>
@@ -537,7 +515,7 @@ export function BookPhotoTester({
             ) : (
               <div className="flex h-24 items-center justify-center px-3 text-center">
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Add a shelf photo, then select Recognize Books.
+                  Add an interior photo to generate the title list.
                 </p>
               </div>
             )}
@@ -559,23 +537,6 @@ export function BookPhotoTester({
             />
           </div>
 
-          <button
-            type="button"
-            onClick={finishAndSaveInventory}
-            disabled={saving || sessionBooks.length === 0}
-            className="h-12 rounded-xl border border-green-800 bg-green-700 px-4 text-base font-bold text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {saving ? (
-              <>
-                <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-                Saving Inventory…
-              </>
-            ) : (
-              `Update Book Box with ${sessionBooks.length} Book${
-                sessionBooks.length === 1 ? "" : "s"
-              }`
-            )}
-          </button>
         </div>
       )}
 
