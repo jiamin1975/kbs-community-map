@@ -667,16 +667,24 @@ export function CommunityMap({
   return (
     <div>
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
-        <div className="grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-end">
+        <div className="grid gap-2">
+          <button
+            type="button"
+            onClick={onAddLibrary}
+            className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-sm transition hover:bg-blue-700"
+          >
+            ＋ Add Book Box
+          </button>
+
           <button
             type="button"
             onClick={findNearbyLibrary}
             disabled={locating}
-            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             {locating
               ? "Finding Nearby Box…"
-              : "📍 Find a Nearby Box to Update"}
+              : "📍 Update Book Box"}
           </button>
 
           <div ref={bookSearchAreaRef} className="relative min-w-0">
@@ -808,13 +816,6 @@ export function CommunityMap({
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={onAddLibrary}
-            className="-mt-2 inline-flex h-12 items-center justify-self-end px-1 text-base font-bold text-muted-foreground transition hover:text-foreground sm:mt-0 sm:whitespace-nowrap"
-          >
-            ＋ Add Book Box
-          </button>
         </div>
 
         <p className="hidden text-xs text-muted-foreground sm:mt-2 sm:block sm:text-sm">
