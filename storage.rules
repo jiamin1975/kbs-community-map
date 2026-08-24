@@ -32,13 +32,21 @@ service firebase.storage {
     match /library-photos/{photoFile} {
       allow read: if true;
 
-      allow create, update: if isApprovedVolunteer()
-        && request.resource.size < 10 * 1024 * 1024
-        && request.resource.contentType.matches(
-          'image/(jpeg|png|webp)'
-        );
+      // Public contributors may upload a new photo.
+allow create: if request.auth != null
+  && request.resource.size <= 10 * 1024 * 1024
+  && request.resource.contentType.matches(
+    'image/(jpeg|png|webp)'
+  );
 
-      allow delete: if isApprovedVolunteer();
+// Only approved volunteers may replace existing photos.
+allow update: if isApprovedVolunteer()
+  && request.resource.size <= 10 * 1024 * 1024
+  && request.resource.contentType.matches(
+    'image/(jpeg|png|webp)'
+  );
+
+allow delete: if isApprovedVolunteer();
     }
   }
 }

@@ -29,9 +29,32 @@ service cloud.firestore {
       return hasApprovedUid() || hasApprovedEmail();
     }
 
+    function isValidPublicBookBoxCreate() {
+      return request.auth != null
+        && request.resource.data.createdByUid == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.address is string
+        && request.resource.data.address.size() > 0
+        && request.resource.data.address.size() <= 300
+        && request.resource.data.latitude is number
+        && request.resource.data.latitude >= -90
+        && request.resource.data.latitude <= 90
+        && request.resource.data.longitude is number
+        && request.resource.data.longitude >= -180
+        && request.resource.data.longitude <= 180
+        && request.resource.data.books is list
+        && request.resource.data.books.size() <= 250
+        && request.resource.data.bookCount ==
+          request.resource.data.books.size()
+        && request.resource.data.photoFile is string;
+    }
+
     match /libraries/{libraryId} {
       allow read: if true;
-      allow create, update: if isApprovedVolunteer();
+      allow create: if isValidPublicBookBoxCreate();
+      allow update: if isApprovedVolunteer();
       allow delete: if false;
 
       match /activity/{activityId} {
@@ -40,14 +63,12 @@ service cloud.firestore {
       }
     }
 
-    // Existing UID-based volunteer records
     match /authorizedVolunteers/{volunteerId} {
       allow read: if request.auth != null
         && request.auth.uid == volunteerId;
       allow write: if false;
     }
 
-    // New Gmail-based volunteer records
     match /authorizedVolunteerEmails/{volunteerEmail} {
       allow read: if request.auth != null
         && request.auth.token.email_verified == true

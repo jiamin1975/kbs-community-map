@@ -111,30 +111,36 @@ function WizardStepHeader({
         </div>
       </div>
 
-{example && (
-  <div
-    className="relative h-32 overflow-hidden rounded-lg border border-blue-200 bg-white"
-    aria-label={`${title} example`}
-  >
-    <span className="absolute left-2 top-2 z-10 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-blue-700 shadow-sm">
-      Example
-    </span>
+      {example && (
+        <div
+          className="relative h-32 overflow-hidden rounded-lg border border-blue-200 bg-white"
+          aria-label={`${title} example`}
+        >
+          <img
+            src={
+              example === "exterior"
+                ? "/examples/book-box-exterior.jpg"
+                : "/examples/book-box-interior.jpg"
+            }
+            alt={
+              example === "exterior"
+                ? "Example of a book box exterior photo"
+                : "Example of a book box interior photo showing the books"
+            }
+            className={`h-full w-full ${
+              example === "exterior"
+                ? "object-contain"
+                : "bg-gray-100 object-contain"
+            }`}
+          />
 
-    <img
-      src={
-        example === "exterior"
-          ? "/examples/book-box-exterior.png"
-          : "/examples/book-box-interior.png"
-      }
-      alt={
-        example === "exterior"
-          ? "Example of a book box exterior photo"
-          : "Example of a book box interior photo showing the books"
-      }
-      className="h-full w-full object-contain"
-    />
-  </div>
-)}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black/70 px-3 py-1.5 text-center">
+            <p className="text-xs font-bold uppercase tracking-wider text-white">
+              Example — Take a photo like this
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
