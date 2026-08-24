@@ -1187,7 +1187,7 @@ export function AddLibraryForm({
               />
             </label>
 
-            <label className="grid min-w-0 gap-0 sm:gap-1">
+            <label className="hidden min-w-0 gap-0 sm:grid sm:gap-1">
               <span className="text-xs font-medium">Neighborhood</span>
 
               <input
@@ -1219,7 +1219,7 @@ export function AddLibraryForm({
 
           {duplicateCheckStatus === "duplicate" && nearbyLibrary && (
             <div
-              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+              className="grid grid-cols-1 gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-3"
               role="alert"
             >
               <div className="min-w-0 font-bold leading-snug">
@@ -1230,7 +1230,7 @@ export function AddLibraryForm({
                 <button
                   type="button"
                   onClick={() => onUseExistingLibrary(nearbyLibrary.library)}
-                  className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-lg border border-amber-700 bg-white px-3 py-2 text-sm font-bold leading-tight text-amber-900 shadow-sm transition hover:bg-amber-100"
+                  className="inline-flex min-h-10 w-full shrink-0 items-center justify-center rounded-lg border border-amber-700 bg-white px-3 py-2 text-sm font-bold leading-tight text-amber-900 shadow-sm transition hover:bg-amber-100 sm:w-auto"
                 >
                   View Existing Box
                 </button>
