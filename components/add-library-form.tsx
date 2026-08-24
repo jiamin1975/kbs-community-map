@@ -685,12 +685,23 @@ export function AddLibraryForm({
       if (!closestLibrary || distanceMeters < closestLibrary.distanceMeters) {
         closestLibrary = {
           library: {
-            ...data,
             id: documentSnapshot.id,
             name: data.name ?? "Unnamed book box",
             address: data.address ?? "",
+            neighborhood: data.neighborhood ?? "",
             latitude: existingLatitude,
             longitude: existingLongitude,
+            books: Array.isArray(data.books) ? data.books : [],
+            bookCount:
+              typeof data.bookCount === "number"
+                ? data.bookCount
+                : Array.isArray(data.books)
+                  ? data.books.length
+                  : 0,
+            lastUpdated: "Recently updated",
+            verified: data.verified === true,
+            photoFile:
+              typeof data.photoFile === "string" ? data.photoFile : "",
           } as Library,
           distanceMeters,
         };
