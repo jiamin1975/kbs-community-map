@@ -38,12 +38,8 @@ import { auth, db, storage } from "@/lib/firebase";
 import type { Library } from "@/lib/libraries";
 
 type NearbyLibrary = {
-  id: string;
-  name: string;
-  address: string;
+  library: Library;
   distanceMeters: number;
-  latitude: number;
-  longitude: number;
 };
 
 type BookPhotoPreview = {
@@ -270,6 +266,7 @@ async function createCroppedPhoto(
 
 type AddLibraryFormProps = {
   onLibraryAdded?: (library: Library) => void;
+  onUseExistingLibrary?: (library: Library) => void;
 };
 
 function calculateDistanceMeters(
@@ -346,7 +343,10 @@ function mergeBooks(existing: RecognizedBook[], incoming: RecognizedBook[]) {
   return Array.from(merged.values());
 }
 
-export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
+export function AddLibraryForm({
+  onLibraryAdded,
+  onUseExistingLibrary,
+}: AddLibraryFormProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
@@ -739,12 +739,15 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
       if (!closestLibrary || distanceMeters < closestLibrary.distanceMeters) {
         closestLibrary = {
-          id: documentSnapshot.id,
-          name: data.name ?? "Unnamed book box",
-          address: data.address ?? "",
+          library: {
+            ...data,
+            id: documentSnapshot.id,
+            name: data.name ?? "Unnamed book box",
+            address: data.address ?? "",
+            latitude: existingLatitude,
+            longitude: existingLongitude,
+          } as Library,
           distanceMeters,
-          latitude: existingLatitude,
-          longitude: existingLongitude,
         };
       }
     }
@@ -1330,13 +1333,22 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
 
           {duplicateCheckStatus === "duplicate" && nearbyLibrary && (
             <div
-              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 max-sm:leading-snug"
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
               role="alert"
             >
-              <p className="font-bold">Possible Duplicate Found!</p>
-              <p className="mt-1 text-xs font-normal max-sm:!text-xs">
-                <strong>Adjust the marker if this is a different book box.</strong>
-              </p>
+              <div className="min-w-0 font-bold leading-snug">
+                <p>Possible Duplicate Found!</p>
+                <p>Move the red marker if this is a different book box.</p>
+              </div>
+              {onUseExistingLibrary && (
+                <button
+                  type="button"
+                  onClick={() => onUseExistingLibrary(nearbyLibrary.library)}
+                  className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-lg border border-amber-700 bg-white px-3 py-2 text-sm font-bold leading-tight text-amber-900 shadow-sm transition hover:bg-amber-100"
+                >
+                  View Existing Box
+                </button>
+              )}
             </div>
           )}
 
@@ -1381,14 +1393,17 @@ export function AddLibraryForm({ onLibraryAdded }: AddLibraryFormProps) {
                     {nearbyLibrary && (
                       <AdvancedMarker
                         position={{
-                          lat: nearbyLibrary.latitude,
-                          lng: nearbyLibrary.longitude,
+                          lat: nearbyLibrary.library.latitude,
+                          lng: nearbyLibrary.library.longitude,
                         }}
+                        onClick={() =>
+                          onUseExistingLibrary?.(nearbyLibrary.library)
+                        }
                         title="Existing book box"
                         zIndex={20}
                       >
                         <div
-                          className="pointer-events-none relative flex size-7 items-start justify-center"
+                          className="relative flex size-7 cursor-pointer items-start justify-center"
                           aria-label="Existing book box"
                         >
                           <MapPin

@@ -53,6 +53,13 @@ export function LibraryMapExperience() {
     setAddLibraryDialogOpen(false)
   }
 
+  function handleUseExistingLibrary(library: Library) {
+    // Close the add form and open the existing box's
+    // full information card on the main map.
+    setNewlyAddedLibrary(library)
+    setAddLibraryDialogOpen(false)
+  }
+
   function handleAddLibraryDialogChange(open: boolean) {
     if (
       !open &&
@@ -119,7 +126,10 @@ export function LibraryMapExperience() {
             <DialogTitle>Add a New Book Box</DialogTitle>
           </DialogHeader>
 
-          <AddLibraryForm onLibraryAdded={handleLibraryAdded} />
+          <AddLibraryForm
+            onLibraryAdded={handleLibraryAdded}
+            onUseExistingLibrary={handleUseExistingLibrary}
+          />
         </DialogContent>
       </Dialog>
     </>
