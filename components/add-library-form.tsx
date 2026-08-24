@@ -127,12 +127,15 @@ function WizardStepHeader({
                 ? "Example of a book box exterior photo"
                 : "Example of a book box interior photo showing the books"
             }
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
           />
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black/65 px-2 py-0.5 text-center sm:px-3 sm:py-1.5">
-            <p className="text-[9px] font-bold uppercase leading-tight tracking-normal text-white sm:text-xs sm:tracking-wider">
-              Example — Take a photo like this
+          <div className="pointer-events-none absolute bottom-1 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/65 px-1.5 py-px text-center sm:inset-x-0 sm:bottom-0 sm:translate-x-0 sm:rounded-none sm:px-3 sm:py-1.5">
+            <p className="text-[8px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
+              <span className="sm:hidden">Example</span>
+              <span className="hidden sm:inline">
+                Example — Take a photo like this
+              </span>
             </p>
           </div>
         </div>
