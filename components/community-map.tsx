@@ -667,24 +667,24 @@ export function CommunityMap({
   return (
     <div>
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
-        <div className="grid gap-2">
+        <div className="grid gap-2 sm:grid-cols-[auto_auto_minmax(0,1fr)] sm:items-end sm:gap-3">
           <button
             type="button"
             onClick={onAddLibrary}
-            className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-sm transition hover:bg-blue-700"
+            className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-sm transition hover:bg-blue-700 sm:w-auto sm:whitespace-nowrap"
           >
-            ＋ Add Book Box
+            ＋ Add a New Book Box
           </button>
 
           <button
             type="button"
             onClick={findNearbyLibrary}
             disabled={locating}
-            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:whitespace-nowrap"
           >
             {locating
               ? "Finding Nearby Box…"
-              : "📍 Update Book Box"}
+              : "📍 Update a Nearby Book Box"}
           </button>
 
           <div ref={bookSearchAreaRef} className="relative min-w-0">
@@ -834,7 +834,7 @@ export function CommunityMap({
                 onClick={onAddLibrary}
                 className="inline font-bold text-amber-900"
               >
-                ＋ Add Book Box
+                ＋ Add a New Book Box
               </button>
             </p>
           </div>
