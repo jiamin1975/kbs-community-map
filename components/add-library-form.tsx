@@ -130,12 +130,9 @@ function WizardStepHeader({
             className="h-full w-full object-contain"
           />
 
-          <div className="pointer-events-none absolute bottom-1 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/65 px-1.5 py-px text-center sm:inset-x-0 sm:bottom-0 sm:translate-x-0 sm:rounded-none sm:px-3 sm:py-1.5">
-            <p className="text-[8px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
-              <span className="sm:hidden">Example</span>
-              <span className="hidden sm:inline">
-                Example — Take a photo like this
-              </span>
+          <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-black/40 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:rounded-none sm:bg-black/65 sm:px-3 sm:py-1.5">
+            <p className="text-[7px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
+              <span>Example — Take a photo like this</span>
             </p>
           </div>
         </div>
