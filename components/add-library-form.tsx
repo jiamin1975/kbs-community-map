@@ -3,17 +3,13 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { createPortal } from "react-dom";
 import {
-  browserPopupRedirectResolver,
-  GoogleAuthProvider,
   onAuthStateChanged,
-  signInWithPopup,
-  signOut,
+  signInAnonymously,
   type User,
 } from "firebase/auth";
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
   serverTimestamp,
   setDoc,
@@ -349,8 +345,6 @@ export function AddLibraryForm({
 }: AddLibraryFormProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [signingIn, setSigningIn] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [accessMessage, setAccessMessage] = useState("");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -442,75 +436,26 @@ export function AddLibraryForm({
 
   useEffect(() => {
     return onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
       setAuthLoading(true);
       setAccessMessage("");
 
-      if (!user) {
-        setIsAuthorized(false);
+      if (user) {
+        setCurrentUser(user);
         setAuthLoading(false);
         return;
       }
 
       try {
-        const volunteerEmail = user.email?.trim().toLowerCase();
-
-        if (!volunteerEmail) {
-          setIsAuthorized(false);
-          setAccessMessage(
-            "No email address was found for this Google account. Please use a Google account with a verified email address.",
-          );
-          setAuthLoading(false);
-          return;
-        }
-
-        const volunteerSnapshot = await getDoc(
-          doc(db, "authorizedVolunteerEmails", volunteerEmail),
-        );
-
-        if (
-          volunteerSnapshot.exists() &&
-          volunteerSnapshot.data().active === true
-        ) {
-          setIsAuthorized(true);
-        } else {
-          setIsAuthorized(false);
-          setAccessMessage(
-            "This Google account is not approved yet. Send your account email to a KBS administrator for approval.",
-          );
-        }
-      } catch (authorizationError) {
-        console.error("Could not verify volunteer access:", authorizationError);
-        setIsAuthorized(false);
+        await signInAnonymously(auth);
+      } catch (signInError) {
+        console.error("Could not start public access:", signInError);
         setAccessMessage(
-          "We could not verify your volunteer access. Please try again.",
+          "Could not prepare the public form. Please refresh and try again.",
         );
-      } finally {
         setAuthLoading(false);
       }
     });
   }, []);
-
-  async function handleGoogleSignIn() {
-    setSigningIn(true);
-    setAccessMessage("");
-
-    try {
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: "select_account" });
-      await signInWithPopup(auth, provider, browserPopupRedirectResolver);
-    } catch (signInError) {
-      console.error("Google sign-in failed:", signInError);
-      setAccessMessage("Google sign-in did not complete. Please try again.");
-    } finally {
-      setSigningIn(false);
-    }
-  }
-
-  async function handleSignOut() {
-    await signOut(auth);
-    setAccessMessage("");
-  }
 
   const markerPosition =
     latitude !== "" &&
@@ -953,11 +898,12 @@ export function AddLibraryForm({
     setError("");
     setNearbyLibrary(null);
 
-    const volunteerEmail = currentUser?.email?.trim().toLowerCase();
+    const contributor =
+      currentUser?.email?.trim().toLowerCase() || "Public contributor";
 
-    if (!volunteerEmail) {
+    if (!currentUser) {
       setError(
-        "Your authorized volunteer email could not be found. Please sign in again.",
+        "Public access is still loading. Please wait a moment and try again.",
       );
       return;
     }
@@ -1069,7 +1015,9 @@ export function AddLibraryForm({
           verified,
           photoFile,
 
-          createdBy: volunteerEmail,
+          createdBy: contributor,
+          createdByUid: currentUser.uid,
+          createdByType: currentUser.isAnonymous ? "public" : "google",
 
           lastUpdated: serverTimestamp(),
           createdAt: serverTimestamp(),
@@ -1150,45 +1098,14 @@ export function AddLibraryForm({
   if (authLoading) {
     return (
       <div className="rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground">
-        Checking volunteer access…
+        Preparing the public form…
       </div>
     );
   }
 
   if (!currentUser) {
     return (
-      <div className="grid gap-4 rounded-2xl border border-border bg-card p-5">
-        <div>
-          <p className="text-sm font-medium text-foreground">
-            Sign in with Google to continue.
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            To become an authorized KBS volunteer, email{" "}
-            <a
-              href="mailto:kitsbeyondsound@gmail.com"
-              className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700"
-            >
-              kitsbeyondsound@gmail.com
-            </a>
-            .
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleGoogleSignIn}
-          disabled={signingIn}
-          className="flex items-center justify-center gap-3 rounded-xl border border-gray-300 bg-white px-4 py-2.5 font-medium text-gray-800 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <span
-            aria-hidden="true"
-            className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-sm font-bold text-blue-600"
-          >
-            G
-          </span>
-          {signingIn ? "Signing In…" : "Continue with Google"}
-        </button>
-
+      <div className="rounded-2xl border border-red-300 bg-red-50 p-5">
         {accessMessage && (
           <p className="text-sm text-red-600" role="alert">
             {accessMessage}
@@ -1198,44 +1115,13 @@ export function AddLibraryForm({
     );
   }
 
-  if (!isAuthorized) {
-    return (
-      <div className="grid gap-4 rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
-        <div>
-          <h2 className="font-semibold">Volunteer Approval Needed</h2>
-          <p className="mt-1 text-sm">{accessMessage}</p>
-          <p className="mt-2 text-xs">
-            Signed in as {currentUser.email ?? "Google user"}
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="w-fit rounded-xl border border-amber-400 bg-white px-4 py-2 text-sm font-medium hover:bg-amber-100"
-        >
-          Use a Different Account
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="min-w-0 overflow-visible rounded-2xl border border-border bg-card p-3 max-sm:[&_button]:text-base max-sm:[&_button_span]:text-base max-sm:[&_input]:text-base max-sm:[&_label]:text-sm max-sm:[&_label_span]:text-sm max-sm:[&_p]:text-sm sm:p-4">
-        <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
+        <div className="border-b border-border pb-3">
           <p className="min-w-0 truncate text-xs text-muted-foreground">
-            Volunteer: {currentUser.email}
+            Contributor: {currentUser.email ?? "Public contributor"}
           </p>
-
-          <button
-            type="button"
-            onClick={handleSignOut}
-            disabled={saving}
-            className="shrink-0 text-xs font-medium text-muted-foreground hover:text-foreground hover:underline disabled:opacity-50 max-sm:!text-[11px]"
-          >
-            Sign Out
-          </button>
         </div>
 
         <div className="mt-3 grid gap-3">

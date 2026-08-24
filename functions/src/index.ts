@@ -108,7 +108,7 @@ async function sendBookBoxNotification(
   const neighborhood = readableText(data.neighborhood);
   const volunteer = readableText(
     data.updatedBy ?? data.createdBy,
-    "Not provided",
+    "Public contributor",
   );
   const bookCount = getBookCount(data);
   const eventTime = new Date().toLocaleString("en-US", {
@@ -125,7 +125,7 @@ async function sendBookBoxNotification(
     `Address: ${address}`,
     `Neighborhood: ${neighborhood}`,
     `Books: ${bookCount}`,
-    `Volunteer: ${volunteer}`,
+    `Contributor: ${volunteer}`,
     `Time: ${eventTime}`,
     `Document ID: ${libraryId}`,
     `Map: ${mapUrl}`,
@@ -163,7 +163,7 @@ async function sendBookBoxNotification(
           </tr>
           <tr><td><strong>Books:</strong></td><td>${bookCount}</td></tr>
           <tr>
-            <td><strong>Volunteer:</strong></td>
+            <td><strong>Contributor:</strong></td>
             <td>${escapeHtml(volunteer)}</td>
           </tr>
           <tr>
