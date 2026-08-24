@@ -1169,7 +1169,7 @@ export function AddLibraryForm({
               </span>
             </button>
 
-            <label className="grid min-w-0 gap-0 sm:gap-1">
+            <label className="hidden min-w-0 gap-0 sm:grid sm:gap-1">
               <span className="flex items-center justify-between gap-1 text-xs font-medium">
                 <span>Book Box Name</span>
                 <span className="text-[10px] font-normal text-muted-foreground">
@@ -1233,9 +1233,11 @@ export function AddLibraryForm({
               className="grid grid-cols-1 gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-3"
               role="alert"
             >
-              <div className="min-w-0 font-bold leading-snug">
-                <p>Possible Duplicate Found!</p>
-                <p>Move the red marker if this is a different book box.</p>
+              <div className="min-w-0 leading-snug">
+                <p className="font-bold">Possible Duplicate Found!</p>
+                <p className="font-normal">
+                  Move the red marker if this is a different book box.
+                </p>
               </div>
               {onUseExistingLibrary && (
                 <button
@@ -1251,12 +1253,6 @@ export function AddLibraryForm({
 
           {markerPosition && (
             <div className="overflow-hidden rounded-xl border border-border max-sm:order-4">
-              <div className="border-b border-border bg-secondary px-3 py-2">
-                <p className="text-sm font-bold text-foreground">
-                  Drag to adjust
-                </p>
-              </div>
-
               <div className="h-[240px] w-full">
                 <APIProvider
                   apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
@@ -1275,7 +1271,6 @@ export function AddLibraryForm({
                       position={markerPosition}
                       draggable
                       onDragEnd={handleMarkerDragEnd}
-                      title="Drag to the exact book-sharing location"
                       zIndex={10}
                     >
                       <div className="flex flex-col items-center">
@@ -1544,26 +1539,6 @@ export function AddLibraryForm({
             {(processedBookPhotos.length > 0 ||
               (bookPhoto && bookPreviewUrl)) && (
               <div className="grid gap-3 sm:grid-cols-2">
-                {bookPhoto && bookPreviewUrl && (
-                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background sm:order-last">
-                    <img
-                      src={bookPreviewUrl}
-                      alt="Box interior photo awaiting recognition"
-                      className="h-40 w-full bg-gray-100 object-contain"
-                    />
-                    <div className="p-2">
-                      <p className="font-semibold">
-                        Interior photo {processedBookPhotos.length + 1}
-                      </p>
-                      <p className="mt-1 font-semibold text-amber-700" role="status">
-                        {analyzingBooks
-                          ? "Recognizing Books…"
-                          : "Waiting to recognize books…"}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
                 {processedBookPhotos
                   .map((bookPhotoPreview, index) => ({
                     bookPhotoPreview,
@@ -1589,6 +1564,26 @@ export function AddLibraryForm({
                       </div>
                     </div>
                   ))}
+
+                {bookPhoto && bookPreviewUrl && (
+                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                    <img
+                      src={bookPreviewUrl}
+                      alt="Box interior photo awaiting recognition"
+                      className="h-40 w-full bg-gray-100 object-contain"
+                    />
+                    <div className="p-2">
+                      <p className="font-semibold">
+                        Interior photo {processedBookPhotos.length + 1}
+                      </p>
+                      <p className="mt-1 font-semibold text-amber-700" role="status">
+                        {analyzingBooks
+                          ? "Recognizing Books…"
+                          : "Waiting to recognize books…"}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
