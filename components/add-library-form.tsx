@@ -111,36 +111,30 @@ function WizardStepHeader({
         </div>
       </div>
 
-      {example && (
-        /* Replace this illustration with a real example image later. */
-        <div className="relative flex h-20 items-center justify-center overflow-hidden rounded-lg border border-dashed border-blue-200 bg-white/90" aria-label={`${title} example`}>
-          <span className="absolute left-2 top-1.5 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-blue-700">
-            Example
-          </span>
+{example && (
+  <div
+    className="relative h-32 overflow-hidden rounded-lg border border-blue-200 bg-white"
+    aria-label={`${title} example`}
+  >
+    <span className="absolute left-2 top-2 z-10 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-blue-700 shadow-sm">
+      Example
+    </span>
 
-          {example === "exterior" && (
-            <div className="relative flex h-14 w-24 items-center justify-center rounded-lg border-2 border-blue-300 bg-blue-50">
-              <div className="h-10 w-7 rounded-t-md border-2 border-amber-700 bg-amber-100">
-                <div className="mx-auto mt-2 h-5 w-4 border border-blue-300 bg-white" />
-              </div>
-              <Camera className="absolute -bottom-1 -right-2 size-6 rounded-full bg-white p-1 text-blue-700 shadow" />
-            </div>
-          )}
-
-          {example === "interior" && (
-            <div className="flex h-12 w-32 items-end justify-center gap-1 rounded-lg border-2 border-violet-200 bg-violet-50 px-3 pb-1">
-              {["h-8 bg-blue-500", "h-10 bg-amber-500", "h-7 bg-green-500", "h-9 bg-violet-500", "h-8 bg-red-400", "h-10 bg-cyan-500"].map(
-                (bookClass, index) => (
-                  <span
-                    key={`${bookClass}-${index}`}
-                    className={`w-2 rounded-sm ${bookClass}`}
-                  />
-                ),
-              )}
-            </div>
-          )}
-        </div>
-      )}
+    <img
+      src={
+        example === "exterior"
+          ? "/examples/book-box-exterior.png"
+          : "/examples/book-box-interior.png"
+      }
+      alt={
+        example === "exterior"
+          ? "Example of a book box exterior photo"
+          : "Example of a book box interior photo showing the books"
+      }
+      className="h-full w-full object-contain"
+    />
+  </div>
+)}
     </div>
   );
 }
@@ -1539,11 +1533,32 @@ export function AddLibraryForm({
             {(processedBookPhotos.length > 0 ||
               (bookPhoto && bookPreviewUrl)) && (
               <div className="grid gap-3 sm:grid-cols-2">
+                {bookPhoto && bookPreviewUrl && (
+                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                    <img
+                      src={bookPreviewUrl}
+                      alt="Box interior photo awaiting recognition"
+                      className="h-40 w-full bg-gray-100 object-contain"
+                    />
+                    <div className="p-2">
+                      <p className="font-semibold">
+                        Interior photo {processedBookPhotos.length + 1}
+                      </p>
+                      <p className="mt-1 font-semibold text-amber-700" role="status">
+                        {analyzingBooks
+                          ? "Recognizing Books…"
+                          : "Waiting to recognize books…"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {processedBookPhotos
                   .map((bookPhotoPreview, index) => ({
                     bookPhotoPreview,
                     number: index + 1,
                   }))
+                  .reverse()
                   .map(({ bookPhotoPreview, number }) => (
                     <div
                       key={bookPhotoPreview.url}
@@ -1564,26 +1579,6 @@ export function AddLibraryForm({
                       </div>
                     </div>
                   ))}
-
-                {bookPhoto && bookPreviewUrl && (
-                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
-                    <img
-                      src={bookPreviewUrl}
-                      alt="Box interior photo awaiting recognition"
-                      className="h-40 w-full bg-gray-100 object-contain"
-                    />
-                    <div className="p-2">
-                      <p className="font-semibold">
-                        Interior photo {processedBookPhotos.length + 1}
-                      </p>
-                      <p className="mt-1 font-semibold text-amber-700" role="status">
-                        {analyzingBooks
-                          ? "Recognizing Books…"
-                          : "Waiting to recognize books…"}
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
