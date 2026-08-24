@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { AddLibraryForm } from "@/components/add-library-form"
 import { BookPhotoTester } from "@/components/book-photo-tester"
@@ -14,6 +14,8 @@ import {
 import type { Library } from "@/lib/libraries"
 
 export function LibraryMapExperience() {
+  const existingBoxFocusTimer = useRef<number | null>(null)
+
   // Used when refreshing an existing book box's inventory
   const [selectedLibrary, setSelectedLibrary] =
     useState<Library | null>(null)
@@ -27,6 +29,14 @@ export function LibraryMapExperience() {
 
   const [addLibraryDialogOpen, setAddLibraryDialogOpen] =
     useState(false)
+
+  useEffect(() => {
+    return () => {
+      if (existingBoxFocusTimer.current !== null) {
+        window.clearTimeout(existingBoxFocusTimer.current)
+      }
+    }
+  }, [])
 
   function handleUploadPhoto(library: Library) {
     setSelectedLibrary(library)
@@ -54,10 +64,23 @@ export function LibraryMapExperience() {
   }
 
   function handleUseExistingLibrary(library: Library) {
-    // Close the add form and open the existing box's
-    // full information card on the main map.
-    setNewlyAddedLibrary(library)
+    // Let the dialog's embedded map finish unmounting before
+    // moving and opening the main map. This avoids a mobile
+    // Google Maps loading race between the two map instances.
     setAddLibraryDialogOpen(false)
+
+    if (existingBoxFocusTimer.current !== null) {
+      window.clearTimeout(existingBoxFocusTimer.current)
+    }
+
+    const focusDelay = window.matchMedia("(max-width: 639px)").matches
+      ? 350
+      : 50
+
+    existingBoxFocusTimer.current = window.setTimeout(() => {
+      setNewlyAddedLibrary({ ...library })
+      existingBoxFocusTimer.current = null
+    }, focusDelay)
   }
 
   function handleAddLibraryDialogChange(open: boolean) {
