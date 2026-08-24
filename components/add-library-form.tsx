@@ -132,7 +132,7 @@ function WizardStepHeader({
 
           <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-black/40 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:rounded-none sm:bg-black/65 sm:px-3 sm:py-1.5">
             <p className="text-[7px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
-              <span>Example — Take a photo like this</span>
+              <span>Example - Take photo like this</span>
             </p>
           </div>
         </div>
@@ -1492,12 +1492,12 @@ export function AddLibraryForm({
               </label>
             </div>
 
-            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
+            <div className="grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
               <button
                 type="button"
                 onClick={() => goToStep(2)}
                 disabled={saving || analyzingBooks}
-                className="min-h-12 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50"
+                className="hidden min-h-12 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50 sm:block"
               >
                 ← Back
               </button>
@@ -1508,7 +1508,7 @@ export function AddLibraryForm({
                 disabled={
                   saving || locating || analyzingBooks || !stepThreeComplete
                 }
-                className="min-h-12 whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
+                className="h-12 w-full whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm sm:h-12"
               >
                 {uploadingPhoto
                   ? "Uploading Photo…"
@@ -1630,6 +1630,15 @@ export function AddLibraryForm({
                 </div>
               )
             )}
+
+            <button
+              type="button"
+              onClick={() => goToStep(2)}
+              disabled={saving || analyzingBooks}
+              className="mt-1 min-h-11 w-fit rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50 sm:hidden"
+            >
+              ← Back
+            </button>
           </div>
 
           <label className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
