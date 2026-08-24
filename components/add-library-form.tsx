@@ -113,7 +113,7 @@ function WizardStepHeader({
 
       {example && (
         <div
-          className="relative h-32 overflow-hidden rounded-lg border border-blue-200 bg-white"
+          className="relative h-24 overflow-hidden rounded-lg border border-blue-200 bg-transparent sm:h-32"
           aria-label={`${title} example`}
         >
           <img
@@ -127,15 +127,11 @@ function WizardStepHeader({
                 ? "Example of a book box exterior photo"
                 : "Example of a book box interior photo showing the books"
             }
-            className={`h-full w-full ${
-              example === "exterior"
-                ? "object-contain"
-                : "bg-gray-100 object-contain"
-            }`}
+            className="h-full w-full object-cover"
           />
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black/70 px-3 py-1.5 text-center">
-            <p className="text-xs font-bold uppercase tracking-wider text-white">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black/65 px-2 py-0.5 text-center sm:px-3 sm:py-1.5">
+            <p className="text-[9px] font-bold uppercase leading-tight tracking-normal text-white sm:text-xs sm:tracking-wider">
               Example — Take a photo like this
             </p>
           </div>
