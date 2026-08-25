@@ -456,51 +456,47 @@ export function BookPhotoTester({
             </label>
           </div>
 
-          {pendingBookPhotos.length > 0 && (
+          {(pendingBookPhotos.length > 0 || sessionBooks.length > 0) && (
             <button
               type="button"
-              onClick={analyzeAllPhotos}
+              onClick={
+                pendingBookPhotos.length > 0
+                  ? analyzeAllPhotos
+                  : finishAndSaveInventory
+              }
               disabled={loading || saving}
-              className="kbs-update-primary inline-flex h-12 items-center justify-center rounded-xl border border-blue-700 bg-blue-600 px-3 text-base font-bold text-white shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+              className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap rounded-xl border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm ${
+                pendingBookPhotos.length > 0
+                  ? "kbs-update-primary border-violet-800 bg-violet-700 hover:bg-violet-800"
+                  : "kbs-update-save border-green-800 bg-green-700 hover:bg-green-800"
+              }`}
             >
-              {loading
-                ? `Recognizing ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}…`
-                : `Recognize All ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`}
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={finishAndSaveInventory}
-            disabled={
-              loading ||
-              saving ||
-              sessionBooks.length === 0 ||
-              pendingBookPhotos.length > 0
-            }
-            className="kbs-update-save min-h-12 whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
-          >
-            {saving ? (
-              <>
-                <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-                Saving Inventory…
-              </>
-            ) : (
-              <>
-                <span className="sm:hidden">
-                  <span className="block">Update Book Box</span>
-                  <span className="block">
-                    with {sessionBooks.length} Book
+              {pendingBookPhotos.length > 0 ? (
+                loading
+                  ? "Recognizing Books…"
+                  : `Recognize Books in ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`
+              ) : saving ? (
+                <>
+                  <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                  Saving Inventory…
+                </>
+              ) : (
+                <>
+                  <span className="sm:hidden">
+                    <span className="block">Update Book Box</span>
+                    <span className="block">
+                      with {sessionBooks.length} Book
+                      {sessionBooks.length === 1 ? "" : "s"}
+                    </span>
+                  </span>
+                  <span className="hidden sm:inline">
+                    Update Book Box with {sessionBooks.length} Book
                     {sessionBooks.length === 1 ? "" : "s"}
                   </span>
-                </span>
-                <span className="hidden sm:inline">
-                  Update Book Box with {sessionBooks.length} Book
-                  {sessionBooks.length === 1 ? "" : "s"}
-                </span>
-              </>
-            )}
-          </button>
+                </>
+              )}
+            </button>
+          )}
 
           {(processedBookPhotos.length > 0 || pendingBookPhotos.length > 0) && (
             <>
