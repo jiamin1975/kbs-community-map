@@ -1583,39 +1583,42 @@ export function AddLibraryForm({
                 ← Back
               </button>
 
-              <button
-                type="button"
-                onClick={handleStepThreePrimaryAction}
-                disabled={
-                  pendingBookPhotos.length > 0
-                    ? saving || analyzingBooks
-                    : saving ||
-                      locating ||
-                      analyzingBooks ||
-                      !stepThreeComplete
-                }
-                className={`h-12 w-full whitespace-nowrap rounded-xl border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm sm:h-12 ${
-                  pendingBookPhotos.length > 0
-                    ? "kbs-add-primary border-blue-700 bg-blue-600 hover:bg-blue-700"
-                    : "border-green-800 bg-green-700 hover:bg-green-800"
-                }`}
-              >
-                {analyzingBooks
-                  ? `Recognizing ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}…`
-                  : pendingBookPhotos.length > 0
-                    ? `Recognize All ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`
-                    : uploadingPhoto
-                      ? "Uploading Photo…"
-                      : saving
-                        ? "Adding Location…"
-                        : (
-                            <span className="whitespace-nowrap">
-                              Add This Book Box with {recognizedBooks.length}{" "}
-                              Book
-                              {recognizedBooks.length === 1 ? "" : "s"}
-                            </span>
-                          )}
-              </button>
+              {(pendingBookPhotos.length > 0 ||
+                recognizedBooks.length > 0) && (
+                <button
+                  type="button"
+                  onClick={handleStepThreePrimaryAction}
+                  disabled={
+                    pendingBookPhotos.length > 0
+                      ? saving || analyzingBooks
+                      : saving ||
+                        locating ||
+                        analyzingBooks ||
+                        !stepThreeComplete
+                  }
+                  className={`h-12 w-full whitespace-nowrap rounded-xl border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm sm:h-12 ${
+                    pendingBookPhotos.length > 0
+                      ? "kbs-add-primary border-blue-700 bg-blue-600 hover:bg-blue-700"
+                      : "border-green-800 bg-green-700 hover:bg-green-800"
+                  }`}
+                >
+                  {analyzingBooks
+                    ? `Recognizing ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}…`
+                    : pendingBookPhotos.length > 0
+                      ? `Recognize All ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`
+                      : uploadingPhoto
+                        ? "Uploading Photo…"
+                        : saving
+                          ? "Adding Location…"
+                          : (
+                              <span className="whitespace-nowrap">
+                                Add This Book Box with {recognizedBooks.length}{" "}
+                                Book
+                                {recognizedBooks.length === 1 ? "" : "s"}
+                              </span>
+                            )}
+                </button>
+              )}
             </div>
 
             {(processedBookPhotos.length > 0 ||
