@@ -75,7 +75,7 @@ function WizardStepHeader({
   example,
 }: WizardStepHeaderProps) {
   return (
-    <div className="grid gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3 dark:border-blue-900 dark:bg-slate-900">
+    <div className="grid gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-1.5" aria-label={`Step ${step} of 3`}>
           {[1, 2, 3].map((dotStep) => (
@@ -92,20 +92,20 @@ function WizardStepHeader({
             />
           ))}
         </div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300 max-sm:!text-xs">
+        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 max-sm:!text-xs">
           Step {step} of 3
         </p>
       </div>
 
       <div className="flex items-start gap-2.5">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-700 shadow-sm dark:border-blue-800 dark:bg-slate-800 dark:text-blue-300">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-700 shadow-sm">
           <Icon className="size-4.5" aria-hidden="true" />
         </span>
         <div className="min-w-0">
-          <p className="text-lg font-bold leading-tight text-foreground dark:text-slate-100 max-sm:!text-lg">
+          <p className="text-lg font-bold leading-tight text-slate-950 max-sm:!text-lg">
             {title}
           </p>
-          <p className="mt-0.5 text-sm leading-snug text-muted-foreground dark:text-slate-300 max-sm:!text-sm">
+          <p className="mt-0.5 text-sm leading-snug text-slate-600 max-sm:!text-sm">
             {instruction}
           </p>
         </div>
@@ -1346,8 +1346,8 @@ export function AddLibraryForm({
           <div
             className={`grid min-w-0 max-w-full gap-2 overflow-hidden rounded-xl p-2.5 transition sm:p-3 ${
               stepOneComplete
-                ? "bg-blue-50/50 dark:bg-slate-900/70"
-                : "pointer-events-none bg-gray-50 opacity-50 dark:bg-slate-900/70"
+                ? "bg-blue-50/50 text-slate-950"
+                : "pointer-events-none bg-gray-50 text-slate-950 opacity-50"
             }`}
           >
             <input
@@ -1361,7 +1361,7 @@ export function AddLibraryForm({
 
             {!photoPreviewUrl ? (
               <>
-                <p className="text-right text-xs text-muted-foreground dark:text-slate-300">
+                <p className="text-right text-xs text-slate-600">
                   Crop for privacy
                 </p>
 
@@ -1382,7 +1382,7 @@ export function AddLibraryForm({
             ) : (
               <div className="w-full min-w-0 max-w-full overflow-hidden">
                 <div className="flex w-full min-w-0 max-w-full justify-center gap-2 overflow-x-hidden pb-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
-                  <div className="w-48 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-background">
+                  <div className="w-48 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-white text-slate-950">
                     <img
                       src={photoPreviewUrl}
                       alt="Preview of the book box exterior"
@@ -1462,8 +1462,8 @@ export function AddLibraryForm({
           <div
             className={`grid min-w-0 gap-2 overflow-hidden rounded-xl p-3 transition ${
               stepTwoComplete
-                ? "bg-violet-50/50 dark:bg-slate-900/70"
-                : "pointer-events-none bg-gray-50 opacity-50 dark:bg-slate-900/70"
+                ? "bg-violet-50/50 text-slate-950"
+                : "pointer-events-none bg-gray-50 text-slate-950 opacity-50"
             }`}
           >
             <input
@@ -1527,7 +1527,7 @@ export function AddLibraryForm({
               (bookPhoto && bookPreviewUrl)) && (
               <div className="grid gap-3 sm:grid-cols-2">
                 {bookPhoto && bookPreviewUrl && (
-                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-white text-slate-950">
                     <img
                       src={bookPreviewUrl}
                       alt="Box interior photo awaiting recognition"
@@ -1537,7 +1537,7 @@ export function AddLibraryForm({
                       <p className="font-semibold">
                         Interior photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="mt-1 font-semibold text-amber-700 dark:text-amber-300" role="status">
+                      <p className="mt-1 font-semibold text-amber-700" role="status">
                         {analyzingBooks
                           ? "Recognizing Books…"
                           : "Waiting to recognize books…"}
@@ -1555,7 +1555,7 @@ export function AddLibraryForm({
                   .map(({ bookPhotoPreview, number }) => (
                     <div
                       key={bookPhotoPreview.url}
-                      className="w-full overflow-hidden rounded-xl border border-violet-200 bg-background"
+                      className="w-full overflow-hidden rounded-xl border border-violet-200 bg-white text-slate-950"
                     >
                       <img
                         src={bookPhotoPreview.url}
@@ -1566,7 +1566,7 @@ export function AddLibraryForm({
                         <p className="font-semibold">
                           Interior photo {number}
                         </p>
-                        <p className="mt-1 font-semibold text-green-700 dark:text-green-300">
+                        <p className="mt-1 font-semibold text-green-700">
                           Recognition Done
                         </p>
                       </div>
@@ -1614,8 +1614,8 @@ export function AddLibraryForm({
                   </ul>
                 </div>
               ) : (
-                <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-violet-200 bg-background px-3 text-center">
-                  <p className="text-xs leading-relaxed text-muted-foreground dark:text-slate-300">
+                <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-violet-200 bg-white px-3 text-center text-slate-950">
+                  <p className="text-xs leading-relaxed text-slate-600">
                     Add an interior photo to generate the title list
                   </p>
                 </div>
@@ -1672,12 +1672,12 @@ export function AddLibraryForm({
           aria-modal="true"
           aria-labelledby="crop-box-photo-title"
         >
-          <div className="grid max-h-[95dvh] w-full max-w-lg gap-3 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl dark:bg-slate-900">
+          <div className="grid max-h-[95dvh] w-full max-w-lg gap-3 overflow-y-auto rounded-2xl bg-white p-4 text-slate-950 shadow-2xl">
             <div>
-              <h2 id="crop-box-photo-title" className="text-lg font-bold text-foreground">
+              <h2 id="crop-box-photo-title" className="text-lg font-bold text-slate-950">
                 Crop Box Exterior Photo
               </h2>
-              <p className="mt-1 text-sm text-muted-foreground dark:text-slate-300">
+              <p className="mt-1 text-sm text-slate-600">
                 Crop closely around the book box and exclude private property when possible.
               </p>
             </div>
@@ -1716,7 +1716,7 @@ export function AddLibraryForm({
                 type="button"
                 onClick={closeCropEditor}
                 disabled={processingPhoto}
-                className="h-12 rounded-xl border border-border bg-white px-4 font-semibold text-foreground hover:bg-secondary disabled:opacity-50 dark:bg-slate-800 dark:text-slate-100"
+                className="h-12 rounded-xl border border-border bg-white px-4 font-semibold text-slate-950 hover:bg-secondary disabled:opacity-50"
               >
                 Cancel
               </button>

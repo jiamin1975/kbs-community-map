@@ -32,21 +32,21 @@ export default function Page() {
             Make Community-Shared Books Easier to Discover
           </h1>
 
-          <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-violet-50 px-4 py-2.5 dark:border-blue-900 dark:bg-none dark:bg-slate-900">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700 dark:text-blue-300 sm:text-xs">
+          <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-violet-50 px-4 py-2.5">
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
               Community-Powered Discovery
             </p>
-            <p className="mt-1.5 text-base font-semibold leading-tight text-foreground dark:text-slate-100 sm:mt-3 sm:text-lg">
-              <span className="font-bold text-blue-700 dark:text-blue-300">One</span>{" "}
+            <p className="mt-1.5 text-base font-semibold leading-tight text-slate-950 sm:mt-3 sm:text-lg">
+              <span className="font-bold text-blue-700">One</span>{" "}
               shelf photo helps the
               <span className="hidden sm:inline"> </span>
               <br className="sm:hidden" />
-              <span className="font-bold text-blue-700 dark:text-blue-300">whole</span> community.
+              <span className="font-bold text-blue-700">whole</span> community.
             </p>
           </div>
 
-          <div className="rounded-xl border border-blue-100 bg-blue-50/60 px-3 py-3 dark:border-blue-900 dark:bg-slate-900 sm:px-3">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700 dark:text-blue-300 sm:text-xs">
+          <div className="rounded-xl border border-blue-100 bg-blue-50/60 px-3 py-3 sm:px-3">
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
               How It Works
             </p>
 
@@ -92,7 +92,7 @@ export default function Page() {
                       />
                     </span>
 
-                    <span className="block text-base font-medium leading-snug text-foreground dark:text-slate-100 sm:text-sm">
+                    <span className="block text-base font-medium leading-snug text-slate-950 sm:text-sm">
                       {step.label}
                     </span>
                   </li>
@@ -107,7 +107,7 @@ export default function Page() {
                   />
                 </span>
 
-                <span className="block text-base font-semibold leading-snug text-green-700 dark:text-green-300 sm:text-sm">
+                <span className="block text-base font-semibold leading-snug text-green-700 sm:text-sm">
                   Search Books
                 </span>
               </li>
