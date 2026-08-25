@@ -75,7 +75,7 @@ function WizardStepHeader({
   example,
 }: WizardStepHeaderProps) {
   return (
-    <div className="grid gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3">
+    <div className="grid gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3 dark:border-blue-900 dark:bg-slate-900">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-1.5" aria-label={`Step ${step} of 3`}>
           {[1, 2, 3].map((dotStep) => (
@@ -92,20 +92,20 @@ function WizardStepHeader({
             />
           ))}
         </div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 max-sm:!text-xs">
+        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300 max-sm:!text-xs">
           Step {step} of 3
         </p>
       </div>
 
       <div className="flex items-start gap-2.5">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-700 shadow-sm">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-700 shadow-sm dark:border-blue-800 dark:bg-slate-800 dark:text-blue-300">
           <Icon className="size-4.5" aria-hidden="true" />
         </span>
         <div className="min-w-0">
-          <p className="text-lg font-bold leading-tight text-foreground max-sm:!text-lg">
+          <p className="text-lg font-bold leading-tight text-foreground dark:text-slate-100 max-sm:!text-lg">
             {title}
           </p>
-          <p className="mt-0.5 text-sm leading-snug text-muted-foreground max-sm:!text-sm">
+          <p className="mt-0.5 text-sm leading-snug text-muted-foreground dark:text-slate-300 max-sm:!text-sm">
             {instruction}
           </p>
         </div>
@@ -130,7 +130,7 @@ function WizardStepHeader({
             className="h-full w-full object-contain"
           />
 
-          <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-black/40 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:rounded-none sm:bg-black/65 sm:px-3 sm:py-1.5">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-black/50 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:rounded-none sm:bg-black/65 sm:px-3 sm:py-1.5">
             <p className="text-[7px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
               <span>Example - Take photo like this</span>
             </p>
@@ -1346,8 +1346,8 @@ export function AddLibraryForm({
           <div
             className={`grid min-w-0 max-w-full gap-2 overflow-hidden rounded-xl p-2.5 transition sm:p-3 ${
               stepOneComplete
-                ? "bg-blue-50/50"
-                : "pointer-events-none bg-gray-50 opacity-50"
+                ? "bg-blue-50/50 dark:bg-slate-900/70"
+                : "pointer-events-none bg-gray-50 opacity-50 dark:bg-slate-900/70"
             }`}
           >
             <input
@@ -1361,7 +1361,7 @@ export function AddLibraryForm({
 
             {!photoPreviewUrl ? (
               <>
-                <p className="text-right text-xs text-muted-foreground">
+                <p className="text-right text-xs text-muted-foreground dark:text-slate-300">
                   Crop for privacy
                 </p>
 
@@ -1462,8 +1462,8 @@ export function AddLibraryForm({
           <div
             className={`grid min-w-0 gap-2 overflow-hidden rounded-xl p-3 transition ${
               stepTwoComplete
-                ? "bg-violet-50/50"
-                : "pointer-events-none bg-gray-50 opacity-50"
+                ? "bg-violet-50/50 dark:bg-slate-900/70"
+                : "pointer-events-none bg-gray-50 opacity-50 dark:bg-slate-900/70"
             }`}
           >
             <input
@@ -1537,7 +1537,7 @@ export function AddLibraryForm({
                       <p className="font-semibold">
                         Interior photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="mt-1 font-semibold text-amber-700" role="status">
+                      <p className="mt-1 font-semibold text-amber-700 dark:text-amber-300" role="status">
                         {analyzingBooks
                           ? "Recognizing Books…"
                           : "Waiting to recognize books…"}
@@ -1566,7 +1566,7 @@ export function AddLibraryForm({
                         <p className="font-semibold">
                           Interior photo {number}
                         </p>
-                        <p className="mt-1 font-semibold text-green-700">
+                        <p className="mt-1 font-semibold text-green-700 dark:text-green-300">
                           Recognition Done
                         </p>
                       </div>
@@ -1615,7 +1615,7 @@ export function AddLibraryForm({
                 </div>
               ) : (
                 <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-violet-200 bg-background px-3 text-center">
-                  <p className="text-xs leading-relaxed text-muted-foreground">
+                  <p className="text-xs leading-relaxed text-muted-foreground dark:text-slate-300">
                     Add an interior photo to generate the title list
                   </p>
                 </div>
@@ -1672,12 +1672,12 @@ export function AddLibraryForm({
           aria-modal="true"
           aria-labelledby="crop-box-photo-title"
         >
-          <div className="grid max-h-[95dvh] w-full max-w-lg gap-3 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl">
+          <div className="grid max-h-[95dvh] w-full max-w-lg gap-3 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl dark:bg-slate-900">
             <div>
               <h2 id="crop-box-photo-title" className="text-lg font-bold text-foreground">
                 Crop Box Exterior Photo
               </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-sm text-muted-foreground dark:text-slate-300">
                 Crop closely around the book box and exclude private property when possible.
               </p>
             </div>
@@ -1716,7 +1716,7 @@ export function AddLibraryForm({
                 type="button"
                 onClick={closeCropEditor}
                 disabled={processingPhoto}
-                className="h-12 rounded-xl border border-border bg-white px-4 font-semibold text-foreground hover:bg-secondary disabled:opacity-50"
+                className="h-12 rounded-xl border border-border bg-white px-4 font-semibold text-foreground hover:bg-secondary disabled:opacity-50 dark:bg-slate-800 dark:text-slate-100"
               >
                 Cancel
               </button>
