@@ -22,7 +22,6 @@ import {
   type MapCameraChangedEvent,
 } from "@vis.gl/react-google-maps";
 import {
-  BrainCircuit,
   Camera,
   MapPin,
   MapPinned,
@@ -1597,16 +1596,14 @@ export function AddLibraryForm({
               >
                 {analyzingBooks
                   ? (
-                      <span className="inline-flex items-center justify-center gap-2">
-                        <BrainCircuit className="size-5" aria-hidden="true" />
+                      <span className="inline-flex items-center justify-center">
                         AI Recognizing Books in {pendingBookPhotos.length}{" "}
                         Photo{pendingBookPhotos.length === 1 ? "" : "s"}…
                       </span>
                     )
                   : pendingBookPhotos.length > 0
                     ? (
-                        <span className="inline-flex items-center justify-center gap-2">
-                          <BrainCircuit className="size-5" aria-hidden="true" />
+                        <span className="inline-flex items-center justify-center">
                           AI: Recognize Books in {pendingBookPhotos.length}{" "}
                           Photo{pendingBookPhotos.length === 1 ? "" : "s"}
                         </span>
@@ -1745,7 +1742,7 @@ export function AddLibraryForm({
               ← Back
             </button>
 
-            <label className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
+            <label className="flex min-w-0 items-center justify-end gap-2 text-right text-xs text-muted-foreground">
               <input
                 type="checkbox"
                 checked={verified}
