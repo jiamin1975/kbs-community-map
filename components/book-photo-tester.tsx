@@ -465,7 +465,7 @@ export function BookPhotoTester({
                   : finishAndSaveInventory
               }
               disabled={loading || saving}
-              className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap rounded-xl border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm ${
+              className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap rounded-xl border px-3 py-1.5 text-base font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm ${
                 pendingBookPhotos.length > 0
                   ? "kbs-update-primary border-violet-800 bg-violet-700 hover:bg-violet-800"
                   : "kbs-update-save border-green-800 bg-green-700 hover:bg-green-800"
@@ -474,7 +474,7 @@ export function BookPhotoTester({
               {pendingBookPhotos.length > 0 ? (
                 loading
                   ? "Recognizing Books…"
-                  : `Recognize Books in ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`
+                  : `AI Recognize Books in ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`
               ) : saving ? (
                 <>
                   <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
@@ -501,19 +501,25 @@ export function BookPhotoTester({
           {(processedBookPhotos.length > 0 || pendingBookPhotos.length > 0) && (
             <>
               <div className="grid min-w-0 gap-3 sm:hidden">
-                {pendingBookPhotos.map((photo, index) => (
+                {pendingBookPhotos
+                  .map((photo, index) => ({
+                    photo,
+                    number: processedBookPhotos.length + index + 1,
+                  }))
+                  .reverse()
+                  .map(({ photo, number }) => (
                   <div
                     key={photo.url}
                     className="kbs-update-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background"
                   >
                     <img
                       src={photo.url}
-                      alt={`Interior photo ${processedBookPhotos.length + index + 1} awaiting recognition`}
+                      alt={`Interior photo ${number} awaiting recognition`}
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2">
                       <p className="font-semibold">
-                        Interior photo {processedBookPhotos.length + index + 1}
+                        Interior photo {number}
                       </p>
                       <p className="kbs-update-recognizing mt-1 font-semibold text-amber-700" role="status">
                         {loading ? "Recognizing Books…" : "Ready to recognize"}
@@ -549,38 +555,48 @@ export function BookPhotoTester({
               </div>
 
               <div className="hidden min-w-0 gap-3 overflow-x-auto pb-2 sm:flex">
-                {processedBookPhotos.map((photo, index) => (
+                {pendingBookPhotos
+                  .map((photo, index) => ({
+                    photo,
+                    number: processedBookPhotos.length + index + 1,
+                  }))
+                  .reverse()
+                  .map(({ photo, number }) => (
                   <div
                     key={photo.url}
-                    className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-violet-200 bg-background"
+                    className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background"
                   >
                     <img
                       src={photo.url}
-                      alt={`Interior photo ${index + 1}`}
+                      alt={`Interior photo ${number} awaiting recognition`}
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2.5">
-                      <p className="font-semibold">Interior photo {index + 1}</p>
-                      <p className="kbs-update-recognized mt-1 font-semibold text-green-700">
-                        Recognition Done
+                      <p className="font-semibold">Interior photo {number}</p>
+                      <p className="kbs-update-recognizing mt-1 font-semibold text-amber-700" role="status">
+                        {loading ? "Recognizing Books…" : "Ready to recognize"}
                       </p>
                     </div>
                   </div>
                 ))}
 
-                {pendingBookPhotos.map((photo, index) => (
-                  <div key={photo.url} className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                {processedBookPhotos
+                  .map((photo, index) => ({
+                    photo,
+                    number: index + 1,
+                  }))
+                  .reverse()
+                  .map(({ photo, number }) => (
+                  <div key={photo.url} className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-violet-200 bg-background">
                     <img
                       src={photo.url}
-                      alt={`Interior photo ${processedBookPhotos.length + index + 1} awaiting recognition`}
+                      alt={`Interior photo ${number}`}
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2.5">
-                      <p className="font-semibold">
-                        Interior photo {processedBookPhotos.length + index + 1}
-                      </p>
-                      <p className="kbs-update-recognizing mt-1 font-semibold text-amber-700" role="status">
-                        {loading ? "Recognizing Books…" : "Ready to recognize"}
+                      <p className="font-semibold">Interior photo {number}</p>
+                      <p className="kbs-update-recognized mt-1 font-semibold text-green-700">
+                        Recognition Done
                       </p>
                     </div>
                   </div>
