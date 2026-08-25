@@ -26,6 +26,7 @@ import {
   MapPin,
   MapPinned,
   ScanLine,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import Cropper, { type Area } from "react-easy-crop";
@@ -1197,6 +1198,17 @@ export function AddLibraryForm({
             background-color: #1e40af !important;
           }
 
+          .kbs-recognize-all:not(:disabled) {
+            background-color: #5b21b6 !important;
+            border-color: #7c3aed !important;
+            color: #faf5ff !important;
+            box-shadow: 0 3px 10px rgba(2, 6, 23, 0.35) !important;
+          }
+
+          .kbs-recognize-all:not(:disabled):active {
+            background-color: #6d28d9 !important;
+          }
+
           .kbs-add-photo-card {
             background-color: #0f172a !important;
             border-color: #475569 !important;
@@ -1588,14 +1600,26 @@ export function AddLibraryForm({
                 }
                 className={`h-12 w-full whitespace-nowrap rounded-xl border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-base sm:h-12 ${
                   pendingBookPhotos.length > 0
-                    ? "kbs-add-primary border-blue-700 bg-blue-600 hover:bg-blue-700"
+                    ? "kbs-recognize-all border-violet-700 bg-violet-600 hover:bg-violet-700"
                     : "border-green-800 bg-green-700 hover:bg-green-800"
                 }`}
               >
                 {analyzingBooks
-                  ? `Recognizing ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}…`
+                  ? (
+                      <span className="inline-flex items-center justify-center gap-2">
+                        <Sparkles className="size-4" aria-hidden="true" />
+                        Recognizing {pendingBookPhotos.length} Photo
+                        {pendingBookPhotos.length === 1 ? "" : "s"}…
+                      </span>
+                    )
                   : pendingBookPhotos.length > 0
-                    ? `Recognize All ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`
+                    ? (
+                        <span className="inline-flex items-center justify-center gap-2">
+                          <Sparkles className="size-4" aria-hidden="true" />
+                          Recognize All {pendingBookPhotos.length} Photo
+                          {pendingBookPhotos.length === 1 ? "" : "s"}
+                        </span>
+                      )
                     : uploadingPhoto
                       ? "Uploading Photo…"
                       : saving
@@ -1613,28 +1637,34 @@ export function AddLibraryForm({
             {(processedBookPhotos.length > 0 ||
               pendingBookPhotos.length > 0) && (
               <div className="grid gap-3 sm:grid-cols-2">
-                {pendingBookPhotos.map((pendingPhoto, index) => (
-                  <div
-                    key={pendingPhoto.url}
-                    className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-white text-slate-950"
-                  >
-                    <img
-                      src={pendingPhoto.url}
-                      alt={`Box interior photo ${processedBookPhotos.length + index + 1} awaiting recognition`}
-                      className="h-40 w-full bg-gray-100 object-contain"
-                    />
-                    <div className="p-2">
-                      <p className="font-semibold">
-                        Interior photo {processedBookPhotos.length + index + 1}
-                      </p>
-                      <p className="mt-1 font-semibold text-amber-700" role="status">
-                        {analyzingBooks
-                          ? "Recognizing Books…"
-                          : "Ready to recognize"}
-                      </p>
+                {pendingBookPhotos
+                  .map((pendingPhoto, index) => ({
+                    pendingPhoto,
+                    number: processedBookPhotos.length + index + 1,
+                  }))
+                  .reverse()
+                  .map(({ pendingPhoto, number }) => (
+                    <div
+                      key={pendingPhoto.url}
+                      className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-white text-slate-950"
+                    >
+                      <img
+                        src={pendingPhoto.url}
+                        alt={`Box interior photo ${number} awaiting recognition`}
+                        className="h-40 w-full bg-gray-100 object-contain"
+                      />
+                      <div className="p-2">
+                        <p className="font-semibold">
+                          Interior photo {number}
+                        </p>
+                        <p className="mt-1 font-semibold text-amber-700" role="status">
+                          {analyzingBooks
+                            ? "Recognizing Books…"
+                            : "Ready to recognize"}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
 
                 {processedBookPhotos
                   .map((bookPhotoPreview, index) => ({
@@ -1706,7 +1736,7 @@ export function AddLibraryForm({
               ) : (
                 <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-violet-200 bg-white px-3 text-center text-slate-950">
                   <p className="text-xs leading-relaxed text-slate-600">
-                    Add an interior photo to generate the title list
+                    Add interior photos to generate the title list
                   </p>
                 </div>
               )
