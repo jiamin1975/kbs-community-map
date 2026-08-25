@@ -75,7 +75,7 @@ function WizardStepHeader({
   example,
 }: WizardStepHeaderProps) {
   return (
-    <div className="grid gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
+    <div className="kbs-add-step-card grid gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-1.5" aria-label={`Step ${step} of 3`}>
           {[1, 2, 3].map((dotStep) => (
@@ -92,7 +92,7 @@ function WizardStepHeader({
             />
           ))}
         </div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 max-sm:!text-xs">
+        <p className="kbs-add-step-label text-xs font-semibold uppercase tracking-wide text-blue-700 max-sm:!text-xs">
           Step {step} of 3
         </p>
       </div>
@@ -102,10 +102,10 @@ function WizardStepHeader({
           <Icon className="size-4.5" aria-hidden="true" />
         </span>
         <div className="min-w-0">
-          <p className="text-lg font-bold leading-tight text-slate-950 max-sm:!text-lg">
+          <p className="kbs-add-step-title text-lg font-bold leading-tight text-slate-950 max-sm:!text-lg">
             {title}
           </p>
-          <p className="mt-0.5 text-sm leading-snug text-slate-600 max-sm:!text-sm">
+          <p className="kbs-add-step-instruction mt-0.5 text-sm leading-snug text-slate-600 max-sm:!text-sm">
             {instruction}
           </p>
         </div>
@@ -1124,7 +1124,55 @@ export function AddLibraryForm({
 
   return (
     <div>
-      <div className="min-w-0 overflow-visible rounded-2xl border border-border bg-card p-3 max-sm:[&_button]:text-base max-sm:[&_button_span]:text-base max-sm:[&_input]:text-base max-sm:[&_label]:text-sm max-sm:[&_label_span]:text-sm max-sm:[&_p]:text-sm sm:p-4">
+      <style>{`
+        @media (prefers-color-scheme: dark) and (max-width: 639px) {
+          .kbs-add-form,
+          .kbs-add-step-card,
+          .kbs-add-content {
+            background-color: #111827 !important;
+            background-image: none !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+          }
+
+          .kbs-add-step-label {
+            color: #93c5fd !important;
+          }
+
+          .kbs-add-step-title {
+            color: #f8fafc !important;
+          }
+
+          .kbs-add-step-instruction {
+            color: #cbd5e1 !important;
+          }
+
+          .kbs-add-input {
+            background-color: #0f172a !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
+          }
+
+          .kbs-add-input::placeholder {
+            color: #94a3b8 !important;
+          }
+
+          .kbs-add-next:disabled {
+            background-color: #1e293b !important;
+            border-color: #475569 !important;
+            color: #94a3b8 !important;
+            opacity: 1 !important;
+          }
+
+          .kbs-add-photo-card {
+            background-color: #0f172a !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
+          }
+        }
+      `}</style>
+
+      <div className="kbs-add-form min-w-0 overflow-visible rounded-2xl border border-border bg-card p-3 max-sm:[&_button]:text-base max-sm:[&_button_span]:text-base max-sm:[&_input]:text-base max-sm:[&_label]:text-sm max-sm:[&_label_span]:text-sm max-sm:[&_p]:text-sm sm:p-4">
         <div className="border-b border-border pb-3">
           <p className="min-w-0 truncate text-xs text-muted-foreground">
             Contributor: {currentUser.email ?? "Public contributor"}
@@ -1176,7 +1224,7 @@ export function AddLibraryForm({
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
+                className="kbs-add-input h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
                 placeholder="Generated from location"
               />
             </label>
@@ -1189,7 +1237,7 @@ export function AddLibraryForm({
               <input
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
-                className="h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
+                className="kbs-add-input h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
                 placeholder="123 Main St, Rockville, MD"
               />
             </label>
@@ -1200,7 +1248,7 @@ export function AddLibraryForm({
               <input
                 value={neighborhood}
                 onChange={(event) => setNeighborhood(event.target.value)}
-                className="h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
+                className="kbs-add-input h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
                 placeholder="Town Center"
               />
             </label>
@@ -1316,7 +1364,7 @@ export function AddLibraryForm({
               type="button"
               onClick={() => goToStep(2)}
               disabled={!stepOneComplete || locating || saving}
-              className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none max-sm:order-5"
+              className="kbs-add-next h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none max-sm:order-5"
             >
               Continue →
             </button>
@@ -1344,7 +1392,7 @@ export function AddLibraryForm({
             />
 
           <div
-            className={`grid min-w-0 max-w-full gap-2 overflow-hidden rounded-xl p-2.5 transition sm:p-3 ${
+            className={`kbs-add-content grid min-w-0 max-w-full gap-2 overflow-hidden rounded-xl border border-transparent p-2.5 transition sm:p-3 ${
               stepOneComplete
                 ? "bg-blue-50/50 text-slate-950"
                 : "pointer-events-none bg-gray-50 text-slate-950 opacity-50"
@@ -1382,7 +1430,7 @@ export function AddLibraryForm({
             ) : (
               <div className="w-full min-w-0 max-w-full overflow-hidden">
                 <div className="flex w-full min-w-0 max-w-full justify-center gap-2 overflow-x-hidden pb-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
-                  <div className="w-48 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-white text-slate-950">
+                  <div className="kbs-add-photo-card w-48 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-white text-slate-950">
                     <img
                       src={photoPreviewUrl}
                       alt="Preview of the book box exterior"
@@ -1431,7 +1479,7 @@ export function AddLibraryForm({
                 type="button"
                 onClick={() => goToStep(3)}
                 disabled={!stepTwoComplete || saving}
-                className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
+                className="kbs-add-next h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
               >
                 Continue →
               </button>
@@ -1460,7 +1508,7 @@ export function AddLibraryForm({
             />
 
           <div
-            className={`grid min-w-0 gap-2 overflow-hidden rounded-xl p-3 transition ${
+            className={`kbs-add-content grid min-w-0 gap-2 overflow-hidden rounded-xl border border-transparent p-3 transition ${
               stepTwoComplete
                 ? "bg-violet-50/50 text-slate-950"
                 : "pointer-events-none bg-gray-50 text-slate-950 opacity-50"
