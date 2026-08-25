@@ -666,6 +666,35 @@ export function CommunityMap({
 
   return (
     <div>
+      <style>{`
+        @media (prefers-color-scheme: dark) and (max-width: 639px) {
+          .kbs-nearby-card {
+            background-color: rgba(15, 23, 42, 0.97) !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45) !important;
+          }
+
+          .kbs-nearby-primary {
+            background-color: #1e3a8a !important;
+            border: 1px solid #3b5998 !important;
+            color: #f8fafc !important;
+            box-shadow: none !important;
+          }
+
+          .kbs-nearby-secondary {
+            background-color: #1e293b !important;
+            border-color: #475569 !important;
+            color: #e2e8f0 !important;
+          }
+
+          .kbs-nearby-primary:active,
+          .kbs-nearby-secondary:active {
+            background-color: #334155 !important;
+          }
+        }
+      `}</style>
+
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
         <div className="kbs-mobile-actions grid gap-2 max-sm:rounded-xl max-sm:border max-sm:border-border max-sm:bg-card max-sm:p-3 sm:grid-cols-[auto_auto_minmax(0,1fr)] sm:items-end sm:gap-3">
           <button
@@ -1203,7 +1232,7 @@ export function CommunityMap({
         )}
 
         {nearbyMatch && (
-          <div className="absolute inset-x-3 bottom-14 z-20 rounded-2xl border border-blue-300 bg-white/95 p-4 text-blue-950 shadow-xl backdrop-blur sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2">
+          <div className="kbs-nearby-card absolute inset-x-3 bottom-14 z-20 rounded-2xl border border-blue-300 bg-white/95 p-4 text-blue-950 shadow-xl backdrop-blur sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2">
             <p className="text-sm font-semibold">Nearest book box found</p>
 
             <p className="mt-1 text-lg font-semibold">
@@ -1224,15 +1253,15 @@ export function CommunityMap({
               <button
                 type="button"
                 onClick={confirmNearbyLibrary}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                className="kbs-nearby-primary rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               >
-                Choose It !
+                Choose It
               </button>
 
               <button
                 type="button"
                 onClick={cancelNearbyLibrary}
-                className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium"
+                className="kbs-nearby-secondary rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium"
               >
                 Choose Another Book Box
               </button>
