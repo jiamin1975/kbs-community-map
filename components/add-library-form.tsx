@@ -1164,6 +1164,17 @@ export function AddLibraryForm({
             opacity: 1 !important;
           }
 
+          .kbs-add-primary:not(:disabled):not([aria-disabled="true"]) {
+            background-color: #1e3a8a !important;
+            border-color: #3b5998 !important;
+            color: #f8fafc !important;
+            box-shadow: 0 3px 10px rgba(2, 6, 23, 0.35) !important;
+          }
+
+          .kbs-add-primary:not(:disabled):not([aria-disabled="true"]):active {
+            background-color: #1e40af !important;
+          }
+
           .kbs-add-photo-card {
             background-color: #0f172a !important;
             border-color: #475569 !important;
@@ -1205,7 +1216,7 @@ export function AddLibraryForm({
               type="button"
               onClick={useCurrentLocation}
               disabled={locating || saving}
-              className="inline-flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-3 font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 max-sm:mb-2 max-sm:!text-sm sm:h-10 sm:px-4 sm:text-sm"
+              className="kbs-add-primary inline-flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-3 font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 max-sm:mb-2 max-sm:!text-sm sm:h-10 sm:px-4 sm:text-sm"
             >
               <span aria-hidden="true">📍</span>
               <span className="truncate max-sm:!text-sm">
@@ -1364,7 +1375,7 @@ export function AddLibraryForm({
               type="button"
               onClick={() => goToStep(2)}
               disabled={!stepOneComplete || locating || saving}
-              className="kbs-add-next h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none max-sm:order-5"
+              className="kbs-add-next kbs-add-primary h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none max-sm:order-5"
             >
               Continue →
             </button>
@@ -1416,7 +1427,7 @@ export function AddLibraryForm({
                 <label
                   htmlFor="library-photo"
                   aria-disabled={!stepOneComplete || processingPhoto}
-                  className={`inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border px-4 text-base font-bold transition sm:h-10 sm:text-sm ${
+                  className={`kbs-add-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border px-4 text-base font-bold transition sm:h-10 sm:text-sm ${
                     processingPhoto
                       ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
                       : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
@@ -1479,7 +1490,7 @@ export function AddLibraryForm({
                 type="button"
                 onClick={() => goToStep(3)}
                 disabled={!stepTwoComplete || saving}
-                className="kbs-add-next h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
+                className="kbs-add-next kbs-add-primary h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
               >
                 Continue →
               </button>
@@ -1527,7 +1538,7 @@ export function AddLibraryForm({
               <label
                 htmlFor="book-photo"
                 aria-disabled={analyzingBooks || saving}
-                className={`inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition max-sm:!text-base sm:h-10 sm:px-2 sm:text-sm ${
+                className={`kbs-add-primary inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition max-sm:!text-base sm:h-10 sm:px-2 sm:text-sm ${
                   analyzingBooks || saving
                     ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
                     : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
@@ -1772,7 +1783,7 @@ export function AddLibraryForm({
                 type="button"
                 onClick={useCroppedPhoto}
                 disabled={processingPhoto || !croppedAreaPixels}
-                className="h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="kbs-add-primary h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {processingPhoto ? "Preparing Photo…" : "Use This Crop"}
               </button>
