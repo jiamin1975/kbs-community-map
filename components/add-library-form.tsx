@@ -43,6 +43,10 @@ type BookPhotoPreview = {
   url: string;
 };
 
+type PendingBookPhoto = BookPhotoPreview & {
+  file: File;
+};
+
 type RecognizedBook = {
   title: string;
   author: string | null;
@@ -387,8 +391,9 @@ export function AddLibraryForm({
   const [pendingLibraryId, setPendingLibraryId] = useState(
     () => doc(collection(db, "libraries")).id,
   );
-  const [bookPhoto, setBookPhoto] = useState<File | null>(null);
-  const [bookPreviewUrl, setBookPreviewUrl] = useState<string | null>(null);
+  const [pendingBookPhotos, setPendingBookPhotos] = useState<
+    PendingBookPhoto[]
+  >([]);
   const [processedBookPhotos, setProcessedBookPhotos] = useState<
     BookPhotoPreview[]
   >([]);
@@ -413,14 +418,6 @@ export function AddLibraryForm({
       }
     };
   }, [cropSourceUrl]);
-
-  useEffect(() => {
-    return () => {
-      if (bookPreviewUrl) {
-        URL.revokeObjectURL(bookPreviewUrl);
-      }
-    };
-  }, [bookPreviewUrl]);
 
   useEffect(() => {
     return () => {
@@ -467,7 +464,10 @@ export function AddLibraryForm({
   const stepOneReady = Boolean(markerPosition && name.trim() && address.trim());
   const stepOneComplete = stepOneReady && duplicateCheckStatus === "clear";
   const stepTwoComplete = stepOneComplete && photo !== null;
-  const stepThreeComplete = stepTwoComplete && recognizedBooks.length > 0;
+  const stepThreeComplete =
+    stepTwoComplete &&
+    recognizedBooks.length > 0 &&
+    pendingBookPhotos.length === 0;
 
   const stepOneHeadingRef = useRef<HTMLHeadingElement>(null);
   const stepTwoHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -823,8 +823,6 @@ export function AddLibraryForm({
     setBookRecognitionError("");
 
     if (!selectedPhoto) {
-      setBookPhoto(null);
-      setBookPreviewUrl(null);
       return;
     }
 
@@ -843,52 +841,67 @@ export function AddLibraryForm({
     }
 
     const previewUrl = URL.createObjectURL(selectedPhoto);
-    setBookPhoto(selectedPhoto);
-    setBookPreviewUrl(previewUrl);
+    processedBookPhotoUrls.current.push(previewUrl);
+    setPendingBookPhotos((currentPhotos) => [
+      ...currentPhotos,
+      { file: selectedPhoto, name: selectedPhoto.name, url: previewUrl },
+    ]);
     event.target.value = "";
-    void analyzeBookPhoto(selectedPhoto);
   }
 
-  async function analyzeBookPhoto(photoToAnalyze: File) {
+  async function analyzeAllBookPhotos() {
+    if (pendingBookPhotos.length === 0) {
+      setBookRecognitionError(
+        "Add at least one interior photo before recognizing books.",
+      );
+      return;
+    }
+
     setAnalyzingBooks(true);
     setBookRecognitionError("");
 
     try {
-      const formData = new FormData();
-      formData.append("image", photoToAnalyze);
-      formData.append("libraryId", pendingLibraryId);
+      const results = await Promise.all(
+        pendingBookPhotos.map(async ({ file }) => {
+          const formData = new FormData();
+          formData.append("image", file);
+          formData.append("libraryId", pendingLibraryId);
 
-      const response = await fetch("/api/analyze-books", {
-        method: "POST",
-        body: formData,
-      });
+          const response = await fetch("/api/analyze-books", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
 
-      const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error ?? "Book recognition failed.");
+          }
 
-      if (!response.ok) {
-        throw new Error(data.error ?? "Book recognition failed.");
-      }
+          return data as RecognitionResult;
+        }),
+      );
 
-      const recognitionResult = data as RecognitionResult;
+      const combinedBooks = results.reduce<RecognizedBook[]>(
+        (books, result) => mergeBooks(books, result.books),
+        [],
+      );
 
-      if (recognitionResult.books.length === 0) {
+      if (combinedBooks.length === 0) {
         setBookRecognitionError(
-          "No books were recognized. Try a clearer, closer photo.",
+          "No books were recognized. Try clearer, closer photos.",
         );
         return;
       }
 
       setRecognizedBooks((current) =>
-        mergeBooks(current, recognitionResult.books),
+        mergeBooks(current, combinedBooks),
       );
-      const processedPreviewUrl = URL.createObjectURL(photoToAnalyze);
-      processedBookPhotoUrls.current.push(processedPreviewUrl);
       setProcessedBookPhotos((current) => [
         ...current,
-        { name: photoToAnalyze.name, url: processedPreviewUrl },
+        ...pendingBookPhotos.map(({ name, url }) => ({ name, url })),
       ]);
-      setBookPhotosProcessed((count) => count + 1);
-      setBookPhoto(null);
+      setBookPhotosProcessed((count) => count + pendingBookPhotos.length);
+      setPendingBookPhotos([]);
     } catch (caughtError) {
       setBookRecognitionError(
         caughtError instanceof Error
@@ -1545,11 +1558,24 @@ export function AddLibraryForm({
                 }`}
               >
                 📚{" "}
-                {bookPhotosProcessed > 0
+                {bookPhotosProcessed > 0 || pendingBookPhotos.length > 0
                   ? "Add Another Interior Photo"
                   : "Add Interior Photo"}
               </label>
             </div>
+
+            {pendingBookPhotos.length > 0 && (
+              <button
+                type="button"
+                onClick={analyzeAllBookPhotos}
+                disabled={saving || analyzingBooks}
+                className="kbs-add-primary h-12 w-full rounded-xl border border-blue-700 bg-blue-600 px-3 text-base font-bold text-white shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {analyzingBooks
+                  ? `Recognizing ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}…`
+                  : `Recognize All ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`}
+              </button>
+            )}
 
             <div className="grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
               <button
@@ -1583,27 +1609,30 @@ export function AddLibraryForm({
             </div>
 
             {(processedBookPhotos.length > 0 ||
-              (bookPhoto && bookPreviewUrl)) && (
+              pendingBookPhotos.length > 0) && (
               <div className="grid gap-3 sm:grid-cols-2">
-                {bookPhoto && bookPreviewUrl && (
-                  <div className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-white text-slate-950">
+                {pendingBookPhotos.map((pendingPhoto, index) => (
+                  <div
+                    key={pendingPhoto.url}
+                    className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-white text-slate-950"
+                  >
                     <img
-                      src={bookPreviewUrl}
-                      alt="Box interior photo awaiting recognition"
+                      src={pendingPhoto.url}
+                      alt={`Box interior photo ${processedBookPhotos.length + index + 1} awaiting recognition`}
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2">
                       <p className="font-semibold">
-                        Interior photo {processedBookPhotos.length + 1}
+                        Interior photo {processedBookPhotos.length + index + 1}
                       </p>
                       <p className="mt-1 font-semibold text-amber-700" role="status">
                         {analyzingBooks
                           ? "Recognizing Books…"
-                          : "Waiting to recognize books…"}
+                          : "Ready to recognize"}
                       </p>
                     </div>
                   </div>
-                )}
+                ))}
 
                 {processedBookPhotos
                   .map((bookPhotoPreview, index) => ({
@@ -1614,7 +1643,7 @@ export function AddLibraryForm({
                   .map(({ bookPhotoPreview, number }) => (
                     <div
                       key={bookPhotoPreview.url}
-                      className="w-full overflow-hidden rounded-xl border border-violet-200 bg-white text-slate-950"
+                      className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-violet-200 bg-white text-slate-950"
                     >
                       <img
                         src={bookPhotoPreview.url}
@@ -1640,7 +1669,7 @@ export function AddLibraryForm({
               </p>
             )}
 
-            {(bookPreviewUrl || recognizedBooks.length > 0) && (
+            {(pendingBookPhotos.length > 0 || recognizedBooks.length > 0) && (
               recognizedBooks.length > 0 ? (
                 <div className="overflow-hidden rounded-lg border border-green-200 bg-green-50">
                   <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">

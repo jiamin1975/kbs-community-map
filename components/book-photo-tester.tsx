@@ -34,6 +34,11 @@ type ProcessedBookPhoto = {
   url: string
 }
 
+type PendingBookPhoto = {
+  file: File
+  url: string
+}
+
 type BookPhotoTesterProps = {
   library: Library | null
   onFinished?: () => void
@@ -97,11 +102,8 @@ export function BookPhotoTester({
   library,
   onFinished,
 }: BookPhotoTesterProps) {
-  const [file, setFile] =
-    useState<File | null>(null)
-
-  const [previewUrl, setPreviewUrl] =
-    useState<string | null>(null)
+  const [pendingBookPhotos, setPendingBookPhotos] =
+    useState<PendingBookPhoto[]>([])
 
   const [sessionBooks, setSessionBooks] =
     useState<RecognizedBook[]>([])
@@ -136,33 +138,29 @@ export function BookPhotoTester({
 
     event.target.value = ""
 
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl)
-    }
-
-    setFile(selectedFile)
-
     setError("")
     setSaved(false)
 
     if (selectedFile) {
       const nextPreviewUrl = URL.createObjectURL(selectedFile)
       processedBookPhotoUrls.current.push(nextPreviewUrl)
-      setPreviewUrl(nextPreviewUrl)
-      void analyzePhoto(selectedFile, nextPreviewUrl)
-    } else {
-      setPreviewUrl(null)
+      setPendingBookPhotos((currentPhotos) => [
+        ...currentPhotos,
+        { file: selectedFile, url: nextPreviewUrl },
+      ])
     }
   }
 
-  async function analyzePhoto(
-    photoToAnalyze: File,
-    photoPreviewUrl: string,
-  ) {
+  async function analyzeAllPhotos() {
     if (!library) {
       setError(
         "Please select a book box first.",
       )
+      return
+    }
+
+    if (pendingBookPhotos.length === 0) {
+      setError("Add at least one interior photo before recognizing books.")
       return
     }
 
@@ -171,64 +169,47 @@ export function BookPhotoTester({
     setSaved(false)
 
     try {
-      const formData = new FormData()
+      const results = await Promise.all(
+        pendingBookPhotos.map(async ({ file }) => {
+          const formData = new FormData()
+          formData.append("image", file)
+          formData.append("libraryId", library.id)
 
-      formData.append("image", photoToAnalyze)
-      formData.append(
-        "libraryId",
-        library.id,
+          const response = await fetch("/api/analyze-books", {
+            method: "POST",
+            body: formData,
+          })
+          const data = await response.json()
+
+          if (!response.ok) {
+            throw new Error(
+              data.error ?? "The book recognition request failed.",
+            )
+          }
+
+          return data as RecognitionResult
+        }),
       )
 
-      const response = await fetch(
-        "/api/analyze-books",
-        {
-          method: "POST",
-          body: formData,
-        },
+      const combinedBooks = results.reduce<RecognizedBook[]>(
+        (books, result) => mergeBooks(books, result.books),
+        [],
       )
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ??
-            "The book recognition request failed.",
-        )
-      }
-
-      const recognitionResult =
-        data as RecognitionResult
-
-      if (
-        recognitionResult.books.length === 0
-      ) {
-        setError(
-          "No books were recognized clearly enough in this photo.",
-        )
+      if (combinedBooks.length === 0) {
+        setError("No books were recognized. Try clearer, closer photos.")
         return
       }
 
-      setSessionBooks(
-        (currentBooks) =>
-          mergeBooks(
-            currentBooks,
-            recognitionResult.books,
-          ),
+      setSessionBooks((currentBooks) =>
+        mergeBooks(currentBooks, combinedBooks),
       )
-
-      setPhotosProcessed(
-        (count) => count + 1,
-      )
-
+      setPhotosProcessed((count) => count + pendingBookPhotos.length)
       setProcessedBookPhotos((currentPhotos) => [
         ...currentPhotos,
-        {
-          url: photoPreviewUrl,
-        },
+        ...pendingBookPhotos.map(({ url }) => ({ url })),
       ])
-
-      setFile(null)
-      setPreviewUrl(null)
+      setPendingBookPhotos([])
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -469,16 +450,34 @@ export function BookPhotoTester({
                   : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
               }`}
             >
-              📚 {photosProcessed > 0
+              📚 {photosProcessed > 0 || pendingBookPhotos.length > 0
                 ? "Add Another Interior Photo"
                 : "Add Interior Photo"}
             </label>
           </div>
 
+          {pendingBookPhotos.length > 0 && (
+            <button
+              type="button"
+              onClick={analyzeAllPhotos}
+              disabled={loading || saving}
+              className="kbs-update-primary inline-flex h-12 items-center justify-center rounded-xl border border-blue-700 bg-blue-600 px-3 text-base font-bold text-white shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading
+                ? `Recognizing ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}…`
+                : `Recognize All ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`}
+            </button>
+          )}
+
           <button
             type="button"
             onClick={finishAndSaveInventory}
-            disabled={loading || saving || sessionBooks.length === 0}
+            disabled={
+              loading ||
+              saving ||
+              sessionBooks.length === 0 ||
+              pendingBookPhotos.length > 0
+            }
             className="kbs-update-save min-h-12 whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
           >
             {saving ? (
@@ -503,30 +502,29 @@ export function BookPhotoTester({
             )}
           </button>
 
-          {(processedBookPhotos.length > 0 || previewUrl) && (
+          {(processedBookPhotos.length > 0 || pendingBookPhotos.length > 0) && (
             <>
               <div className="grid min-w-0 gap-3 sm:hidden">
-                {previewUrl && file && (
+                {pendingBookPhotos.map((photo, index) => (
                   <div
+                    key={photo.url}
                     className="kbs-update-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background"
                   >
                     <img
-                      src={previewUrl}
-                      alt="Interior photo awaiting recognition"
+                      src={photo.url}
+                      alt={`Interior photo ${processedBookPhotos.length + index + 1} awaiting recognition`}
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2">
                       <p className="font-semibold">
-                        Interior photo {processedBookPhotos.length + 1}
+                        Interior photo {processedBookPhotos.length + index + 1}
                       </p>
                       <p className="kbs-update-recognizing mt-1 font-semibold text-amber-700" role="status">
-                        {loading
-                          ? "Recognizing Books…"
-                          : "Waiting to recognize books…"}
+                        {loading ? "Recognizing Books…" : "Ready to recognize"}
                       </p>
                     </div>
                   </div>
-                )}
+                ))}
 
                 {processedBookPhotos
                   .map((photo, index) => ({
@@ -574,25 +572,23 @@ export function BookPhotoTester({
                   </div>
                 ))}
 
-                {previewUrl && file && (
-                  <div className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                {pendingBookPhotos.map((photo, index) => (
+                  <div key={photo.url} className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
                     <img
-                      src={previewUrl}
-                      alt="Interior photo awaiting recognition"
+                      src={photo.url}
+                      alt={`Interior photo ${processedBookPhotos.length + index + 1} awaiting recognition`}
                       className="h-40 w-full bg-gray-100 object-contain"
                     />
                     <div className="p-2.5">
                       <p className="font-semibold">
-                        Interior photo {processedBookPhotos.length + 1}
+                        Interior photo {processedBookPhotos.length + index + 1}
                       </p>
                       <p className="kbs-update-recognizing mt-1 font-semibold text-amber-700" role="status">
-                        {loading
-                          ? "Recognizing Books…"
-                          : "Waiting to recognize books…"}
+                        {loading ? "Recognizing Books…" : "Ready to recognize"}
                       </p>
                     </div>
                   </div>
-                )}
+                ))}
               </div>
             </>
           )}
