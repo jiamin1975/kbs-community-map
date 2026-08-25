@@ -1742,7 +1742,7 @@ export function AddLibraryForm({
               ← Back
             </button>
 
-            <label className="flex min-w-0 items-center justify-end gap-2 text-right text-xs text-muted-foreground">
+            <label className="hidden min-w-0 items-center justify-end gap-2 text-right text-xs text-muted-foreground max-sm:!hidden sm:!flex">
               <input
                 type="checkbox"
                 checked={verified}
