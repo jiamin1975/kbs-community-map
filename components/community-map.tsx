@@ -692,6 +692,64 @@ export function CommunityMap({
           .kbs-nearby-secondary:active {
             background-color: #334155 !important;
           }
+
+          .kbs-box-details {
+            background-color: #0f172a !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
+          }
+
+          .kbs-box-close {
+            background-color: #1e293b !important;
+            color: #cbd5e1 !important;
+            box-shadow: none !important;
+          }
+
+          .kbs-box-photo-loading,
+          .kbs-box-status {
+            background-color: #1e293b !important;
+            color: #cbd5e1 !important;
+          }
+
+          .kbs-box-address,
+          .kbs-box-status-by {
+            color: #94a3b8 !important;
+          }
+
+          .kbs-box-count {
+            background-color: #172554 !important;
+            color: #bfdbfe !important;
+          }
+
+          .kbs-box-update {
+            background-color: #1e3a8a !important;
+            border: 1px solid #3b5998 !important;
+            color: #f8fafc !important;
+            box-shadow: none !important;
+          }
+
+          .kbs-box-inventory {
+            background-color: #0f1f1a !important;
+            border-color: #166534 !important;
+            color: #dcfce7 !important;
+          }
+
+          .kbs-box-inventory-header {
+            background-color: #14532d !important;
+            border-color: #166534 !important;
+            color: #f0fdf4 !important;
+          }
+
+          .kbs-box-inventory-list,
+          .kbs-box-inventory-list > :not([hidden]) ~ :not([hidden]) {
+            border-color: #166534 !important;
+          }
+
+          .kbs-box-inventory-number,
+          .kbs-box-inventory-author,
+          .kbs-box-inventory-empty {
+            color: #86efac !important;
+          }
         }
       `}</style>
 
@@ -1087,7 +1145,7 @@ export function CommunityMap({
         </APIProvider>
 
         {selectedLibrary && isMobile && (
-          <div className="absolute inset-4 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-4 text-black shadow-2xl">
+          <div className="kbs-box-details absolute inset-4 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-4 text-black shadow-2xl">
             <button
               type="button"
               aria-label="Close box details"
@@ -1095,14 +1153,14 @@ export function CommunityMap({
                 setSelectedLibrary(null);
                 setLibraryPhotoUrl(null);
               }}
-              className="absolute right-3 top-3 z-10 flex size-11 items-center justify-center rounded-full bg-white/95 text-3xl leading-none text-gray-600 shadow-sm"
+              className="kbs-box-close absolute right-3 top-3 z-10 flex size-11 items-center justify-center rounded-full bg-white/95 text-3xl leading-none text-gray-600 shadow-sm"
             >
               ×
             </button>
 
             <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto pr-1 [overflow-wrap:anywhere]">
               {photoLoading && (
-                <div className="mb-3 flex h-40 w-full items-center justify-center rounded-xl bg-gray-100">
+                <div className="kbs-box-photo-loading mb-3 flex h-40 w-full items-center justify-center rounded-xl bg-gray-100">
                   <p className="text-base text-gray-500">Loading photo…</p>
                 </div>
               )}
@@ -1120,48 +1178,48 @@ export function CommunityMap({
               </h2>
 
               {selectedLibrary.address && (
-                <p className="mt-1 max-w-full whitespace-normal break-words text-base leading-snug text-gray-600 [overflow-wrap:anywhere]">
+                <p className="kbs-box-address mt-1 max-w-full whitespace-normal break-words text-base leading-snug text-gray-600 [overflow-wrap:anywhere]">
                   {selectedLibrary.address}
                 </p>
               )}
 
-              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-base font-medium text-blue-700">
+              <div className="kbs-box-count mt-3 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-base font-medium text-blue-700">
                 📚 <span>{selectedLibrary.bookCount} books</span>
               </div>
 
               <button
                 type="button"
                 onClick={() => onUploadPhoto(selectedLibrary)}
-                className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-base font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                className="kbs-box-update mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-base font-semibold text-white shadow-sm transition hover:bg-blue-700"
               >
                 📷 Update Inventory
               </button>
 
-              <div className="mt-2 max-w-full whitespace-normal break-words rounded-lg bg-gray-100 px-3 py-2.5 text-sm text-gray-700 [overflow-wrap:anywhere]">
+              <div className="kbs-box-status mt-2 max-w-full whitespace-normal break-words rounded-lg bg-gray-100 px-3 py-2.5 text-sm text-gray-700 [overflow-wrap:anywhere]">
                 <p className="font-medium">
                   <span aria-hidden="true">🕒</span>{" "}
                   <span className="font-semibold">Last updated:</span>{" "}
                   {selectedLibrary.lastUpdated}
                 </p>
                 {"updatedBy" in selectedLibrary && selectedLibrary.updatedBy && (
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="kbs-box-status-by mt-1 text-xs text-gray-500">
                     <span className="font-medium">Updated by:</span>{" "}
                     {String(selectedLibrary.updatedBy)}
                   </p>
                 )}
               </div>
 
-              <div className="mt-5 overflow-hidden rounded-lg border border-green-200 bg-green-50">
-                <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950">
+              <div className="kbs-box-inventory mt-5 overflow-hidden rounded-lg border border-green-200 bg-green-50">
+                <p className="kbs-box-inventory-header border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950">
                   Box Inventory
                 </p>
 
                 {selectedLibrary.books.length === 0 ? (
-                  <p className="px-3 py-4 text-sm text-green-800">
+                  <p className="kbs-box-inventory-empty px-3 py-4 text-sm text-green-800">
                     No books have been inventoried yet.
                   </p>
                 ) : (
-                  <ul className="min-w-0 divide-y divide-green-200 overflow-x-hidden">
+                  <ul className="kbs-box-inventory-list min-w-0 divide-y divide-green-200 overflow-x-hidden">
                   {[...selectedLibrary.books]
                     .sort((firstBook, secondBook) => {
                       const firstTitle =
@@ -1207,7 +1265,7 @@ export function CommunityMap({
                           key={`${title}-${index}`}
                           className="flex min-w-0 items-start gap-2 overflow-hidden px-3 py-2"
                         >
-                          <span className="w-8 shrink-0 whitespace-nowrap pt-0.5 text-right text-xs font-bold tabular-nums text-green-700">
+                          <span className="kbs-box-inventory-number w-8 shrink-0 whitespace-nowrap pt-0.5 text-right text-xs font-bold tabular-nums text-green-700">
                             {index + 1}.
                           </span>
                           <div className="min-w-0 flex-1">
@@ -1216,7 +1274,7 @@ export function CommunityMap({
                             </p>
 
                             {author && (
-                              <p className="mt-1 max-w-full whitespace-normal break-words text-sm leading-tight text-green-800 [overflow-wrap:anywhere]">
+                              <p className="kbs-box-inventory-author mt-1 max-w-full whitespace-normal break-words text-sm leading-tight text-green-800 [overflow-wrap:anywhere]">
                                 {author}
                               </p>
                             )}
