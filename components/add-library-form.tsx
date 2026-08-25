@@ -22,11 +22,11 @@ import {
   type MapCameraChangedEvent,
 } from "@vis.gl/react-google-maps";
 import {
+  BrainCircuit,
   Camera,
   MapPin,
   MapPinned,
   ScanLine,
-  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import Cropper, { type Area } from "react-easy-crop";
@@ -1319,7 +1319,7 @@ export function AddLibraryForm({
 
           {duplicateCheckStatus === "duplicate" && nearbyLibrary && (
             <div
-              className="grid grid-cols-1 gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-3"
+              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
               role="alert"
             >
               <div className="min-w-0 leading-snug">
@@ -1328,15 +1328,6 @@ export function AddLibraryForm({
                   Move the red marker if this is a different book box.
                 </p>
               </div>
-              {onUseExistingLibrary && (
-                <button
-                  type="button"
-                  onClick={() => onUseExistingLibrary(nearbyLibrary.library)}
-                  className="inline-flex min-h-10 w-full shrink-0 items-center justify-center rounded-lg border border-amber-700 bg-white px-3 py-2 text-sm font-bold leading-tight text-amber-900 shadow-sm transition hover:bg-amber-100 sm:w-auto"
-                >
-                  View Existing Box
-                </button>
-              )}
             </div>
           )}
 
@@ -1607,17 +1598,17 @@ export function AddLibraryForm({
                 {analyzingBooks
                   ? (
                       <span className="inline-flex items-center justify-center gap-2">
-                        <Sparkles className="size-4" aria-hidden="true" />
-                        Recognizing {pendingBookPhotos.length} Photo
-                        {pendingBookPhotos.length === 1 ? "" : "s"}…
+                        <BrainCircuit className="size-5" aria-hidden="true" />
+                        AI Recognizing Books in {pendingBookPhotos.length}{" "}
+                        Photo{pendingBookPhotos.length === 1 ? "" : "s"}…
                       </span>
                     )
                   : pendingBookPhotos.length > 0
                     ? (
                         <span className="inline-flex items-center justify-center gap-2">
-                          <Sparkles className="size-4" aria-hidden="true" />
-                          Recognize All {pendingBookPhotos.length} Photo
-                          {pendingBookPhotos.length === 1 ? "" : "s"}
+                          <BrainCircuit className="size-5" aria-hidden="true" />
+                          AI: Recognize Books in {pendingBookPhotos.length}{" "}
+                          Photo{pendingBookPhotos.length === 1 ? "" : "s"}
                         </span>
                       )
                     : uploadingPhoto
@@ -1636,7 +1627,7 @@ export function AddLibraryForm({
 
             {(processedBookPhotos.length > 0 ||
               pendingBookPhotos.length > 0) && (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:flex sm:overflow-x-auto sm:pb-2">
                 {pendingBookPhotos
                   .map((pendingPhoto, index) => ({
                     pendingPhoto,
@@ -1646,7 +1637,7 @@ export function AddLibraryForm({
                   .map(({ pendingPhoto, number }) => (
                     <div
                       key={pendingPhoto.url}
-                      className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-white text-slate-950"
+                      className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-white text-slate-950 sm:w-64 sm:shrink-0"
                     >
                       <img
                         src={pendingPhoto.url}
@@ -1659,8 +1650,8 @@ export function AddLibraryForm({
                         </p>
                         <p className="mt-1 font-semibold text-amber-700" role="status">
                           {analyzingBooks
-                            ? "Recognizing Books…"
-                            : "Ready to recognize"}
+                            ? "AI Recognizing Books…"
+                            : "Ready for AI book recognition"}
                         </p>
                       </div>
                     </div>
@@ -1675,7 +1666,7 @@ export function AddLibraryForm({
                   .map(({ bookPhotoPreview, number }) => (
                     <div
                       key={bookPhotoPreview.url}
-                      className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-violet-200 bg-white text-slate-950"
+                      className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-violet-200 bg-white text-slate-950 sm:w-64 sm:shrink-0"
                     >
                       <img
                         src={bookPhotoPreview.url}
@@ -1687,7 +1678,7 @@ export function AddLibraryForm({
                           Interior photo {number}
                         </p>
                         <p className="mt-1 font-semibold text-green-700">
-                          Recognition Done
+                          Book Recognition Done
                         </p>
                       </div>
                     </div>
