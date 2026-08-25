@@ -1560,7 +1560,7 @@ export function AddLibraryForm({
               <label
                 htmlFor="book-photo"
                 aria-disabled={analyzingBooks || saving}
-                className={`kbs-add-primary inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition max-sm:!text-base sm:h-10 sm:px-2 sm:text-sm ${
+                className={`kbs-add-primary inline-flex h-12 w-full min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition max-sm:!text-base sm:h-12 sm:px-3 sm:text-sm ${
                   analyzingBooks || saving
                     ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
                     : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
@@ -1568,58 +1568,47 @@ export function AddLibraryForm({
               >
                 📚{" "}
                 {bookPhotosProcessed > 0 || pendingBookPhotos.length > 0
-                  ? "Add Another Interior Photo"
-                  : "Add Interior Photo"}
+                  ? "Add More Interior Photo"
+                  : "Add Interior Photos"}
               </label>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
+            {(pendingBookPhotos.length > 0 ||
+              recognizedBooks.length > 0) && (
               <button
                 type="button"
-                onClick={() => goToStep(2)}
-                disabled={saving || analyzingBooks}
-                className="hidden min-h-12 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50 sm:block"
+                onClick={handleStepThreePrimaryAction}
+                disabled={
+                  pendingBookPhotos.length > 0
+                    ? saving || analyzingBooks
+                    : saving ||
+                      locating ||
+                      analyzingBooks ||
+                      !stepThreeComplete
+                }
+                className={`h-12 w-full whitespace-nowrap rounded-xl border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-base sm:h-12 ${
+                  pendingBookPhotos.length > 0
+                    ? "kbs-add-primary border-blue-700 bg-blue-600 hover:bg-blue-700"
+                    : "border-green-800 bg-green-700 hover:bg-green-800"
+                }`}
               >
-                ← Back
+                {analyzingBooks
+                  ? `Recognizing ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}…`
+                  : pendingBookPhotos.length > 0
+                    ? `Recognize All ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`
+                    : uploadingPhoto
+                      ? "Uploading Photo…"
+                      : saving
+                        ? "Adding Location…"
+                        : (
+                            <span className="whitespace-nowrap">
+                              Add This Book Box with {recognizedBooks.length}{" "}
+                              Book
+                              {recognizedBooks.length === 1 ? "" : "s"}
+                            </span>
+                          )}
               </button>
-
-              {(pendingBookPhotos.length > 0 ||
-                recognizedBooks.length > 0) && (
-                <button
-                  type="button"
-                  onClick={handleStepThreePrimaryAction}
-                  disabled={
-                    pendingBookPhotos.length > 0
-                      ? saving || analyzingBooks
-                      : saving ||
-                        locating ||
-                        analyzingBooks ||
-                        !stepThreeComplete
-                  }
-                  className={`h-12 w-full whitespace-nowrap rounded-xl border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm sm:h-12 ${
-                    pendingBookPhotos.length > 0
-                      ? "kbs-add-primary border-blue-700 bg-blue-600 hover:bg-blue-700"
-                      : "border-green-800 bg-green-700 hover:bg-green-800"
-                  }`}
-                >
-                  {analyzingBooks
-                    ? `Recognizing ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}…`
-                    : pendingBookPhotos.length > 0
-                      ? `Recognize All ${pendingBookPhotos.length} Photo${pendingBookPhotos.length === 1 ? "" : "s"}`
-                      : uploadingPhoto
-                        ? "Uploading Photo…"
-                        : saving
-                          ? "Adding Location…"
-                          : (
-                              <span className="whitespace-nowrap">
-                                Add This Book Box with {recognizedBooks.length}{" "}
-                                Book
-                                {recognizedBooks.length === 1 ? "" : "s"}
-                              </span>
-                            )}
-                </button>
-              )}
-            </div>
+            )}
 
             {(processedBookPhotos.length > 0 ||
               pendingBookPhotos.length > 0) && (
@@ -1723,25 +1712,28 @@ export function AddLibraryForm({
               )
             )}
 
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={() => goToStep(2)}
               disabled={saving || analyzingBooks}
-              className="mt-1 min-h-11 w-fit rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50 sm:hidden"
+              className="min-h-11 w-fit rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50"
             >
               ← Back
             </button>
+
+            <label className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
+              <input
+                type="checkbox"
+                checked={verified}
+                onChange={(event) => setVerified(event.target.checked)}
+              />
+
+              <span>Verified by a KBS volunteer</span>
+            </label>
           </div>
-
-          <label className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
-            <input
-              type="checkbox"
-              checked={verified}
-              onChange={(event) => setVerified(event.target.checked)}
-            />
-
-            <span>Verified by a KBS volunteer</span>
-          </label>
 
           </section>
 
