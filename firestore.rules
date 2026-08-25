@@ -46,15 +46,40 @@ service cloud.firestore {
         && request.resource.data.longitude <= 180
         && request.resource.data.books is list
         && request.resource.data.books.size() <= 250
+        && request.resource.data.bookCount == request.resource.data.books.size()
+        && request.resource.data.photoFile is string;
+    }
+
+    function isValidPublicInventoryUpdate() {
+      return request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'books',
+          'bookCount',
+          'lastUpdated',
+          'recognitionNotes',
+          'updatedBy'
+        ])
+        && request.resource.data.books is list
+        && request.resource.data.books.size() <= 250
         && request.resource.data.bookCount ==
           request.resource.data.books.size()
-        && request.resource.data.photoFile is string;
+        && request.resource.data.lastUpdated is timestamp
+        && request.resource.data.recognitionNotes is string
+        && request.resource.data.recognitionNotes.size() <= 300
+        && (
+          request.resource.data.updatedBy == null
+          || (
+            request.resource.data.updatedBy is string
+            && request.resource.data.updatedBy.size() <= 60
+          )
+        );
     }
 
     match /libraries/{libraryId} {
       allow read: if true;
       allow create: if isValidPublicBookBoxCreate();
-      allow update: if isApprovedVolunteer();
+      allow update: if isApprovedVolunteer()
+        || isValidPublicInventoryUpdate();
       allow delete: if false;
 
       match /activity/{activityId} {
@@ -63,12 +88,14 @@ service cloud.firestore {
       }
     }
 
+    // Existing UID-based volunteer records
     match /authorizedVolunteers/{volunteerId} {
       allow read: if request.auth != null
         && request.auth.uid == volunteerId;
       allow write: if false;
     }
 
+    // New Gmail-based volunteer records
     match /authorizedVolunteerEmails/{volunteerEmail} {
       allow read: if request.auth != null
         && request.auth.token.email_verified == true
