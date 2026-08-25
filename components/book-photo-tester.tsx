@@ -315,9 +315,117 @@ export function BookPhotoTester({
   }
 
   return (
-    <div className="min-w-0 p-1">
+    <div className="kbs-update-root min-w-0 p-1">
+      <style>{`
+        @media (prefers-color-scheme: dark) and (max-width: 639px) {
+          .kbs-update-root {
+            color: #f8fafc !important;
+          }
+
+          .kbs-update-location,
+          .kbs-update-workspace {
+            background-color: #111827 !important;
+            background-image: none !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+          }
+
+          .kbs-update-primary:not([aria-disabled="true"]) {
+            background-color: #1e3a8a !important;
+            border-color: #3b5998 !important;
+            color: #f8fafc !important;
+            box-shadow: 0 3px 10px rgba(2, 6, 23, 0.35) !important;
+          }
+
+          .kbs-update-primary[aria-disabled="true"] {
+            background-color: #1e293b !important;
+            border-color: #475569 !important;
+            color: #94a3b8 !important;
+          }
+
+          .kbs-update-save:not(:disabled) {
+            background-color: #166534 !important;
+            border-color: #22824c !important;
+            color: #f0fdf4 !important;
+            box-shadow: none !important;
+          }
+
+          .kbs-update-save:disabled {
+            background-color: #1e293b !important;
+            border-color: #475569 !important;
+            color: #94a3b8 !important;
+            opacity: 1 !important;
+            box-shadow: none !important;
+          }
+
+          .kbs-update-photo-card {
+            background-color: #0f172a !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
+          }
+
+          .kbs-update-photo-card img {
+            background-color: #111827 !important;
+          }
+
+          .kbs-update-recognizing {
+            color: #fcd34d !important;
+          }
+
+          .kbs-update-recognized {
+            color: #86efac !important;
+          }
+
+          .kbs-update-inventory {
+            background-color: #0f1f1a !important;
+            border-color: #166534 !important;
+            color: #dcfce7 !important;
+          }
+
+          .kbs-update-inventory-header {
+            background-color: #14532d !important;
+            border-color: #166534 !important;
+            color: #f0fdf4 !important;
+          }
+
+          .kbs-update-inventory-list,
+          .kbs-update-inventory-list > :not([hidden]) ~ :not([hidden]) {
+            border-color: #166534 !important;
+            color: #dcfce7 !important;
+          }
+
+          .kbs-update-inventory-list li::marker,
+          .kbs-update-inventory-author,
+          .kbs-update-inventory-empty {
+            color: #86efac !important;
+          }
+
+          .kbs-update-contributor {
+            background-color: #0f172a !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
+          }
+
+          .kbs-update-contributor::placeholder {
+            color: #94a3b8 !important;
+          }
+
+          .kbs-update-success {
+            background-color: #0f2d22 !important;
+            border-color: #166534 !important;
+            color: #bbf7d0 !important;
+          }
+
+          .kbs-update-error {
+            background-color: #3f171b !important;
+            border-color: #991b1b !important;
+            color: #fecaca !important;
+          }
+        }
+      `}</style>
+
       {library ? (
-        <div className="rounded-xl border border-border bg-secondary px-4 py-3">
+        <div className="kbs-update-location rounded-xl border border-border bg-secondary px-4 py-3">
           <div className="flex min-w-0 items-start gap-3">
             <span className="mt-0.5 shrink-0 text-base">📍</span>
             <div className="min-w-0 flex-1">
@@ -341,7 +449,7 @@ export function BookPhotoTester({
       )}
 
       {!saved && (
-        <div className="mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl bg-violet-50/50 p-3">
+        <div className="kbs-update-workspace mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl border border-transparent bg-violet-50/50 p-3">
           <input
             id="update-book-photo"
             type="file"
@@ -355,7 +463,7 @@ export function BookPhotoTester({
             <label
               htmlFor="update-book-photo"
               aria-disabled={loading || saving}
-              className={`inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition sm:h-10 sm:px-2 sm:text-sm ${
+              className={`kbs-update-primary inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition sm:h-10 sm:px-2 sm:text-sm ${
                 loading || saving
                   ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
                   : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
@@ -371,7 +479,7 @@ export function BookPhotoTester({
             type="button"
             onClick={finishAndSaveInventory}
             disabled={loading || saving || sessionBooks.length === 0}
-            className="min-h-12 whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
+            className="kbs-update-save min-h-12 whitespace-nowrap rounded-xl border border-green-800 bg-green-700 px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-sm"
           >
             {saving ? (
               <>
@@ -400,7 +508,7 @@ export function BookPhotoTester({
               <div className="grid min-w-0 gap-3 sm:hidden">
                 {previewUrl && file && (
                   <div
-                    className="w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background"
+                    className="kbs-update-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background"
                   >
                     <img
                       src={previewUrl}
@@ -411,7 +519,7 @@ export function BookPhotoTester({
                       <p className="font-semibold">
                         Interior photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="mt-1 font-semibold text-amber-700" role="status">
+                      <p className="kbs-update-recognizing mt-1 font-semibold text-amber-700" role="status">
                         {loading
                           ? "Recognizing Books…"
                           : "Waiting to recognize books…"}
@@ -429,7 +537,7 @@ export function BookPhotoTester({
                   .map(({ photo, number }) => (
                     <div
                       key={photo.url}
-                      className="w-full overflow-hidden rounded-xl border border-violet-200 bg-background"
+                      className="kbs-update-photo-card w-full overflow-hidden rounded-xl border border-violet-200 bg-background"
                     >
                       <img
                         src={photo.url}
@@ -438,7 +546,7 @@ export function BookPhotoTester({
                       />
                       <div className="p-2">
                         <p className="font-semibold">Interior photo {number}</p>
-                        <p className="mt-1 font-semibold text-green-700">
+                        <p className="kbs-update-recognized mt-1 font-semibold text-green-700">
                           Recognition Done
                         </p>
                       </div>
@@ -450,7 +558,7 @@ export function BookPhotoTester({
                 {processedBookPhotos.map((photo, index) => (
                   <div
                     key={photo.url}
-                    className="w-52 shrink-0 overflow-hidden rounded-xl border border-violet-200 bg-background"
+                    className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-violet-200 bg-background"
                   >
                     <img
                       src={photo.url}
@@ -459,7 +567,7 @@ export function BookPhotoTester({
                     />
                     <div className="p-2.5">
                       <p className="font-semibold">Interior photo {index + 1}</p>
-                      <p className="mt-1 font-semibold text-green-700">
+                      <p className="kbs-update-recognized mt-1 font-semibold text-green-700">
                         Recognition Done
                       </p>
                     </div>
@@ -467,7 +575,7 @@ export function BookPhotoTester({
                 ))}
 
                 {previewUrl && file && (
-                  <div className="w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
+                  <div className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background">
                     <img
                       src={previewUrl}
                       alt="Interior photo awaiting recognition"
@@ -477,7 +585,7 @@ export function BookPhotoTester({
                       <p className="font-semibold">
                         Interior photo {processedBookPhotos.length + 1}
                       </p>
-                      <p className="mt-1 font-semibold text-amber-700" role="status">
+                      <p className="kbs-update-recognizing mt-1 font-semibold text-amber-700" role="status">
                         {loading
                           ? "Recognizing Books…"
                           : "Waiting to recognize books…"}
@@ -489,13 +597,13 @@ export function BookPhotoTester({
             </>
           )}
 
-          <div className="overflow-hidden rounded-lg border border-green-200 bg-green-50" aria-live="polite">
-            <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
+          <div className="kbs-update-inventory overflow-hidden rounded-lg border border-green-200 bg-green-50" aria-live="polite">
+            <p className="kbs-update-inventory-header border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
               Box Inventory
             </p>
 
             {sessionBooks.length > 0 ? (
-              <ol className="max-h-64 list-decimal divide-y divide-green-200 overflow-y-auto pl-9 pr-2 text-green-950 marker:font-bold marker:text-green-700 sm:max-h-52 sm:pl-8">
+              <ol className="kbs-update-inventory-list max-h-64 list-decimal divide-y divide-green-200 overflow-y-auto pl-9 pr-2 text-green-950 marker:font-bold marker:text-green-700 sm:max-h-52 sm:pl-8">
                 {sessionBooks
                   .slice()
                   .sort((firstBook, secondBook) =>
@@ -505,7 +613,7 @@ export function BookPhotoTester({
                     <li key={normalizeBookTitle(book.title)} className="py-2 pl-1 sm:py-1">
                       <p className="text-base font-semibold leading-tight sm:text-[11px]">{book.title}</p>
                       {book.author && (
-                        <p className="mt-1 text-sm leading-tight text-green-800 sm:mt-0 sm:text-[10px]">
+                        <p className="kbs-update-inventory-author mt-1 text-sm leading-tight text-green-800 sm:mt-0 sm:text-[10px]">
                           {book.author}
                         </p>
                       )}
@@ -514,7 +622,7 @@ export function BookPhotoTester({
               </ol>
             ) : (
               <div className="flex h-24 items-center justify-center px-3 text-center">
-                <p className="text-sm leading-relaxed text-muted-foreground">
+                <p className="kbs-update-inventory-empty text-sm leading-relaxed text-muted-foreground">
                   Add an interior photo to generate the title list.
                 </p>
               </div>
@@ -533,7 +641,7 @@ export function BookPhotoTester({
               maxLength={60}
               placeholder="Contributor name (optional)"
               disabled={saving}
-              className="h-8 w-56 rounded-lg border border-border/80 bg-card px-2.5 text-xs text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="kbs-update-contributor h-8 w-56 rounded-lg border border-border/80 bg-card px-2.5 text-xs text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
@@ -542,7 +650,7 @@ export function BookPhotoTester({
 
       {saved && (
         <div
-          className="mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-green-900"
+          className="kbs-update-success mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-green-900"
           role="status"
         >
           <p className="font-semibold">
@@ -565,7 +673,7 @@ export function BookPhotoTester({
 
       {error && (
         <p
-          className="mt-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700"
+          className="kbs-update-error mt-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700"
           role="alert"
         >
           {error}
