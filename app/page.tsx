@@ -33,20 +33,20 @@ export default function Page() {
           </h1>
 
           <div className="kbs-mobile-card rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-violet-50 px-4 py-2.5">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
+            <p className="kbs-mobile-accent text-sm font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
               Community-Powered Discovery
             </p>
             <p className="kbs-mobile-card-text mt-1.5 text-base font-semibold leading-tight text-slate-950 sm:mt-3 sm:text-lg">
-              <span className="font-bold text-blue-700">One</span>{" "}
+              <span className="kbs-mobile-accent font-bold text-blue-700">One</span>{" "}
               shelf photo helps the
               <span className="hidden sm:inline"> </span>
               <br className="sm:hidden" />
-              <span className="font-bold text-blue-700">whole</span> community.
+              <span className="kbs-mobile-accent font-bold text-blue-700">whole</span> community.
             </p>
           </div>
 
           <div className="kbs-mobile-card rounded-xl border border-blue-100 bg-blue-50/60 px-3 py-3 sm:px-3">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
+            <p className="kbs-mobile-accent text-sm font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
               How It Works
             </p>
 
@@ -126,6 +126,10 @@ export default function Page() {
 
             .kbs-mobile-card-text {
               color: #f8fafc !important;
+            }
+
+            .kbs-mobile-accent {
+              color: #93c5fd !important;
             }
 
             .kbs-mobile-update {
