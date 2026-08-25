@@ -132,16 +132,16 @@ export default function Page() {
               color: #93c5fd !important;
             }
 
-            .kbs-mobile-update {
+            .kbs-mobile-add,
+            .kbs-mobile-update,
+            .kbs-mobile-search {
               background-color: #1e293b !important;
               border: 1px solid #475569 !important;
               color: #f8fafc !important;
             }
 
             .kbs-mobile-search {
-              background-color: #0f172a !important;
-              border-color: #475569 !important;
-              color: #f8fafc !important;
+              caret-color: #f8fafc;
             }
 
             .kbs-mobile-search::placeholder {
