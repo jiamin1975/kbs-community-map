@@ -667,7 +667,7 @@ export function CommunityMap({
   return (
     <div>
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
-        <div className="grid gap-2 sm:grid-cols-[auto_auto_minmax(0,1fr)] sm:items-end sm:gap-3">
+        <div className="kbs-mobile-actions grid gap-2 max-sm:rounded-xl max-sm:border max-sm:border-border max-sm:bg-card max-sm:p-3 sm:grid-cols-[auto_auto_minmax(0,1fr)] sm:items-end sm:gap-3">
           <button
             type="button"
             onClick={onAddLibrary}
@@ -680,7 +680,7 @@ export function CommunityMap({
             type="button"
             onClick={findNearbyLibrary}
             disabled={locating}
-            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:whitespace-nowrap"
+            className="kbs-mobile-update inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:whitespace-nowrap"
           >
             {locating
               ? "Finding Nearby Box…"
@@ -723,7 +723,7 @@ export function CommunityMap({
                   }
                 }}
                 placeholder="Search books by title or author"
-                className="h-12 w-full rounded-xl border border-border bg-background pl-12 pr-4 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                className="kbs-mobile-search h-12 w-full rounded-xl border border-border bg-background pl-12 pr-4 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
               />
             </div>
 

@@ -32,11 +32,11 @@ export default function Page() {
             Make Community-Shared Books Easier to Discover
           </h1>
 
-          <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-violet-50 px-4 py-2.5">
+          <div className="kbs-mobile-card rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-violet-50 px-4 py-2.5">
             <p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
               Community-Powered Discovery
             </p>
-            <p className="mt-1.5 text-base font-semibold leading-tight text-slate-950 sm:mt-3 sm:text-lg">
+            <p className="kbs-mobile-card-text mt-1.5 text-base font-semibold leading-tight text-slate-950 sm:mt-3 sm:text-lg">
               <span className="font-bold text-blue-700">One</span>{" "}
               shelf photo helps the
               <span className="hidden sm:inline"> </span>
@@ -45,7 +45,7 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-blue-100 bg-blue-50/60 px-3 py-3 sm:px-3">
+          <div className="kbs-mobile-card rounded-xl border border-blue-100 bg-blue-50/60 px-3 py-3 sm:px-3">
             <p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
               How It Works
             </p>
@@ -92,7 +92,7 @@ export default function Page() {
                       />
                     </span>
 
-                    <span className="block text-base font-medium leading-snug text-slate-950 sm:text-sm">
+                    <span className="kbs-mobile-card-text block text-base font-medium leading-snug text-slate-950 sm:text-sm">
                       {step.label}
                     </span>
                   </li>
@@ -114,6 +114,37 @@ export default function Page() {
             </ol>
           </div>
         </section>
+
+        <style>{`
+          @media (prefers-color-scheme: dark) and (max-width: 639px) {
+            .kbs-mobile-card,
+            .kbs-mobile-actions {
+              background-color: #111827 !important;
+              background-image: none !important;
+              border-color: #334155 !important;
+            }
+
+            .kbs-mobile-card-text {
+              color: #f8fafc !important;
+            }
+
+            .kbs-mobile-update {
+              background-color: #1e293b !important;
+              border: 1px solid #475569 !important;
+              color: #f8fafc !important;
+            }
+
+            .kbs-mobile-search {
+              background-color: #0f172a !important;
+              border-color: #475569 !important;
+              color: #f8fafc !important;
+            }
+
+            .kbs-mobile-search::placeholder {
+              color: #94a3b8 !important;
+            }
+          }
+        `}</style>
 
         <LibraryMapExperience />
       </main>
