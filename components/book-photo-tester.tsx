@@ -451,8 +451,8 @@ export function BookPhotoTester({
               }`}
             >
               📚 {photosProcessed > 0 || pendingBookPhotos.length > 0
-                ? "Add Another Interior Photo"
-                : "Add Interior Photo"}
+                ? "Add More Interior Photos"
+                : "Add Interior Photos"}
             </label>
           </div>
 
@@ -615,7 +615,7 @@ export function BookPhotoTester({
             ) : (
               <div className="flex h-24 items-center justify-center px-3 text-center">
                 <p className="kbs-update-inventory-empty text-sm leading-relaxed text-muted-foreground">
-                  Add an interior photo to generate the title list.
+                  Add interior photos to generate the title list.
                 </p>
               </div>
             )}
