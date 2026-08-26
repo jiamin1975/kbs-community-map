@@ -1451,9 +1451,9 @@ export function AddLibraryForm({
               type="button"
               onClick={() => goToStep(2)}
               disabled={!stepOneComplete || locating || saving}
-              className="kbs-add-next kbs-add-primary h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none max-sm:order-5"
+              className="kbs-add-next kbs-add-primary h-10 w-fit justify-self-end rounded-none border border-blue-700 bg-blue-600 px-6 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 max-sm:order-5 max-sm:!text-sm"
             >
-              Continue →
+              Next
             </button>
           </section>
 
@@ -1551,22 +1551,14 @@ export function AddLibraryForm({
             )}
           </div>
 
-            <div className="grid grid-cols-[auto_1fr] gap-2">
-              <button
-                type="button"
-                onClick={() => goToStep(1)}
-                disabled={saving}
-                className="h-12 rounded-xl border border-border bg-background px-4 text-base font-semibold text-foreground transition hover:bg-secondary disabled:opacity-50"
-              >
-                ← Back
-              </button>
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => goToStep(3)}
                 disabled={!stepTwoComplete || saving}
-                className="kbs-add-next kbs-add-primary h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
+                className="kbs-add-next kbs-add-primary h-10 w-fit rounded-none border border-blue-700 bg-blue-600 px-6 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 max-sm:!text-sm"
               >
-                Continue →
+                Next
               </button>
             </div>
           </section>
@@ -1780,16 +1772,7 @@ export function AddLibraryForm({
 
           </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => goToStep(2)}
-              disabled={saving || analyzingBooks}
-              className="min-h-11 w-full rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50 sm:w-fit"
-            >
-              ← Back
-            </button>
-
+          <div className="flex items-center justify-end gap-3">
             <label className="hidden min-w-0 items-center justify-end gap-2 text-right text-xs text-muted-foreground max-sm:!hidden sm:!flex">
               <input
                 type="checkbox"
