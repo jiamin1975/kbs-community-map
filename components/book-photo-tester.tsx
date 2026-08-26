@@ -474,7 +474,7 @@ export function BookPhotoTester({
               {pendingBookPhotos.length > 0 ? (
                 loading
                   ? "Recognizing Books…"
-                  : `✦ AI: Recognize books in ${pendingBookPhotos.length} photo${pendingBookPhotos.length === 1 ? "" : "s"}`
+                  : `✨ AI: Recognize books in ${pendingBookPhotos.length} photo${pendingBookPhotos.length === 1 ? "" : "s"}`
               ) : saving ? (
                 <>
                   <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />

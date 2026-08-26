@@ -1059,7 +1059,7 @@ export function CommunityMap({
 
                     <div className="w-full min-w-0 max-w-full overflow-x-hidden sm:overflow-visible">
                   {/* Current inventory */}
-                  <div className="mt-3 overflow-hidden rounded-lg border border-green-200 bg-green-50 sm:mt-0">
+                  <div className="mt-3 overflow-hidden rounded-none border border-green-200 bg-green-50 sm:mt-0">
                     <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 sm:py-1.5 sm:text-sm sm:font-semibold">
                       Box Inventory
                     </p>
@@ -1209,7 +1209,7 @@ export function CommunityMap({
                 )}
               </div>
 
-              <div className="kbs-box-inventory mt-5 overflow-hidden rounded-lg border border-green-200 bg-green-50">
+              <div className="kbs-box-inventory mt-5 overflow-hidden rounded-none border border-green-200 bg-green-50">
                 <p className="kbs-box-inventory-header border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950">
                   Box Inventory
                 </p>
