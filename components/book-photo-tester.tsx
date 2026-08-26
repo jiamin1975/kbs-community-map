@@ -323,7 +323,7 @@ export function BookPhotoTester({
           .kbs-update-workspace {
             background-color: #111827 !important;
             background-image: none !important;
-            border-color: #7c3aed !important;
+            border-color: #334155 !important;
             color: #f8fafc !important;
           }
 
@@ -432,8 +432,14 @@ export function BookPhotoTester({
         }
       `}</style>
 
+      <div className="border-b border-border px-3 pb-3 pt-1">
+        <p className="min-w-0 truncate text-xs text-muted-foreground">
+          Contributor: {updatedBy || "Public contributor"}
+        </p>
+      </div>
+
       {library ? (
-        <div className="kbs-update-location rounded-none border border-border bg-secondary px-4 py-3">
+        <div className="kbs-update-location mt-3 rounded-none border border-border bg-secondary px-4 py-3">
           <div className="flex min-w-0 items-start gap-3">
             <span className="mt-0.5 shrink-0 text-base">📍</span>
             <div className="min-w-0 flex-1">
@@ -457,26 +463,8 @@ export function BookPhotoTester({
       )}
 
       {!saved && (
-        <div className="kbs-update-workspace mt-3 grid min-w-0 gap-3 overflow-hidden rounded-none border border-violet-200 bg-violet-50/50 p-3">
-          <div className="border-b border-violet-200 pb-3">
-            <label
-              htmlFor="inventory-updated-by"
-              className="mb-1 block text-xs font-medium text-muted-foreground"
-            >
-              Contributor
-            </label>
-            <input
-              id="inventory-updated-by"
-              type="text"
-              value={updatedBy}
-              onChange={(event) => setUpdatedBy(event.target.value)}
-              maxLength={60}
-              placeholder="Public contributor"
-              disabled={saving}
-              className="kbs-update-contributor h-9 w-full rounded-lg border border-border/80 bg-card px-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-64"
-            />
-          </div>
-          <div className="kbs-update-step-card grid gap-2 rounded-none border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
+        <div className="kbs-update-workspace mt-3 grid min-w-0 gap-3 overflow-hidden rounded-none border border-border bg-card p-3">
+<div className="kbs-update-step-card grid gap-2 rounded-none border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
             <p className="kbs-update-step-instruction text-sm leading-snug text-slate-600">
               Photograph the books inside the box so their titles are visible.
             </p>
