@@ -1608,7 +1608,7 @@ export function AddLibraryForm({
                     : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
                 }`}
               >
-                📚{" "}
+                📷{" "}
                 {bookPhotosProcessed > 0 || pendingBookPhotos.length > 0
                   ? "Add More Interior Photo"
                   : "Add Interior Photos"}
