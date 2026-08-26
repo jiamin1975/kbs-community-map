@@ -1231,14 +1231,14 @@ export function AddLibraryForm({
           }
 
           .kbs-add-primary:not(:disabled):not([aria-disabled="true"]) {
-            background-color: #1e3a8a !important;
-            border-color: #3b5998 !important;
+            background-color: #2563eb !important;
+            border-color: #3b82f6 !important;
             color: #f8fafc !important;
             box-shadow: 0 3px 10px rgba(2, 6, 23, 0.35) !important;
           }
 
           .kbs-add-primary:not(:disabled):not([aria-disabled="true"]):active {
-            background-color: #1e40af !important;
+            background-color: #1d4ed8 !important;
           }
 
           .kbs-recognize-all:not(:disabled) {
@@ -1644,7 +1644,7 @@ export function AddLibraryForm({
                   : pendingBookPhotos.length > 0
                     ? (
                         <span className="inline-flex items-center justify-center">
-                          AI: Recognize Books in {pendingBookPhotos.length}{" "}
+                          ✨ AI: Recognize Books in {pendingBookPhotos.length}{" "}
                           Photo{pendingBookPhotos.length === 1 ? "" : "s"}
                         </span>
                       )
@@ -1688,7 +1688,7 @@ export function AddLibraryForm({
                         <p className="mt-1 font-semibold text-amber-700" role="status">
                           {analyzingBooks
                             ? "AI Recognizing Books…"
-                            : "Ready for AI book recognition"}
+                            : "Ready for Recognition"}
                         </p>
                       </div>
                     </div>
