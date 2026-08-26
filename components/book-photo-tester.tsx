@@ -120,7 +120,7 @@ export function BookPhotoTester({
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [updatedBy, setUpdatedBy] = useState("")
+  const [updatedBy, setUpdatedBy] = useState("Public contributor")
 
   useEffect(() => {
     return () => {
@@ -313,11 +313,17 @@ export function BookPhotoTester({
             color: #f8fafc !important;
           }
 
-          .kbs-update-location,
-          .kbs-update-workspace {
+          .kbs-update-location {
             background-color: #111827 !important;
             background-image: none !important;
             border-color: #334155 !important;
+            color: #f8fafc !important;
+          }
+
+          .kbs-update-workspace {
+            background-color: #111827 !important;
+            background-image: none !important;
+            border-color: #7c3aed !important;
             color: #f8fafc !important;
           }
 
@@ -451,7 +457,25 @@ export function BookPhotoTester({
       )}
 
       {!saved && (
-        <div className="kbs-update-workspace mt-3 grid min-w-0 gap-3 overflow-hidden rounded-none border border-transparent bg-violet-50/50 p-3">
+        <div className="kbs-update-workspace mt-3 grid min-w-0 gap-3 overflow-hidden rounded-none border border-violet-200 bg-violet-50/50 p-3">
+          <div className="border-b border-violet-200 pb-3">
+            <label
+              htmlFor="inventory-updated-by"
+              className="mb-1 block text-xs font-medium text-muted-foreground"
+            >
+              Contributor
+            </label>
+            <input
+              id="inventory-updated-by"
+              type="text"
+              value={updatedBy}
+              onChange={(event) => setUpdatedBy(event.target.value)}
+              maxLength={60}
+              placeholder="Public contributor"
+              disabled={saving}
+              className="kbs-update-contributor h-9 w-full rounded-lg border border-border/80 bg-card px-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:w-64"
+            />
+          </div>
           <div className="kbs-update-step-card grid gap-2 rounded-none border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
             <p className="kbs-update-step-instruction text-sm leading-snug text-slate-600">
               Photograph the books inside the box so their titles are visible.
@@ -467,8 +491,8 @@ export function BookPhotoTester({
                 className="h-full w-full object-contain"
               />
 
-              <div className="pointer-events-none absolute left-1/2 top-3/4 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-none bg-black/50 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:bg-black/65 sm:px-3 sm:py-1.5">
-                <p className="text-[7px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
+              <div className="pointer-events-none absolute left-1/2 top-3/4 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-none bg-black/65 px-3 py-1.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:bg-black/65 sm:px-3 sm:py-1.5">
+                <p className="text-xs font-bold uppercase leading-tight tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
                   <span>Example - Take photo like this</span>
                 </p>
               </div>
@@ -680,24 +704,7 @@ export function BookPhotoTester({
               </div>
             )}
           </div>
-
-          <div className="flex justify-end">
-            <label htmlFor="inventory-updated-by" className="sr-only">
-              Contributor name (optional)
-            </label>
-            <input
-              id="inventory-updated-by"
-              type="text"
-              value={updatedBy}
-              onChange={(event) => setUpdatedBy(event.target.value)}
-              maxLength={60}
-              placeholder="Contributor name (optional)"
-              disabled={saving}
-              className="kbs-update-contributor h-8 w-56 rounded-lg border border-border/80 bg-card px-2.5 text-xs text-foreground outline-none transition placeholder:text-muted-foreground focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
-
-        </div>
+</div>
       )}
 
       {saved && (
