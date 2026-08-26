@@ -72,14 +72,14 @@ function WizardStepHeader({
   example,
 }: WizardStepHeaderProps) {
   return (
-    <div className="kbs-add-step-card grid gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
+    <div className="kbs-add-step-card grid gap-2 rounded-none border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
       <p className="kbs-add-step-instruction text-sm leading-snug text-slate-600 max-sm:!text-sm">
         {instruction}
       </p>
 
       {example && (
         <div
-          className="relative h-24 overflow-hidden rounded-lg border border-blue-200 bg-transparent sm:h-32"
+          className="relative h-24 overflow-hidden rounded-none border border-blue-200 bg-transparent sm:h-32"
           aria-label={`${title} example`}
         >
           <img
@@ -96,7 +96,7 @@ function WizardStepHeader({
             className="h-full w-full object-contain"
           />
 
-          <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-black/50 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:rounded-none sm:bg-black/65 sm:px-3 sm:py-1.5">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-none bg-black/50 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:bg-black/65 sm:px-3 sm:py-1.5">
             <p className="text-[7px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
               <span>Example - Take photo like this</span>
             </p>
@@ -129,7 +129,7 @@ function WizardProgress({
 
   return (
     <nav
-      className="kbs-add-wizard-nav overflow-hidden rounded-xl border border-border bg-background"
+      className="kbs-add-wizard-nav overflow-hidden rounded-none border border-border bg-background"
       aria-label="Add a new book box progress"
     >
       {steps
@@ -1152,7 +1152,7 @@ export function AddLibraryForm({
 
   if (authLoading) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground">
+      <div className="rounded-none border border-border bg-card p-5 text-sm text-muted-foreground">
         Preparing the public form…
       </div>
     );
@@ -1160,7 +1160,7 @@ export function AddLibraryForm({
 
   if (!currentUser) {
     return (
-      <div className="rounded-2xl border border-red-300 bg-red-50 p-5">
+      <div className="rounded-none border border-red-300 bg-red-50 p-5">
         {accessMessage && (
           <p className="text-sm text-red-600" role="alert">
             {accessMessage}
@@ -1260,7 +1260,7 @@ export function AddLibraryForm({
         }
       `}</style>
 
-      <div className="kbs-add-form min-w-0 overflow-visible rounded-2xl border border-border bg-card p-3 max-sm:[&_button]:text-base max-sm:[&_button_span]:text-base max-sm:[&_input]:text-base max-sm:[&_label]:text-sm max-sm:[&_label_span]:text-sm max-sm:[&_p]:text-sm sm:p-4">
+      <div className="kbs-add-form min-w-0 overflow-visible rounded-none border border-border bg-card p-3 max-sm:[&_button]:text-base max-sm:[&_button_span]:text-base max-sm:[&_input]:text-base max-sm:[&_label]:text-sm max-sm:[&_label_span]:text-sm max-sm:[&_p]:text-sm sm:p-4">
         <div className="border-b border-border pb-3">
           <p className="min-w-0 truncate text-xs text-muted-foreground">
             Contributor: {currentUser.email ?? "Public contributor"}
@@ -1301,7 +1301,7 @@ export function AddLibraryForm({
               type="button"
               onClick={useCurrentLocation}
               disabled={locating || saving}
-              className="kbs-add-primary inline-flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-blue-700 bg-blue-600 px-3 font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 max-sm:mb-2 max-sm:!text-sm sm:h-10 sm:px-4 sm:text-sm"
+              className="kbs-add-primary inline-flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-none border border-blue-700 bg-blue-600 px-3 font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 max-sm:mb-2 max-sm:!text-sm sm:h-10 sm:px-4 sm:text-sm"
             >
               <span aria-hidden="true">📍</span>
               <span className="truncate max-sm:!text-sm">
@@ -1352,7 +1352,7 @@ export function AddLibraryForm({
 
           {duplicateCheckStatus === "checking" && (
             <div
-              className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800 max-sm:!text-sm max-sm:font-bold max-sm:leading-snug"
+              className="rounded-none border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800 max-sm:!text-sm max-sm:font-bold max-sm:leading-snug"
               role="status"
             >
               Checking for an existing book box near this location…
@@ -1361,7 +1361,7 @@ export function AddLibraryForm({
 
           {duplicateCheckStatus === "clear" && (
             <div
-              className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-bold text-green-800 max-sm:!text-base max-sm:leading-snug"
+              className="rounded-none border border-green-200 bg-green-50 px-3 py-2 text-sm font-bold text-green-800 max-sm:!text-base max-sm:leading-snug"
               role="status"
             >
               Location confirmed!
@@ -1370,7 +1370,7 @@ export function AddLibraryForm({
 
           {duplicateCheckStatus === "duplicate" && nearbyLibrary && (
             <div
-              className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+              className="rounded-none border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
               role="alert"
             >
               <div className="min-w-0 leading-snug">
@@ -1383,7 +1383,7 @@ export function AddLibraryForm({
           )}
 
           {markerPosition && (
-            <div className="overflow-hidden rounded-xl border border-border max-sm:order-4">
+            <div className="overflow-hidden rounded-none border border-border max-sm:order-4">
               <div className="h-[240px] w-full">
                 <APIProvider
                   apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
@@ -1477,7 +1477,7 @@ export function AddLibraryForm({
             />
 
           <div
-            className={`kbs-add-content grid min-w-0 max-w-full gap-2 overflow-hidden rounded-xl border border-transparent p-2.5 transition sm:p-3 ${
+            className={`kbs-add-content grid min-w-0 max-w-full gap-2 overflow-hidden rounded-none border border-transparent p-2.5 transition sm:p-3 ${
               stepOneComplete
                 ? "bg-blue-50/50 text-slate-950"
                 : "pointer-events-none bg-gray-50 text-slate-950 opacity-50"
@@ -1501,7 +1501,7 @@ export function AddLibraryForm({
                 <label
                   htmlFor="library-photo"
                   aria-disabled={!stepOneComplete || processingPhoto}
-                  className={`kbs-add-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border px-4 text-base font-bold transition sm:h-10 sm:text-sm ${
+                  className={`kbs-add-primary inline-flex h-12 w-full items-center justify-center gap-2 rounded-none border px-4 text-base font-bold transition sm:h-10 sm:text-sm ${
                     processingPhoto
                       ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
                       : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
@@ -1515,7 +1515,7 @@ export function AddLibraryForm({
             ) : (
               <div className="w-full min-w-0 max-w-full overflow-hidden">
                 <div className="flex w-full min-w-0 max-w-full justify-center gap-2 overflow-x-hidden pb-2 sm:overflow-x-auto sm:overscroll-x-contain sm:pr-1 sm:[scrollbar-width:thin]">
-                  <div className="kbs-add-photo-card w-48 shrink-0 overflow-hidden rounded-xl border border-blue-200 bg-white text-slate-950">
+                  <div className="kbs-add-photo-card w-48 shrink-0 overflow-hidden rounded-none border border-blue-200 bg-white text-slate-950">
                     <img
                       src={photoPreviewUrl}
                       alt="Preview of the book box exterior"
@@ -1583,7 +1583,7 @@ export function AddLibraryForm({
             />
 
           <div
-            className={`kbs-add-content grid min-w-0 gap-2 overflow-hidden rounded-xl border border-transparent p-3 transition ${
+            className={`kbs-add-content grid min-w-0 gap-2 overflow-hidden rounded-none border border-transparent p-3 transition ${
               stepTwoComplete
                 ? "bg-violet-50/50 text-slate-950"
                 : "pointer-events-none bg-gray-50 text-slate-950 opacity-50"
@@ -1602,7 +1602,7 @@ export function AddLibraryForm({
               <label
                 htmlFor="book-photo"
                 aria-disabled={analyzingBooks || saving}
-                className={`kbs-add-primary inline-flex h-12 w-full min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition max-sm:!text-base sm:h-12 sm:px-3 sm:text-sm ${
+                className={`kbs-add-primary inline-flex h-12 w-full min-w-0 items-center justify-center gap-1.5 rounded-none border px-3 text-base font-bold transition max-sm:!text-base sm:h-12 sm:px-3 sm:text-sm ${
                   analyzingBooks || saving
                     ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
                     : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
@@ -1628,7 +1628,7 @@ export function AddLibraryForm({
                       analyzingBooks ||
                       !stepThreeComplete
                 }
-                className={`h-12 w-full whitespace-nowrap rounded-xl border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-base sm:h-12 ${
+                className={`h-12 w-full whitespace-nowrap rounded-none border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-base sm:h-12 ${
                   pendingBookPhotos.length > 0
                     ? "kbs-recognize-all border-violet-700 bg-violet-600 hover:bg-violet-700"
                     : "border-green-800 bg-green-700 hover:bg-green-800"
@@ -1674,7 +1674,7 @@ export function AddLibraryForm({
                   .map(({ pendingPhoto, number }) => (
                     <div
                       key={pendingPhoto.url}
-                      className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-white text-slate-950 sm:w-64 sm:shrink-0"
+                      className="kbs-add-photo-card w-full overflow-hidden rounded-none border border-dashed border-violet-300 bg-white text-slate-950 sm:w-64 sm:shrink-0"
                     >
                       <img
                         src={pendingPhoto.url}
@@ -1703,7 +1703,7 @@ export function AddLibraryForm({
                   .map(({ bookPhotoPreview, number }) => (
                     <div
                       key={bookPhotoPreview.url}
-                      className="kbs-add-photo-card w-full overflow-hidden rounded-xl border border-violet-200 bg-white text-slate-950 sm:w-64 sm:shrink-0"
+                      className="kbs-add-photo-card w-full overflow-hidden rounded-none border border-violet-200 bg-white text-slate-950 sm:w-64 sm:shrink-0"
                     >
                       <img
                         src={bookPhotoPreview.url}
@@ -1731,7 +1731,7 @@ export function AddLibraryForm({
 
             {(pendingBookPhotos.length > 0 || recognizedBooks.length > 0) && (
               recognizedBooks.length > 0 ? (
-                <div className="overflow-hidden rounded-lg border border-green-200 bg-green-50">
+                <div className="overflow-hidden rounded-none border border-green-200 bg-green-50">
                   <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
                     Book Box Inventory
                   </p>
@@ -1762,7 +1762,7 @@ export function AddLibraryForm({
                   </ul>
                 </div>
               ) : (
-                <div className="flex h-24 items-center justify-center rounded-xl border border-dashed border-violet-200 bg-white px-3 text-center text-slate-950">
+                <div className="flex h-24 items-center justify-center rounded-none border border-dashed border-violet-200 bg-white px-3 text-center text-slate-950">
                   <p className="text-xs leading-relaxed text-slate-600">
                     Add interior photos to generate the title list
                   </p>
@@ -1788,7 +1788,7 @@ export function AddLibraryForm({
 
           {message && (
             <div
-              className="rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-800"
+              className="rounded-none border border-green-300 bg-green-50 p-3 text-sm text-green-800"
               role="status"
             >
               {message}
@@ -1797,7 +1797,7 @@ export function AddLibraryForm({
 
           {error && (
             <div
-              className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700"
+              className="rounded-none border border-red-300 bg-red-50 p-3 text-sm text-red-700"
               role="alert"
             >
               {error}
@@ -1814,7 +1814,7 @@ export function AddLibraryForm({
           aria-modal="true"
           aria-labelledby="crop-box-photo-title"
         >
-          <div className="grid max-h-[95dvh] w-full max-w-lg gap-3 overflow-y-auto rounded-2xl bg-white p-4 text-slate-950 shadow-2xl">
+          <div className="grid max-h-[95dvh] w-full max-w-lg gap-3 overflow-y-auto rounded-none bg-white p-4 text-slate-950 shadow-2xl">
             <div>
               <h2 id="crop-box-photo-title" className="text-lg font-bold text-slate-950">
                 Crop Box Exterior Photo
@@ -1824,7 +1824,7 @@ export function AddLibraryForm({
               </p>
             </div>
 
-            <div className="relative h-[55dvh] max-h-[480px] min-h-72 overflow-hidden rounded-xl bg-black">
+            <div className="relative h-[55dvh] max-h-[480px] min-h-72 overflow-hidden rounded-none bg-black">
               <Cropper
                 image={cropSourceUrl}
                 crop={cropPosition}
@@ -1858,7 +1858,7 @@ export function AddLibraryForm({
                 type="button"
                 onClick={closeCropEditor}
                 disabled={processingPhoto}
-                className="h-12 rounded-xl border border-border bg-white px-4 font-semibold text-slate-950 hover:bg-secondary disabled:opacity-50"
+                className="h-12 rounded-none border border-border bg-white px-4 font-semibold text-slate-950 hover:bg-secondary disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1866,7 +1866,7 @@ export function AddLibraryForm({
                 type="button"
                 onClick={useCroppedPhoto}
                 disabled={processingPhoto || !croppedAreaPixels}
-                className="kbs-add-primary h-12 rounded-xl border border-blue-700 bg-blue-600 px-4 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="kbs-add-primary h-12 rounded-none border border-blue-700 bg-blue-600 px-4 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {processingPhoto ? "Preparing Photo…" : "Use This Crop"}
               </button>
