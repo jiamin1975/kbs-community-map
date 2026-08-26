@@ -299,6 +299,16 @@ export function BookPhotoTester({
     <div className="kbs-update-root min-w-0 p-1">
       <style>{`
         @media (prefers-color-scheme: dark) and (max-width: 639px) {
+          .kbs-update-step-card {
+            background-color: #111827 !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+          }
+
+          .kbs-update-step-instruction {
+            color: #cbd5e1 !important;
+          }
+
           .kbs-update-root {
             color: #f8fafc !important;
           }
@@ -442,6 +452,29 @@ export function BookPhotoTester({
 
       {!saved && (
         <div className="kbs-update-workspace mt-3 grid min-w-0 gap-3 overflow-hidden rounded-none border border-transparent bg-violet-50/50 p-3">
+          <div className="kbs-update-step-card grid gap-2 rounded-none border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
+            <p className="kbs-update-step-instruction text-sm leading-snug text-slate-600">
+              Photograph the books inside the box so their titles are visible.
+            </p>
+
+            <div
+              className="relative h-24 overflow-hidden rounded-none border border-blue-200 bg-transparent sm:h-32"
+              aria-label="Box interior photo example"
+            >
+              <img
+                src="/examples/book-box-interior.jpg"
+                alt="Example of a book box interior photo showing the books"
+                className="h-full w-full object-contain"
+              />
+
+              <div className="pointer-events-none absolute left-1/2 top-3/4 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-none bg-black/50 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:bg-black/65 sm:px-3 sm:py-1.5">
+                <p className="text-[7px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
+                  <span>Example - Take photo like this</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
           <input
             id="update-book-photo"
             type="file"

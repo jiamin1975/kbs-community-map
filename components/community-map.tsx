@@ -695,7 +695,7 @@ export function CommunityMap({
 
           .kbs-box-details {
             background-color: #0f172a !important;
-            border: 1px solid #334155 !important;
+            border: 2px solid #3b82f6 !important;
             color: #f8fafc !important;
           }
 
@@ -1145,7 +1145,7 @@ export function CommunityMap({
         </APIProvider>
 
         {selectedLibrary && isMobile && (
-          <div className="kbs-box-details absolute inset-4 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-4 text-black shadow-2xl">
+          <div className="kbs-box-details absolute inset-4 z-30 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border-2 border-blue-500 bg-white p-4 text-black shadow-2xl">
             <button
               type="button"
               aria-label="Close box details"
