@@ -112,7 +112,7 @@ export function LibraryMapExperience() {
         open={uploadDialogOpen}
         onOpenChange={handleUploadDialogChange}
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-none sm:max-w-3xl">
+        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-none max-sm:left-2 max-sm:right-2 max-sm:top-2 max-sm:h-[calc(100dvh-1rem)] max-sm:max-h-[calc(100dvh-1rem)] max-sm:w-auto max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:p-3 sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Update Book Box Inventory</DialogTitle>
           </DialogHeader>

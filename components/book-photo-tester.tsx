@@ -324,6 +324,17 @@ export function BookPhotoTester({
             color: #94a3b8 !important;
           }
 
+          .kbs-update-recognize-all:not(:disabled) {
+            background-color: #5b21b6 !important;
+            border-color: #7c3aed !important;
+            color: #faf5ff !important;
+            box-shadow: 0 3px 10px rgba(2, 6, 23, 0.35) !important;
+          }
+
+          .kbs-update-recognize-all:not(:disabled):active {
+            background-color: #6d28d9 !important;
+          }
+
           .kbs-update-save:not(:disabled) {
             background-color: #166534 !important;
             border-color: #22824c !important;
@@ -467,7 +478,7 @@ export function BookPhotoTester({
               disabled={loading || saving}
               className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap rounded-none border px-3 py-1.5 text-base font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm ${
                 pendingBookPhotos.length > 0
-                  ? "kbs-update-primary border-violet-800 bg-violet-700 hover:bg-violet-800"
+                  ? "kbs-update-recognize-all border-violet-700 bg-violet-600 hover:bg-violet-700"
                   : "kbs-update-save border-green-800 bg-green-700 hover:bg-green-800"
               }`}
             >
