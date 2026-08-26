@@ -132,39 +132,41 @@ function WizardProgress({
       className="kbs-add-wizard-nav overflow-hidden rounded-xl border border-border bg-background"
       aria-label="Add a new book box progress"
     >
-      {steps.map(({ step, title }) => {
-        const complete = completedSteps[step - 1];
-        const active = currentStep === step;
-        const available = active || complete || step < currentStep;
+      {steps
+        .filter(({ step }) => step <= currentStep)
+        .map(({ step, title }) => {
+          const complete = completedSteps[step - 1];
+          const active = currentStep === step;
+          const available = active || complete;
 
-        return (
-          <button
-            key={step}
-            type="button"
-            onClick={() => available && onStepSelect(step)}
-            disabled={!available}
-            aria-current={active ? "step" : undefined}
-            className={`kbs-add-wizard-row flex min-h-9 w-full items-center gap-2 border-b border-border px-3 py-1.5 text-left text-sm font-normal leading-tight transition last:border-b-0 max-sm:!text-sm ${
-              active
-                ? "bg-blue-50 text-blue-950"
-                : complete
-                  ? "bg-white text-foreground hover:bg-blue-50/60"
-                  : "cursor-default bg-muted/40 text-muted-foreground"
-            }`}
-          >
-            <span className="min-w-0 flex-1 font-normal leading-tight">
-              Step {step}. {title}
-            </span>
-
-            {complete && (
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-sky-500 text-white">
-                <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
-                <span className="sr-only">Completed</span>
+          return (
+            <button
+              key={step}
+              type="button"
+              onClick={() => available && onStepSelect(step)}
+              disabled={!available}
+              aria-current={active ? "step" : undefined}
+              className={`kbs-add-wizard-row flex min-h-9 w-full items-center gap-2 border-b border-border px-3 py-1.5 text-left text-sm font-normal leading-tight transition last:border-b-0 max-sm:!text-sm ${
+                active
+                  ? "bg-blue-50 text-blue-950"
+                  : complete
+                    ? "bg-white text-foreground hover:bg-blue-50/60"
+                    : "cursor-default bg-muted/40 text-muted-foreground"
+              }`}
+            >
+              <span className="min-w-0 flex-1 font-normal leading-tight">
+                Step {step}. {title}
               </span>
-            )}
-          </button>
-        );
-      })}
+
+              {complete && (
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-sky-500 text-white">
+                  <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
+                  <span className="sr-only">Completed</span>
+                </span>
+              )}
+            </button>
+          );
+        })}
     </nav>
   );
 }
