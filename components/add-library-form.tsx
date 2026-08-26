@@ -96,7 +96,7 @@ function WizardStepHeader({
             className="h-full w-full object-contain"
           />
 
-          <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-none bg-black/50 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:bg-black/65 sm:px-3 sm:py-1.5">
+          <div className="pointer-events-none absolute left-1/2 top-3/4 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-none bg-black/50 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:bg-black/65 sm:px-3 sm:py-1.5">
             <p className="text-[7px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
               <span>Example - Take photo like this</span>
             </p>
@@ -1185,13 +1185,13 @@ export function AddLibraryForm({
 
           .kbs-add-wizard-nav,
           .kbs-add-wizard-row {
-            background-color: #0f172a !important;
+            background-color: #1e293b !important;
             border-color: #334155 !important;
             color: #f8fafc !important;
           }
 
           .kbs-add-wizard-row[aria-current="step"] {
-            background-color: #172554 !important;
+            background-color: #1e3a5f !important;
             color: #eff6ff !important;
           }
 
