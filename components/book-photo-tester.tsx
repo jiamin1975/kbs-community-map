@@ -432,14 +432,14 @@ export function BookPhotoTester({
         }
       `}</style>
 
-      <div className="border-b border-border px-3 pb-3 pt-1">
-        <p className="min-w-0 truncate text-xs text-muted-foreground">
-          Contributor: {updatedBy || "Public contributor"}
-        </p>
-      </div>
-
       {library ? (
         <div className="kbs-update-location mt-3 rounded-none border border-border bg-secondary px-4 py-3">
+          <div className="mb-3 border-b border-border pb-3">
+            <p className="min-w-0 truncate text-xs text-muted-foreground">
+              Contributor: {updatedBy || "Public contributor"}
+            </p>
+          </div>
+
           <div className="flex min-w-0 items-start gap-3">
             <span className="mt-0.5 shrink-0 text-base">📍</span>
             <div className="min-w-0 flex-1">
