@@ -758,7 +758,7 @@ export function CommunityMap({
           <button
             type="button"
             onClick={onAddLibrary}
-            className="kbs-mobile-add inline-flex h-12 w-full items-center justify-center rounded-xl border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-sm transition hover:bg-blue-700 sm:w-auto sm:whitespace-nowrap"
+            className="kbs-mobile-add inline-flex h-12 w-full items-center justify-center rounded-none border border-blue-700 bg-blue-600 px-4 text-base font-bold text-white shadow-sm transition hover:bg-blue-700 sm:w-auto sm:whitespace-nowrap"
           >
             ＋ Add a New Book Box
           </button>
@@ -767,7 +767,7 @@ export function CommunityMap({
             type="button"
             onClick={findNearbyLibrary}
             disabled={locating}
-            className="kbs-mobile-update inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary px-4 font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:whitespace-nowrap"
+            className="kbs-mobile-update inline-flex h-12 w-full items-center justify-center rounded-none bg-primary px-4 font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:whitespace-nowrap"
           >
             {locating
               ? "Finding Nearby Box…"

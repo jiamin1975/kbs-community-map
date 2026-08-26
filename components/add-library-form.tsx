@@ -146,7 +146,7 @@ function WizardProgress({
               onClick={() => available && onStepSelect(step)}
               disabled={!available}
               aria-current={active ? "step" : undefined}
-              className={`kbs-add-wizard-row flex min-h-9 w-full items-center gap-2 border-b border-border px-3 py-1.5 text-left text-sm font-normal leading-tight transition last:border-b-0 max-sm:!text-sm ${
+              className={`kbs-add-wizard-row flex min-h-9 w-full items-center gap-2 border-b border-border px-3 py-1.5 text-left text-sm font-bold leading-tight transition last:border-b-0 max-sm:!text-sm ${
                 active
                   ? "bg-blue-50 text-blue-950"
                   : complete
@@ -154,7 +154,7 @@ function WizardProgress({
                     : "cursor-default bg-muted/40 text-muted-foreground"
               }`}
             >
-              <span className="min-w-0 flex-1 font-normal leading-tight">
+              <span className="min-w-0 flex-1 font-bold leading-tight">
                 Step {step}. {title}
               </span>
 

@@ -406,7 +406,7 @@ export function BookPhotoTester({
       `}</style>
 
       {library ? (
-        <div className="kbs-update-location rounded-xl border border-border bg-secondary px-4 py-3">
+        <div className="kbs-update-location rounded-none border border-border bg-secondary px-4 py-3">
           <div className="flex min-w-0 items-start gap-3">
             <span className="mt-0.5 shrink-0 text-base">📍</span>
             <div className="min-w-0 flex-1">
@@ -422,7 +422,7 @@ export function BookPhotoTester({
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-dashed border-border p-4">
+        <div className="rounded-none border border-dashed border-border p-4">
           <p className="text-sm text-muted-foreground">
             Select a library before updating inventory.
           </p>
@@ -430,7 +430,7 @@ export function BookPhotoTester({
       )}
 
       {!saved && (
-        <div className="kbs-update-workspace mt-3 grid min-w-0 gap-3 overflow-hidden rounded-xl border border-transparent bg-violet-50/50 p-3">
+        <div className="kbs-update-workspace mt-3 grid min-w-0 gap-3 overflow-hidden rounded-none border border-transparent bg-violet-50/50 p-3">
           <input
             id="update-book-photo"
             type="file"
@@ -444,7 +444,7 @@ export function BookPhotoTester({
             <label
               htmlFor="update-book-photo"
               aria-disabled={loading || saving}
-              className={`kbs-update-primary inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-3 text-base font-bold transition sm:h-10 sm:px-2 sm:text-sm ${
+              className={`kbs-update-primary inline-flex h-12 min-w-0 items-center justify-center gap-1.5 rounded-none border px-3 text-base font-bold transition sm:h-10 sm:px-2 sm:text-sm ${
                 loading || saving
                   ? "pointer-events-none cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500 shadow-none"
                   : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
@@ -465,7 +465,7 @@ export function BookPhotoTester({
                   : finishAndSaveInventory
               }
               disabled={loading || saving}
-              className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap rounded-xl border px-3 py-1.5 text-base font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm ${
+              className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap rounded-none border px-3 py-1.5 text-base font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm ${
                 pendingBookPhotos.length > 0
                   ? "kbs-update-primary border-violet-800 bg-violet-700 hover:bg-violet-800"
                   : "kbs-update-save border-green-800 bg-green-700 hover:bg-green-800"
@@ -510,7 +510,7 @@ export function BookPhotoTester({
                   .map(({ photo, number }) => (
                   <div
                     key={photo.url}
-                    className="kbs-update-photo-card w-full overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background"
+                    className="kbs-update-photo-card w-full overflow-hidden rounded-none border border-dashed border-violet-300 bg-background"
                   >
                     <img
                       src={photo.url}
@@ -537,7 +537,7 @@ export function BookPhotoTester({
                   .map(({ photo, number }) => (
                     <div
                       key={photo.url}
-                      className="kbs-update-photo-card w-full overflow-hidden rounded-xl border border-violet-200 bg-background"
+                      className="kbs-update-photo-card w-full overflow-hidden rounded-none border border-violet-200 bg-background"
                     >
                       <img
                         src={photo.url}
@@ -564,7 +564,7 @@ export function BookPhotoTester({
                   .map(({ photo, number }) => (
                   <div
                     key={photo.url}
-                    className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-dashed border-violet-300 bg-background"
+                    className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-none border border-dashed border-violet-300 bg-background"
                   >
                     <img
                       src={photo.url}
@@ -587,7 +587,7 @@ export function BookPhotoTester({
                   }))
                   .reverse()
                   .map(({ photo, number }) => (
-                  <div key={photo.url} className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-xl border border-violet-200 bg-background">
+                  <div key={photo.url} className="kbs-update-photo-card w-52 shrink-0 overflow-hidden rounded-none border border-violet-200 bg-background">
                     <img
                       src={photo.url}
                       alt={`Interior photo ${number}`}
@@ -605,7 +605,7 @@ export function BookPhotoTester({
             </>
           )}
 
-          <div className="kbs-update-inventory overflow-hidden rounded-lg border border-green-200 bg-green-50" aria-live="polite">
+          <div className="kbs-update-inventory overflow-hidden rounded-none border border-green-200 bg-green-50" aria-live="polite">
             <p className="kbs-update-inventory-header border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
               Box Inventory
             </p>
@@ -658,7 +658,7 @@ export function BookPhotoTester({
 
       {saved && (
         <div
-          className="kbs-update-success mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-green-900"
+          className="kbs-update-success mt-5 rounded-none border border-green-300 bg-green-50 p-4 text-green-900"
           role="status"
         >
           <p className="font-semibold">
@@ -681,7 +681,7 @@ export function BookPhotoTester({
 
       {error && (
         <p
-          className="kbs-update-error mt-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700"
+          className="kbs-update-error mt-4 rounded-none border border-red-300 bg-red-50 p-3 text-sm text-red-700"
           role="alert"
         >
           {error}
