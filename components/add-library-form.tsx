@@ -23,6 +23,7 @@ import {
 } from "@vis.gl/react-google-maps";
 import {
   Camera,
+  Check,
   MapPin,
   MapPinned,
   ScanLine,
@@ -64,56 +65,21 @@ type DuplicateCheckStatus = "idle" | "checking" | "clear" | "duplicate";
 type WizardExample = "exterior" | "interior";
 
 type WizardStepHeaderProps = {
-  step: 1 | 2 | 3;
   title: string;
   instruction: string;
-  icon: LucideIcon;
   example?: WizardExample;
 };
 
 function WizardStepHeader({
-  step,
   title,
   instruction,
-  icon: Icon,
   example,
 }: WizardStepHeaderProps) {
   return (
     <div className="kbs-add-step-card grid gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-slate-950">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5" aria-label={`Step ${step} of 3`}>
-          {[1, 2, 3].map((dotStep) => (
-            <span
-              key={dotStep}
-              className={`size-2.5 rounded-full ${
-                dotStep === step
-                  ? "bg-green-600"
-                  : dotStep < step
-                    ? "bg-blue-300"
-                    : "bg-gray-300"
-              }`}
-              aria-hidden="true"
-            />
-          ))}
-        </div>
-        <p className="kbs-add-step-label text-xs font-semibold uppercase tracking-wide text-blue-700 max-sm:!text-xs">
-          Step {step} of 3
-        </p>
-      </div>
-
-      <div className="flex items-start gap-2.5">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-700 shadow-sm">
-          <Icon className="size-4.5" aria-hidden="true" />
-        </span>
-        <div className="min-w-0">
-          <p className="kbs-add-step-title text-lg font-bold leading-tight text-slate-950 max-sm:!text-lg">
-            {title}
-          </p>
-          <p className="kbs-add-step-instruction mt-0.5 text-sm leading-snug text-slate-600 max-sm:!text-sm">
-            {instruction}
-          </p>
-        </div>
-      </div>
+      <p className="kbs-add-step-instruction text-sm leading-snug text-slate-600 max-sm:!text-sm">
+        {instruction}
+      </p>
 
       {example && (
         <div
@@ -142,6 +108,81 @@ function WizardStepHeader({
         </div>
       )}
     </div>
+  );
+}
+
+type WizardProgressProps = {
+  currentStep: 1 | 2 | 3;
+  completedSteps: [boolean, boolean, boolean];
+  onStepSelect: (step: 1 | 2 | 3) => void;
+};
+
+function WizardProgress({
+  currentStep,
+  completedSteps,
+  onStepSelect,
+}: WizardProgressProps) {
+  const steps: Array<{
+    step: 1 | 2 | 3;
+    title: string;
+    icon: LucideIcon;
+  }> = [
+    { step: 1, title: "Confirm Box Location", icon: MapPinned },
+    { step: 2, title: "Add Box Exterior Photo", icon: Camera },
+    { step: 3, title: "Add Box Interior Photos", icon: ScanLine },
+  ];
+
+  return (
+    <nav
+      className="kbs-add-wizard-nav overflow-hidden rounded-xl border border-border bg-background"
+      aria-label="Add a new book box progress"
+    >
+      {steps.map(({ step, title, icon: Icon }) => {
+        const complete = completedSteps[step - 1];
+        const active = currentStep === step;
+        const available = active || complete || step < currentStep;
+
+        return (
+          <button
+            key={step}
+            type="button"
+            onClick={() => available && onStepSelect(step)}
+            disabled={!available}
+            aria-current={active ? "step" : undefined}
+            className={`kbs-add-wizard-row flex min-h-12 w-full items-center gap-2.5 border-b border-border px-3 py-2 text-left transition last:border-b-0 ${
+              active
+                ? "bg-blue-50 text-blue-950"
+                : complete
+                  ? "bg-white text-foreground hover:bg-blue-50/60"
+                  : "cursor-default bg-muted/40 text-muted-foreground"
+            }`}
+          >
+            <span
+              className={`flex size-8 shrink-0 items-center justify-center rounded-full border ${
+                active
+                  ? "border-blue-300 bg-white text-blue-700"
+                  : complete
+                    ? "border-blue-200 bg-blue-50 text-blue-700"
+                    : "border-border bg-background text-muted-foreground"
+              }`}
+            >
+              <Icon className="size-4" aria-hidden="true" />
+            </span>
+
+            <span className="min-w-0 flex-1 font-bold leading-tight">
+              Step {step}. {title}
+            </span>
+
+            {complete && (
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-sky-500 text-white">
+                <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+                <span className="sr-only">Completed</span>
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </nav>
   );
 }
 
@@ -1157,6 +1198,24 @@ export function AddLibraryForm({
             color: #f8fafc !important;
           }
 
+          .kbs-add-wizard-nav,
+          .kbs-add-wizard-row {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+          }
+
+          .kbs-add-wizard-row[aria-current="step"] {
+            background-color: #172554 !important;
+            color: #eff6ff !important;
+          }
+
+          .kbs-add-wizard-row:disabled {
+            background-color: #111827 !important;
+            color: #94a3b8 !important;
+            opacity: 1 !important;
+          }
+
           .kbs-add-step-label {
             color: #93c5fd !important;
           }
@@ -1224,6 +1283,16 @@ export function AddLibraryForm({
         </div>
 
         <div className="mt-3 grid gap-3">
+          <WizardProgress
+            currentStep={currentStep}
+            completedSteps={[
+              stepOneComplete,
+              stepTwoComplete,
+              stepThreeComplete,
+            ]}
+            onStepSelect={goToStep}
+          />
+
           <section
             className={currentStep === 1 ? "grid gap-3" : "hidden"}
             aria-labelledby="add-location-step"
@@ -1238,10 +1307,8 @@ export function AddLibraryForm({
             </h2>
 
             <WizardStepHeader
-              step={1}
               title="Confirm Box Location"
               instruction="Move the marker to the exact location of the book box."
-              icon={MapPinned}
             />
 
           <div className="grid gap-1 sm:grid-cols-2 sm:items-end sm:gap-2">
@@ -1419,10 +1486,8 @@ export function AddLibraryForm({
             </h2>
 
             <WizardStepHeader
-              step={2}
               title="Add Box Exterior Photo"
               instruction="Include the entire box and avoid surrounding private property."
-              icon={Camera}
               example="exterior"
             />
 
@@ -1535,10 +1600,8 @@ export function AddLibraryForm({
             </h2>
 
             <WizardStepHeader
-              step={3}
-              title="Add Box Interior Photo"
+              title="Add Box Interior Photos"
               instruction="Photograph the books inside the box so their titles are visible."
-              icon={ScanLine}
               example="interior"
             />
 
@@ -1737,7 +1800,7 @@ export function AddLibraryForm({
               type="button"
               onClick={() => goToStep(2)}
               disabled={saving || analyzingBooks}
-              className="min-h-11 w-fit rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50"
+              className="min-h-11 w-full rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold leading-tight text-foreground transition hover:bg-secondary disabled:opacity-50 sm:w-fit"
             >
               ← Back
             </button>
