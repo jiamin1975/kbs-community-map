@@ -133,7 +133,7 @@ export function LibraryMapExperience() {
         onOpenChange={handleAddLibraryDialogChange}
       >
         <DialogContent
-          className="max-h-[90vh] overflow-y-auto sm:max-w-3xl"
+          className="max-h-[90vh] overflow-y-auto max-sm:left-2 max-sm:right-2 max-sm:top-2 max-sm:h-[calc(100dvh-1rem)] max-sm:max-h-[calc(100dvh-1rem)] max-sm:w-auto max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-xl max-sm:p-3 sm:max-w-3xl"
           onInteractOutside={(event) => {
             const target = event.target
 

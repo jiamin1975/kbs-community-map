@@ -22,12 +22,8 @@ import {
   type MapCameraChangedEvent,
 } from "@vis.gl/react-google-maps";
 import {
-  Camera,
   Check,
   MapPin,
-  MapPinned,
-  ScanLine,
-  type LucideIcon,
 } from "lucide-react";
 import Cropper, { type Area } from "react-easy-crop";
 
@@ -125,11 +121,10 @@ function WizardProgress({
   const steps: Array<{
     step: 1 | 2 | 3;
     title: string;
-    icon: LucideIcon;
   }> = [
-    { step: 1, title: "Confirm Box Location", icon: MapPinned },
-    { step: 2, title: "Add Box Exterior Photo", icon: Camera },
-    { step: 3, title: "Add Box Interior Photos", icon: ScanLine },
+    { step: 1, title: "Confirm Box Location" },
+    { step: 2, title: "Add Box Exterior Photo" },
+    { step: 3, title: "Add Box Interior Photos" },
   ];
 
   return (
@@ -137,7 +132,7 @@ function WizardProgress({
       className="kbs-add-wizard-nav overflow-hidden rounded-xl border border-border bg-background"
       aria-label="Add a new book box progress"
     >
-      {steps.map(({ step, title, icon: Icon }) => {
+      {steps.map(({ step, title }) => {
         const complete = completedSteps[step - 1];
         const active = currentStep === step;
         const available = active || complete || step < currentStep;
@@ -149,7 +144,7 @@ function WizardProgress({
             onClick={() => available && onStepSelect(step)}
             disabled={!available}
             aria-current={active ? "step" : undefined}
-            className={`kbs-add-wizard-row flex min-h-12 w-full items-center gap-2.5 border-b border-border px-3 py-2 text-left transition last:border-b-0 ${
+            className={`kbs-add-wizard-row flex min-h-9 w-full items-center gap-2 border-b border-border px-3 py-1.5 text-left text-sm font-normal leading-tight transition last:border-b-0 max-sm:!text-sm ${
               active
                 ? "bg-blue-50 text-blue-950"
                 : complete
@@ -157,25 +152,13 @@ function WizardProgress({
                   : "cursor-default bg-muted/40 text-muted-foreground"
             }`}
           >
-            <span
-              className={`flex size-8 shrink-0 items-center justify-center rounded-full border ${
-                active
-                  ? "border-blue-300 bg-white text-blue-700"
-                  : complete
-                    ? "border-blue-200 bg-blue-50 text-blue-700"
-                    : "border-border bg-background text-muted-foreground"
-              }`}
-            >
-              <Icon className="size-4" aria-hidden="true" />
-            </span>
-
-            <span className="min-w-0 flex-1 font-bold leading-tight">
+            <span className="min-w-0 flex-1 font-normal leading-tight">
               Step {step}. {title}
             </span>
 
             {complete && (
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-sky-500 text-white">
-                <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-sky-500 text-white">
+                <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
                 <span className="sr-only">Completed</span>
               </span>
             )}
