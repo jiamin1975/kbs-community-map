@@ -1035,7 +1035,7 @@ export function CommunityMap({
                           <button
                             type="button"
                             onClick={() => onUploadPhoto(selectedLibrary)}
-                            className="inline-flex h-11 w-full items-center justify-center gap-1 rounded-xl bg-blue-600 px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:h-8"
+                            className="inline-flex h-11 w-full items-center justify-center gap-1 rounded-none bg-blue-600 px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:h-8"
                           >
                             📷 Update Inventory
                           </button>
@@ -1190,7 +1190,7 @@ export function CommunityMap({
               <button
                 type="button"
                 onClick={() => onUploadPhoto(selectedLibrary)}
-                className="kbs-box-update mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-base font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                className="kbs-box-update mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-none bg-blue-600 px-4 text-base font-semibold text-white shadow-sm transition hover:bg-blue-700"
               >
                 📷 Update Inventory
               </button>
@@ -1311,7 +1311,7 @@ export function CommunityMap({
               <button
                 type="button"
                 onClick={confirmNearbyLibrary}
-                className="kbs-nearby-primary rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                className="kbs-nearby-primary rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               >
                 Choose It
               </button>
@@ -1319,7 +1319,7 @@ export function CommunityMap({
               <button
                 type="button"
                 onClick={cancelNearbyLibrary}
-                className="kbs-nearby-secondary rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium"
+                className="kbs-nearby-secondary rounded-none border border-border bg-background px-4 py-2 text-sm font-medium"
               >
                 Choose Another Book Box
               </button>
