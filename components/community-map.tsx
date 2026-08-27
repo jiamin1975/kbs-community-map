@@ -728,26 +728,26 @@ export function CommunityMap({
             box-shadow: none !important;
           }
 
-          .kbs-box-inventory {
+          .kbs-box-book list {
             background-color: #0f1f1a !important;
             border-color: #166534 !important;
             color: #dcfce7 !important;
           }
 
-          .kbs-box-inventory-header {
+          .kbs-box-book list-header {
             background-color: #14532d !important;
             border-color: #166534 !important;
             color: #f0fdf4 !important;
           }
 
-          .kbs-box-inventory-list,
-          .kbs-box-inventory-list > :not([hidden]) ~ :not([hidden]) {
+          .kbs-box-book list-list,
+          .kbs-box-book list-list > :not([hidden]) ~ :not([hidden]) {
             border-color: #166534 !important;
           }
 
-          .kbs-box-inventory-number,
-          .kbs-box-inventory-author,
-          .kbs-box-inventory-empty {
+          .kbs-box-book list-number,
+          .kbs-box-book list-author,
+          .kbs-box-book list-empty {
             color: #86efac !important;
           }
         }
@@ -1037,7 +1037,7 @@ export function CommunityMap({
                             onClick={() => onUploadPhoto(selectedLibrary)}
                             className="inline-flex h-11 w-full items-center justify-center gap-1 rounded-none bg-blue-600 px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:h-8"
                           >
-                            📷 Update Inventory
+                            📷 Update Book List
                           </button>
 
                           <div className="max-w-full break-words rounded-lg bg-gray-100 px-2.5 py-2 text-xs text-gray-700">
@@ -1058,10 +1058,10 @@ export function CommunityMap({
                     </div>
 
                     <div className="w-full min-w-0 max-w-full overflow-x-hidden sm:overflow-visible">
-                  {/* Current inventory */}
+                  {/* Current book list */}
                   <div className="mt-3 overflow-hidden rounded-none border border-green-200 bg-green-50 sm:mt-0">
                     <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 sm:py-1.5 sm:text-sm sm:font-semibold">
-                      Box Inventory
+                      Book List
                     </p>
 
                     {selectedLibrary.books.length === 0 ? (
@@ -1192,7 +1192,7 @@ export function CommunityMap({
                 onClick={() => onUploadPhoto(selectedLibrary)}
                 className="kbs-box-update mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-none bg-blue-600 px-4 text-base font-semibold text-white shadow-sm transition hover:bg-blue-700"
               >
-                📷 Update Inventory
+                📷 Update Book List
               </button>
 
               <div className="kbs-box-status mt-2 max-w-full whitespace-normal break-words rounded-lg bg-gray-100 px-3 py-2.5 text-sm text-gray-700 [overflow-wrap:anywhere]">
@@ -1209,17 +1209,17 @@ export function CommunityMap({
                 )}
               </div>
 
-              <div className="kbs-box-inventory mt-5 overflow-hidden rounded-none border border-green-200 bg-green-50">
-                <p className="kbs-box-inventory-header border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950">
-                  Box Inventory
+              <div className="kbs-box-book list mt-5 overflow-hidden rounded-none border border-green-200 bg-green-50">
+                <p className="kbs-box-book list-header border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950">
+                  Book List
                 </p>
 
                 {selectedLibrary.books.length === 0 ? (
-                  <p className="kbs-box-inventory-empty px-3 py-4 text-sm text-green-800">
+                  <p className="kbs-box-book list-empty px-3 py-4 text-sm text-green-800">
                     No books have been inventoried yet.
                   </p>
                 ) : (
-                  <ul className="kbs-box-inventory-list min-w-0 divide-y divide-green-200 overflow-x-hidden">
+                  <ul className="kbs-box-book list-list min-w-0 divide-y divide-green-200 overflow-x-hidden">
                   {[...selectedLibrary.books]
                     .sort((firstBook, secondBook) => {
                       const firstTitle =
@@ -1265,7 +1265,7 @@ export function CommunityMap({
                           key={`${title}-${index}`}
                           className="flex min-w-0 items-start gap-2 overflow-hidden px-3 py-2"
                         >
-                          <span className="kbs-box-inventory-number w-8 shrink-0 whitespace-nowrap pt-0.5 text-right text-xs font-bold tabular-nums text-green-700">
+                          <span className="kbs-box-book list-number w-8 shrink-0 whitespace-nowrap pt-0.5 text-right text-xs font-bold tabular-nums text-green-700">
                             {index + 1}.
                           </span>
                           <div className="min-w-0 flex-1">
@@ -1274,7 +1274,7 @@ export function CommunityMap({
                             </p>
 
                             {author && (
-                              <p className="kbs-box-inventory-author mt-1 max-w-full whitespace-normal break-words text-sm leading-tight text-green-800 [overflow-wrap:anywhere]">
+                              <p className="kbs-box-book list-author mt-1 max-w-full whitespace-normal break-words text-sm leading-tight text-green-800 [overflow-wrap:anywhere]">
                                 {author}
                               </p>
                             )}

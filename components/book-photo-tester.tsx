@@ -263,7 +263,7 @@ export function BookPhotoTester({
           lastUpdated:
             serverTimestamp(),
           recognitionNotes:
-            `Inventory created from ${photosProcessed} photo${
+            `Book List created from ${photosProcessed} photo${
               photosProcessed === 1
                 ? ""
                 : "s"
@@ -281,14 +281,14 @@ export function BookPhotoTester({
       }
     } catch (caughtError) {
       console.error(
-        "Could not save inventory:",
+        "Could not save book list:",
         caughtError,
       )
 
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Could not save the inventory.",
+          : "Could not save the book list.",
       )
     } finally {
       setSaving(false)
@@ -384,27 +384,27 @@ export function BookPhotoTester({
             color: #86efac !important;
           }
 
-          .kbs-update-inventory {
+          .kbs-update-book list {
             background-color: #0f1f1a !important;
             border-color: #166534 !important;
             color: #dcfce7 !important;
           }
 
-          .kbs-update-inventory-header {
+          .kbs-update-book list-header {
             background-color: #14532d !important;
             border-color: #166534 !important;
             color: #f0fdf4 !important;
           }
 
-          .kbs-update-inventory-list,
-          .kbs-update-inventory-list > :not([hidden]) ~ :not([hidden]) {
+          .kbs-update-book list-list,
+          .kbs-update-book list-list > :not([hidden]) ~ :not([hidden]) {
             border-color: #166534 !important;
             color: #dcfce7 !important;
           }
 
-          .kbs-update-inventory-list li::marker,
-          .kbs-update-inventory-author,
-          .kbs-update-inventory-empty {
+          .kbs-update-book list-list li::marker,
+          .kbs-update-book list-author,
+          .kbs-update-book list-empty {
             color: #86efac !important;
           }
 
@@ -457,7 +457,7 @@ export function BookPhotoTester({
       ) : (
         <div className="rounded-none border border-dashed border-border p-4">
           <p className="text-sm text-muted-foreground">
-            Select a library before updating inventory.
+            Select a library before updating book list.
           </p>
         </div>
       )}
@@ -534,7 +534,7 @@ export function BookPhotoTester({
               ) : saving ? (
                 <>
                   <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-                  Saving Inventory…
+                  Saving Book List…
                 </>
               ) : (
                 <>
@@ -661,13 +661,13 @@ export function BookPhotoTester({
             </>
           )}
 
-          <div className="kbs-update-inventory overflow-hidden rounded-none border border-green-200 bg-green-50" aria-live="polite">
-            <p className="kbs-update-inventory-header border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
-              Box Inventory
+          <div className="kbs-update-book list overflow-hidden rounded-none border border-green-200 bg-green-50" aria-live="polite">
+            <p className="kbs-update-book list-header border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
+              Book List
             </p>
 
             {sessionBooks.length > 0 ? (
-              <ol className="kbs-update-inventory-list max-h-64 list-decimal divide-y divide-green-200 overflow-y-auto pl-9 pr-2 text-green-950 marker:font-bold marker:text-green-700 sm:max-h-52 sm:pl-8">
+              <ol className="kbs-update-book list-list max-h-64 list-decimal divide-y divide-green-200 overflow-y-auto pl-9 pr-2 text-green-950 marker:font-bold marker:text-green-700 sm:max-h-52 sm:pl-8">
                 {sessionBooks
                   .slice()
                   .sort((firstBook, secondBook) =>
@@ -677,7 +677,7 @@ export function BookPhotoTester({
                     <li key={normalizeBookTitle(book.title)} className="py-2 pl-1 sm:py-1">
                       <p className="text-base font-semibold leading-tight sm:text-[11px]">{book.title}</p>
                       {book.author && (
-                        <p className="kbs-update-inventory-author mt-1 text-sm leading-tight text-green-800 sm:mt-0 sm:text-[10px]">
+                        <p className="kbs-update-book list-author mt-1 text-sm leading-tight text-green-800 sm:mt-0 sm:text-[10px]">
                           {book.author}
                         </p>
                       )}
@@ -686,7 +686,7 @@ export function BookPhotoTester({
               </ol>
             ) : (
               <div className="flex h-24 items-center justify-center px-3 text-center">
-                <p className="kbs-update-inventory-empty text-sm leading-relaxed text-muted-foreground">
+                <p className="kbs-update-book list-empty text-sm leading-relaxed text-muted-foreground">
                   Add interior photos to generate the title list.
                 </p>
               </div>
@@ -701,7 +701,7 @@ export function BookPhotoTester({
           role="status"
         >
           <p className="font-semibold">
-            Inventory updated successfully
+            Book list updated successfully
           </p>
 
           <p className="mt-1 text-sm">

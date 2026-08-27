@@ -1063,7 +1063,7 @@ export function AddLibraryForm({
 
           books: recognizedBooks,
           bookCount: recognizedBooks.length,
-          recognitionNotes: `Inventory created from ${bookPhotosProcessed} box interior photo${
+          recognitionNotes: `Book List created from ${bookPhotosProcessed} box interior photo${
             bookPhotosProcessed === 1 ? "" : "s"
           }.`,
 
@@ -1733,7 +1733,7 @@ export function AddLibraryForm({
               recognizedBooks.length > 0 ? (
                 <div className="overflow-hidden rounded-none border border-green-200 bg-green-50">
                   <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
-                    Book Box Inventory
+                    Book Book List
                   </p>
                   <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto text-green-950 sm:max-h-52">
                     {recognizedBooks

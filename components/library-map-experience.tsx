@@ -16,7 +16,7 @@ import type { Library } from "@/lib/libraries"
 export function LibraryMapExperience() {
   const existingBoxFocusTimer = useRef<number | null>(null)
 
-  // Used when refreshing an existing book box's inventory
+  // Used when refreshing an existing book box's book list
   const [selectedLibrary, setSelectedLibrary] =
     useState<Library | null>(null)
 
@@ -56,7 +56,7 @@ export function LibraryMapExperience() {
   }
 
   function handleLibraryAdded(library: Library) {
-    // Step 3 already created the first inventory.
+    // Step 3 already created the first book list.
     // Close the form and open the new book box's
     // information card on the map.
     setNewlyAddedLibrary(library)
@@ -107,14 +107,14 @@ export function LibraryMapExperience() {
         />
       </section>
 
-      {/* Update the inventory for an existing book box */}
+      {/* Update the book list for an existing book box */}
       <Dialog
         open={uploadDialogOpen}
         onOpenChange={handleUploadDialogChange}
       >
         <DialogContent className="max-h-[90vh] overflow-y-auto rounded-none max-sm:left-2 max-sm:right-2 max-sm:top-2 max-sm:h-[calc(100dvh-1rem)] max-sm:max-h-[calc(100dvh-1rem)] max-sm:w-auto max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:p-3 sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Update Book Box Inventory</DialogTitle>
+            <DialogTitle>Update Book Box Book List</DialogTitle>
           </DialogHeader>
 
           {selectedLibrary && (
@@ -127,7 +127,7 @@ export function LibraryMapExperience() {
         </DialogContent>
       </Dialog>
 
-      {/* Create a book box and its first inventory */}
+      {/* Create a book box and its first book list */}
       <Dialog
         open={addLibraryDialogOpen}
         onOpenChange={handleAddLibraryDialogChange}
