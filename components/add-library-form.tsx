@@ -60,6 +60,12 @@ type DuplicateCheckStatus = "idle" | "checking" | "clear" | "duplicate";
 
 type WizardExample = "exterior" | "interior";
 
+type AddSuccessSummary = {
+  totalBoxes: number;
+  totalBooks: number;
+};
+
+
 type WizardStepHeaderProps = {
   title: string;
   instruction: string;
@@ -329,6 +335,25 @@ function generateLibraryName(address: string) {
     : "Community Book Box";
 }
 
+function formatOrdinal(value: number) {
+  const lastTwoDigits = value % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+    return `${value}th`;
+  }
+
+  switch (value % 10) {
+    case 1:
+      return `${value}st`;
+    case 2:
+      return `${value}nd`;
+    case 3:
+      return `${value}rd`;
+    default:
+      return `${value}th`;
+  }
+}
+
 function normalizeBookTitle(title: string) {
   return title
     .trim()
@@ -384,6 +409,8 @@ export function AddLibraryForm({
   const [locating, setLocating] = useState(false);
 
   const [message, setMessage] = useState("");
+  const [successSummary, setSuccessSummary] =
+    useState<AddSuccessSummary | null>(null);
   const [error, setError] = useState("");
   const [locationAdjusted, setLocationAdjusted] = useState(false);
 
@@ -950,6 +977,7 @@ export function AddLibraryForm({
 
   async function handleSubmit() {
     setMessage("");
+    setSuccessSummary(null);
     setError("");
     setNearbyLibrary(null);
 
@@ -1102,7 +1130,22 @@ export function AddLibraryForm({
         photoFile,
       };
 
-      onLibraryAdded?.(newlyAddedLibrary);
+      const librariesSnapshot = await getDocs(collection(db, "libraries"));
+      const totalBoxes = librariesSnapshot.size;
+      const totalBooks = librariesSnapshot.docs.reduce((sum, snapshot) => {
+        const data = snapshot.data();
+
+        if (typeof data.bookCount === "number") {
+          return sum + data.bookCount;
+        }
+
+        return sum + (Array.isArray(data.books) ? data.books.length : 0);
+      }, 0);
+
+      setSuccessSummary({
+        totalBoxes,
+        totalBooks,
+      });
 
       setName("");
       setAddress("");
@@ -1133,9 +1176,11 @@ export function AddLibraryForm({
 
       setMapZoom(18);
 
-      setMessage(
-        "Book-sharing location, photo, and book list added successfully.",
-      );
+      setMessage("");
+
+      window.setTimeout(() => {
+        onLibraryAdded?.(newlyAddedLibrary);
+      }, 2800);
     } catch (caughtError) {
       console.error("Could not add book box:", caughtError);
 
@@ -1268,6 +1313,24 @@ export function AddLibraryForm({
         </div>
 
         <div className="mt-3 grid gap-3">
+          {successSummary ? (
+            <div
+              className="rounded-none border-2 border-green-300 bg-green-50 px-4 py-6 text-center text-green-950"
+              role="status"
+            >
+              <p className="text-lg font-bold max-sm:!text-lg">
+                Thank you! 🎉
+              </p>
+              <p className="mt-2 text-base font-semibold leading-relaxed max-sm:!text-base">
+                You added our {formatOrdinal(successSummary.totalBoxes)} book box!
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-green-800 max-sm:!text-sm">
+                We now have {successSummary.totalBooks.toLocaleString()}{" "}
+                {successSummary.totalBooks === 1 ? "book" : "books"} in total.
+              </p>
+            </div>
+          ) : (
+            <>
           <WizardProgress
             currentStep={currentStep}
             completedSteps={[
@@ -1785,6 +1848,8 @@ export function AddLibraryForm({
           </div>
 
           </section>
+            </>
+          )}
 
           {message && (
             <div
