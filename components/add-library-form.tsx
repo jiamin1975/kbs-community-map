@@ -63,6 +63,7 @@ type WizardExample = "exterior" | "interior";
 type AddSuccessSummary = {
   totalBoxes: number;
   totalBooks: number;
+  exteriorPhotoUrl: string | null;
 };
 
 
@@ -411,6 +412,7 @@ export function AddLibraryForm({
   const [message, setMessage] = useState("");
   const [successSummary, setSuccessSummary] =
     useState<AddSuccessSummary | null>(null);
+  const [successLibrary, setSuccessLibrary] = useState<Library | null>(null);
   const [error, setError] = useState("");
   const [locationAdjusted, setLocationAdjusted] = useState(false);
 
@@ -813,7 +815,6 @@ export function AddLibraryForm({
 
     if (!selectedPhoto) {
       setPhoto(null);
-      setPhotoPreviewUrl(null);
       return;
     }
 
@@ -1145,7 +1146,9 @@ export function AddLibraryForm({
       setSuccessSummary({
         totalBoxes,
         totalBooks,
+        exteriorPhotoUrl: photoPreviewUrl,
       });
+      setSuccessLibrary(newlyAddedLibrary);
 
       setName("");
       setAddress("");
@@ -1176,9 +1179,7 @@ export function AddLibraryForm({
 
       setMessage("");
 
-      window.setTimeout(() => {
-        onLibraryAdded?.(newlyAddedLibrary);
-      }, 2800);
+      // Keep the success panel open until the visitor clicks X.
     } catch (caughtError) {
       console.error("Could not add book box:", caughtError);
 
@@ -1313,19 +1314,48 @@ export function AddLibraryForm({
         <div className="mt-3 grid gap-3">
           {successSummary ? (
             <div
-              className="rounded-none border-2 border-green-300 bg-green-50 px-4 py-6 text-center text-green-950"
+              className="relative overflow-hidden rounded-none border-2 border-green-300 bg-green-50 text-green-950"
               role="status"
             >
-              <p className="text-lg font-bold max-sm:!text-lg">
-                Thank you! 🎉
-              </p>
-              <p className="mt-2 text-base font-semibold leading-relaxed max-sm:!text-base">
-                You added our {formatOrdinal(successSummary.totalBoxes)} book box!
-              </p>
-              <p className="mt-1 text-sm leading-relaxed text-green-800 max-sm:!text-sm">
-                We now have {successSummary.totalBooks.toLocaleString()}{" "}
-                {successSummary.totalBooks === 1 ? "book" : "books"} in total.
-              </p>
+              <button
+                type="button"
+                aria-label="Close success message"
+                onClick={() => {
+                  if (successSummary.exteriorPhotoUrl) {
+                    URL.revokeObjectURL(successSummary.exteriorPhotoUrl);
+                  }
+                  const addedLibrary = successLibrary;
+                  setSuccessSummary(null);
+                  setSuccessLibrary(null);
+                  if (addedLibrary) {
+                    onLibraryAdded?.(addedLibrary);
+                  }
+                }}
+                className="absolute right-2 top-2 z-10 flex size-9 items-center justify-center rounded-none bg-black/55 text-xl font-normal leading-none text-white hover:bg-black/70"
+              >
+                ×
+              </button>
+
+              {successSummary.exteriorPhotoUrl && (
+                <img
+                  src={successSummary.exteriorPhotoUrl}
+                  alt="Exterior photo of the book box you added"
+                  className="h-52 w-full bg-white object-contain sm:h-64"
+                />
+              )}
+
+              <div className="px-4 py-5 text-center">
+                <p className="text-lg font-bold max-sm:!text-lg">
+                  Thank you! 🎉
+                </p>
+                <p className="mt-2 text-base font-semibold leading-relaxed max-sm:!text-base">
+                  You added our {formatOrdinal(successSummary.totalBoxes)} book box!
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-green-800 max-sm:!text-sm">
+                  We now have {successSummary.totalBooks.toLocaleString()}{" "}
+                  {successSummary.totalBooks === 1 ? "book" : "books"} in total.
+                </p>
+              </div>
             </div>
           ) : (
             <>
