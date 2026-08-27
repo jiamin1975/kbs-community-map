@@ -1610,7 +1610,7 @@ export function AddLibraryForm({
               >
                 📷{" "}
                 {bookPhotosProcessed > 0 || pendingBookPhotos.length > 0
-                  ? "Add More Interior Photo"
+                  ? "Add More Interior Photos"
                   : "Add Interior Photos"}
               </label>
             </div>
@@ -1733,7 +1733,7 @@ export function AddLibraryForm({
               recognizedBooks.length > 0 ? (
                 <div className="overflow-hidden rounded-none border border-green-200 bg-green-50">
                   <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
-                    Book Book List
+                    Book List
                   </p>
                   <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto text-green-950 sm:max-h-52">
                     {recognizedBooks

@@ -507,7 +507,7 @@ export function BookPhotoTester({
               }`}
             >
               📷 {photosProcessed > 0 || pendingBookPhotos.length > 0
-                ? "Add More Interior Photos"
+                ? "Add More Interior Photoss"
                 : "Add Interior Photos"}
             </label>
           </div>
@@ -537,7 +537,7 @@ export function BookPhotoTester({
                   Saving Book List…
                 </>
               ) : (
-                <span className="whitespace-nowrap max-sm:text-sm">
+                <span className="whitespace-nowrap">
                   Update Book Box with {sessionBooks.length} Book
                   {sessionBooks.length === 1 ? "" : "s"}
                 </span>
