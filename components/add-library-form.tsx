@@ -1503,36 +1503,19 @@ export function AddLibraryForm({
               />
             </label>
 
-            <button
-              type="button"
-              onClick={useManualAddress}
-              disabled={!address.trim() || geocodingAddress || locating || saving}
-              className="kbs-add-primary h-9 w-full rounded-none border border-blue-700 bg-blue-600 px-3 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 sm:hidden"
-            >
-              {geocodingAddress ? "Finding Address…" : "Find Address"}
-            </button>
-
-            <label className="hidden min-w-0 gap-0 sm:grid sm:gap-1">
-              <span className="text-xs font-medium">Neighborhood</span>
-
-              <input
-                value={neighborhood}
-                onChange={(event) => setNeighborhood(event.target.value)}
-                className="kbs-add-input h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
-                placeholder="Town Center"
-              />
-            </label>
-          </div>
-
-          <div className="hidden justify-end sm:flex">
-            <button
-              type="button"
-              onClick={useManualAddress}
-              disabled={!address.trim() || geocodingAddress || locating || saving}
-              className="kbs-add-primary h-9 w-fit rounded-none border border-blue-700 bg-blue-600 px-4 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500"
-            >
-              {geocodingAddress ? "Finding Address…" : "Find Address"}
-            </button>
+            <div className="grid min-w-0 gap-0 sm:gap-1">
+              <span className="hidden text-xs font-medium sm:block">
+                &nbsp;
+              </span>
+              <button
+                type="button"
+                onClick={useManualAddress}
+                disabled={!address.trim() || geocodingAddress || locating || saving}
+                className="kbs-add-primary h-9 w-full rounded-none border border-blue-700 bg-blue-600 px-3 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 max-sm:mt-1 max-sm:!text-sm"
+              >
+                {geocodingAddress ? "Finding Address…" : "Find Address"}
+              </button>
+            </div>
           </div>
 
           {duplicateCheckStatus === "checking" && (
