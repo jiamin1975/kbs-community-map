@@ -24,6 +24,11 @@ export function LibraryMapExperience() {
   const [newlyAddedLibrary, setNewlyAddedLibrary] =
     useState<Library | null>(null)
 
+  // A newly created box waits here while the Thank You screen is visible.
+  // It is focused only after the user closes the Add a New Book Box dialog.
+  const [pendingAddedLibrary, setPendingAddedLibrary] =
+    useState<Library | null>(null)
+
   const [uploadDialogOpen, setUploadDialogOpen] =
     useState(false)
 
@@ -56,11 +61,9 @@ export function LibraryMapExperience() {
   }
 
   function handleLibraryAdded(library: Library) {
-    // Step 3 already created the first book list.
-    // Close the form and open the new book box's
-    // information card on the map.
-    setNewlyAddedLibrary(library)
-    setAddLibraryDialogOpen(false)
+    // The box has been saved, but keep the Add dialog open
+    // so the Thank You screen remains visible.
+    setPendingAddedLibrary(library)
   }
 
   function handleUseExistingLibrary(library: Library) {
@@ -92,6 +95,13 @@ export function LibraryMapExperience() {
     }
 
     setAddLibraryDialogOpen(open)
+
+    if (!open && pendingAddedLibrary) {
+      // After the visitor closes the Thank You dialog,
+      // return to and open the newly added book box on the main map.
+      setNewlyAddedLibrary({ ...pendingAddedLibrary })
+      setPendingAddedLibrary(null)
+    }
   }
 
   return (

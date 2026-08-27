@@ -412,6 +412,7 @@ export function AddLibraryForm({
   const [message, setMessage] = useState("");
   const [successSummary, setSuccessSummary] =
     useState<AddSuccessSummary | null>(null);
+  const [successLibrary, setSuccessLibrary] = useState<Library | null>(null);
   const [error, setError] = useState("");
   const [locationAdjusted, setLocationAdjusted] = useState(false);
 
@@ -1148,6 +1149,7 @@ export function AddLibraryForm({
         exteriorPhotoUrl: photoPreviewUrl,
       });
       onLibraryAdded?.(newlyAddedLibrary);
+      setSuccessLibrary(newlyAddedLibrary);
 
       setName("");
       setAddress("");
