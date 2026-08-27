@@ -1317,30 +1317,11 @@ export function AddLibraryForm({
               className="relative overflow-hidden rounded-none border-2 border-green-300 bg-green-50 text-green-950"
               role="status"
             >
-              <button
-                type="button"
-                aria-label="Close success message"
-                onClick={() => {
-                  if (successSummary.exteriorPhotoUrl) {
-                    URL.revokeObjectURL(successSummary.exteriorPhotoUrl);
-                  }
-                  const addedLibrary = successLibrary;
-                  setSuccessSummary(null);
-                  setSuccessLibrary(null);
-                  if (addedLibrary) {
-                    onLibraryAdded?.(addedLibrary);
-                  }
-                }}
-                className="absolute right-2 top-2 z-10 flex size-9 items-center justify-center rounded-none bg-black/55 text-xl font-normal leading-none text-white hover:bg-black/70"
-              >
-                ×
-              </button>
-
               {successSummary.exteriorPhotoUrl && (
                 <img
                   src={successSummary.exteriorPhotoUrl}
                   alt="Exterior photo of the book box you added"
-                  className="h-52 w-full bg-white object-contain sm:h-64"
+                  className="mt-4 h-52 w-full bg-white object-contain sm:mt-5 sm:h-64"
                 />
               )}
 
