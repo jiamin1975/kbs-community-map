@@ -1156,8 +1156,6 @@ export function AddLibraryForm({
       setCurrentStep(1);
       setPhoto(null);
       setPhotoPreviewUrl(null);
-      setBookPhoto(null);
-      setBookPreviewUrl(null);
       processedBookPhotoUrls.current.forEach((url) =>
         URL.revokeObjectURL(url),
       );
