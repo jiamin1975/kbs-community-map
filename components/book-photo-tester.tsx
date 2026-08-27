@@ -537,19 +537,10 @@ export function BookPhotoTester({
                   Saving Book List…
                 </>
               ) : (
-                <>
-                  <span className="sm:hidden">
-                    <span className="block">Update Book Box</span>
-                    <span className="block">
-                      with {sessionBooks.length} Book
-                      {sessionBooks.length === 1 ? "" : "s"}
-                    </span>
-                  </span>
-                  <span className="hidden sm:inline">
-                    Update Book Box with {sessionBooks.length} Book
-                    {sessionBooks.length === 1 ? "" : "s"}
-                  </span>
-                </>
+                <span className="whitespace-nowrap max-sm:text-sm">
+                  Update Book Box with {sessionBooks.length} Book
+                  {sessionBooks.length === 1 ? "" : "s"}
+                </span>
               )}
             </button>
           )}
