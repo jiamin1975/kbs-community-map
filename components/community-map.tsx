@@ -99,6 +99,12 @@ export function CommunityMap({
     null,
   );
 
+  // Admin location checker. Visible only with ?admin=1 in the URL.
+  const [showAdminCheck, setShowAdminCheck] = useState(false);
+  const [adminCheckEnabled, setAdminCheckEnabled] = useState(false);
+  const [adminCheckPoint, setAdminCheckPoint] = useState<{ lat: number; lng: number } | null>(null);
+  const [adminCheckMatch, setAdminCheckMatch] = useState<NearbyLibraryMatch | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState("");
@@ -222,6 +228,11 @@ export function CommunityMap({
       return firstResult.library.name.localeCompare(secondResult.library.name);
     });
   }, [bookSearchResults, userLocation]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setShowAdminCheck(params.get("admin") === "1");
+  }, []);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 639px)");
@@ -411,6 +422,47 @@ export function CommunityMap({
       cancelled = true;
     };
   }, [selectedLibrary?.id, selectedLibrary?.photoFile]);
+
+  function checkClickedLocation(latitude: number, longitude: number) {
+    setAdminCheckPoint({ lat: latitude, lng: longitude });
+    setSelectedLibrary(null);
+    setNearbyMatch(null);
+
+    const validLibraries = libraries.filter(
+      (library) => Number.isFinite(library.latitude) && Number.isFinite(library.longitude),
+    );
+
+    if (validLibraries.length === 0) {
+      setAdminCheckMatch(null);
+      return;
+    }
+
+    const closestMatch = validLibraries
+      .map((library) => ({
+        library,
+        distanceMeters: calculateDistanceMeters(
+          latitude, longitude, library.latitude, library.longitude,
+        ),
+      }))
+      .sort((a, b) => a.distanceMeters - b.distanceMeters)[0];
+
+    setAdminCheckMatch(closestMatch);
+  }
+
+  function openAdminCheckMatch() {
+    if (!adminCheckMatch) return;
+    const library = adminCheckMatch.library;
+    setSelectedLibrary(library);
+    setAdminCheckEnabled(false);
+    setAdminCheckPoint(null);
+    setAdminCheckMatch(null);
+    setLibraryPhotoUrl(null);
+    setMapCenter({ lat: library.latitude, lng: library.longitude });
+    setMapZoom(18);
+    setMapCameraTarget({
+      lat: library.latitude, lng: library.longitude, zoom: 18, requestId: Date.now(),
+    });
+  }
 
   function findNearbyLibrary() {
     setLocationError("");
@@ -905,6 +957,31 @@ export function CommunityMap({
 
         </div>
 
+        {showAdminCheck && (
+          <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-dashed border-border pt-2">
+            <span className="text-xs font-medium text-muted-foreground">Admin</span>
+            <button
+              type="button"
+              onClick={() => {
+                setAdminCheckEnabled((current) => !current);
+                setAdminCheckPoint(null);
+                setAdminCheckMatch(null);
+                setSelectedLibrary(null);
+              }}
+              className={`rounded-none border px-3 py-1.5 text-xs font-medium ${
+                adminCheckEnabled
+                  ? "border-blue-600 bg-blue-600 text-white"
+                  : "border-border bg-background text-foreground"
+              }`}
+            >
+              {adminCheckEnabled ? "✓ Check Existing Box: ON" : "Check Existing Box"}
+            </button>
+            {adminCheckEnabled && (
+              <span className="text-xs text-muted-foreground">Click the matching location on the map.</span>
+            )}
+          </div>
+        )}
+
         <p className="hidden text-xs text-muted-foreground sm:mt-2 sm:block sm:text-sm">
           Every photo helps someone find a book.
         </p>
@@ -937,6 +1014,12 @@ export function CommunityMap({
             center={mapCenter}
             zoom={mapZoom}
             onCameraChanged={handleCameraChanged}
+            onClick={(event) => {
+              if (!adminCheckEnabled) return;
+              const clickedLocation = event.detail.latLng;
+              if (!clickedLocation) return;
+              checkClickedLocation(clickedLocation.lat, clickedLocation.lng);
+            }}
             mapId="DEMO_MAP_ID"
             gestureHandling="greedy"
             mapTypeControl={false}
@@ -944,6 +1027,12 @@ export function CommunityMap({
             fullscreenControl
           >
             <MapCameraController target={mapCameraTarget} />
+
+            {adminCheckEnabled && adminCheckPoint && (
+              <AdvancedMarker position={adminCheckPoint} title="Location being checked" zIndex={10}>
+                <div className="pointer-events-none flex size-8 items-center justify-center rounded-full border-2 border-white bg-red-600 text-sm font-bold text-white shadow-lg">?</div>
+              </AdvancedMarker>
+            )}
 
             {userLocation && (
               <AdvancedMarker
@@ -974,6 +1063,10 @@ export function CommunityMap({
                   }}
                   title={library.name}
                   onClick={() => {
+                    if (adminCheckEnabled) {
+                      checkClickedLocation(library.latitude, library.longitude);
+                      return;
+                    }
                     setSelectedLibrary(library);
                     setNearbyMatch(null);
                     setLocationError("");
@@ -1286,6 +1379,36 @@ export function CommunityMap({
                 )}
               </div>
             </div>
+          </div>
+        )}
+
+        {showAdminCheck && adminCheckEnabled && adminCheckPoint && (
+          <div className="absolute inset-x-3 bottom-14 z-30 border border-border bg-white p-4 text-black shadow-xl sm:left-1/2 sm:right-auto sm:w-[440px] sm:-translate-x-1/2 dark:bg-slate-900 dark:text-slate-50">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium text-gray-500 dark:text-slate-400">Existing Box Check</p>
+                <p className={`mt-1 text-lg font-semibold ${adminCheckMatch && adminCheckMatch.distanceMeters <= 50 ? "text-green-700 dark:text-green-400" : "text-blue-700 dark:text-blue-400"}`}>
+                  {adminCheckMatch && adminCheckMatch.distanceMeters <= 50 ? "✓ Already Added" : "Not Added Nearby"}
+                </p>
+              </div>
+              <button type="button" aria-label="Close check" onClick={() => { setAdminCheckPoint(null); setAdminCheckMatch(null); }} className="text-2xl leading-none text-gray-500">×</button>
+            </div>
+
+            {adminCheckMatch && adminCheckMatch.distanceMeters <= 50 ? (
+              <>
+                <p className="mt-2 text-sm">A saved book box is about <strong>{Math.round(adminCheckMatch.distanceMeters)} m</strong> from where you clicked.</p>
+                <p className="mt-2 text-sm font-semibold">{adminCheckMatch.library.name}</p>
+                {adminCheckMatch.library.address && <p className="mt-1 text-sm text-gray-600 dark:text-slate-300">{adminCheckMatch.library.address}</p>}
+                <button type="button" onClick={openAdminCheckMatch} className="mt-3 rounded-none border border-blue-700 bg-blue-600 px-3 py-2 text-sm font-medium text-white">View Existing Box</button>
+              </>
+            ) : adminCheckMatch ? (
+              <>
+                <p className="mt-2 text-sm">No saved book box is within <strong>50 m</strong> of this location.</p>
+                <p className="mt-2 text-xs text-gray-500 dark:text-slate-400">Closest saved box: {Math.round(adminCheckMatch.distanceMeters)} m away.</p>
+              </>
+            ) : (
+              <p className="mt-2 text-sm">No saved book boxes were available to compare.</p>
+            )}
           </div>
         )}
 
