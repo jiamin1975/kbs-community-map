@@ -1507,14 +1507,28 @@ export function AddLibraryForm({
               <span className="hidden text-xs font-medium sm:block">
                 &nbsp;
               </span>
+
               <button
                 type="button"
                 onClick={useManualAddress}
                 disabled={!address.trim() || geocodingAddress || locating || saving}
-                className="kbs-add-primary h-9 w-full rounded-none border border-blue-700 bg-blue-600 px-3 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 max-sm:mt-1 max-sm:!text-sm"
+                className="kbs-add-primary hidden h-9 w-full rounded-none border border-blue-700 bg-blue-600 px-3 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 sm:block"
               >
                 {geocodingAddress ? "Finding Address…" : "Find Address"}
               </button>
+
+              {address.trim() && !markerPosition && (
+                <div className="flex justify-end sm:hidden">
+                  <button
+                    type="button"
+                    onClick={useManualAddress}
+                    disabled={geocodingAddress || locating || saving}
+                    className="mt-1 border-0 bg-transparent p-0 text-xs font-normal text-blue-600 underline underline-offset-2 transition hover:text-blue-700 disabled:cursor-not-allowed disabled:text-gray-400 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    {geocodingAddress ? "Finding Address…" : "Find Address"}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
