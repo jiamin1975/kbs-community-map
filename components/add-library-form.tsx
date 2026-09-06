@@ -987,54 +987,67 @@ export function AddLibraryForm({
   }
 
   async function handleBookPhotoChange(event: ChangeEvent<HTMLInputElement>) {
-    const selectedPhoto = event.target.files?.[0] ?? null;
+    const selectedPhotos = Array.from(event.target.files ?? []);
     event.target.value = "";
 
     setBookRecognitionError("");
 
-    if (!selectedPhoto) {
+    if (selectedPhotos.length === 0) {
       return;
     }
 
-    if (!selectedPhoto.type.startsWith("image/")) {
-      setBookRecognitionError("Please choose an image file.");
+    const invalidPhoto = selectedPhotos.find(
+      (selectedPhoto) => !selectedPhoto.type.startsWith("image/"),
+    );
+
+    if (invalidPhoto) {
+      setBookRecognitionError("Please choose image files only.");
       return;
     }
 
-    if (selectedPhoto.size > 20 * 1024 * 1024) {
+    const oversizedPhoto = selectedPhotos.find(
+      (selectedPhoto) => selectedPhoto.size > 20 * 1024 * 1024,
+    );
+
+    if (oversizedPhoto) {
       setBookRecognitionError(
-        "The box interior photo must be smaller than 20 MB.",
+        "Each box interior photo must be smaller than 20 MB.",
       );
       return;
     }
 
     try {
-      const preparedPhoto = await normalizeBookPhoto(selectedPhoto);
+      const preparedPhotos = await Promise.all(
+        selectedPhotos.map(async (selectedPhoto) => {
+          const preparedPhoto = await normalizeBookPhoto(selectedPhoto);
 
-      if (preparedPhoto.size > 10 * 1024 * 1024) {
-        setBookRecognitionError(
-          "The prepared interior photo is still too large. Please choose a smaller photo.",
-        );
-        return;
-      }
+          if (preparedPhoto.size > 10 * 1024 * 1024) {
+            throw new Error(
+              `${selectedPhoto.name} is still too large after preparation. Please choose a smaller photo.`,
+            );
+          }
 
-      const previewUrl = URL.createObjectURL(preparedPhoto);
-      processedBookPhotoUrls.current.push(previewUrl);
+          const previewUrl = URL.createObjectURL(preparedPhoto);
+          processedBookPhotoUrls.current.push(previewUrl);
+
+          return {
+            file: preparedPhoto,
+            name: selectedPhoto.name,
+            url: previewUrl,
+          };
+        }),
+      );
 
       setPendingBookPhotos((currentPhotos) => [
         ...currentPhotos,
-        {
-          file: preparedPhoto,
-          name: selectedPhoto.name,
-          url: previewUrl,
-        },
+        ...preparedPhotos,
       ]);
     } catch (caughtError) {
-      console.error("Could not prepare interior photo:", caughtError);
+      console.error("Could not prepare interior photos:", caughtError);
       setBookRecognitionError(
         caughtError instanceof Error
           ? caughtError.message
-          : "The interior photo could not be prepared.",
+          : "The interior photos could not be prepared.",
       );
     }
   }
@@ -1329,8 +1342,6 @@ export function AddLibraryForm({
       setCurrentStep(1);
       setPhoto(null);
       setPhotoPreviewUrl(null);
-      setBookPhoto(null);
-      setBookPreviewUrl(null);
       processedBookPhotoUrls.current.forEach((url) =>
         URL.revokeObjectURL(url),
       );
@@ -1842,6 +1853,7 @@ export function AddLibraryForm({
               id="book-photo"
               type="file"
               accept="image/*"
+              multiple
               onChange={handleBookPhotoChange}
               disabled={saving || analyzingBooks || !stepTwoComplete}
               className="hidden"
@@ -1859,7 +1871,7 @@ export function AddLibraryForm({
               >
                 📚{" "}
                 {bookPhotosProcessed > 0 || pendingBookPhotos.length > 0
-                  ? "Add More Interior Photo"
+                  ? "Add More Interior Photos"
                   : "Add Interior Photos"}
               </label>
             </div>
