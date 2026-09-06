@@ -6,6 +6,7 @@ import { z } from "zod"
 export const runtime = "nodejs"
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024
+const MAX_RECOGNITION_ATTEMPTS = 2
 
 const ALLOWED_IMAGE_TYPES = new Set([
   "image/jpeg",
@@ -28,6 +29,69 @@ const BookRecognitionSchema = z.object({
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
+
+async function recognizeBooks(imageDataUrl: string) {
+  return openai.responses.parse({
+    model: "gpt-5.6-luna",
+    input: [
+      {
+        role: "system",
+        content:
+          "You identify visible books in photographs. Be conservative and never invent a title.",
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: `
+Analyze this image of a bookshelf or Little Free Library.
+
+Identify every book whose title is sufficiently visible.
+
+Rules:
+- Do not guess a title from color, layout, or vague resemblance alone.
+- Include partially visible books only when enough text is present.
+- Use confidence "high" when the full title is clearly readable.
+- Use confidence "medium" when most of the title is readable.
+- Use confidence "low" when the title is incomplete but still reasonably identifiable.
+- If an author is not visible, return null.
+- In visibleText, record the actual title or spine text you relied on.
+- Ignore magazines, toys, decorations, and other non-book objects.
+- Mention glare, blur, obstruction, or unreadable books in notes.
+            `.trim(),
+          },
+          {
+            type: "input_image",
+            image_url: imageDataUrl,
+            detail: "high",
+          },
+        ],
+      },
+    ],
+    text: {
+      format: zodTextFormat(
+        BookRecognitionSchema,
+        "book_recognition",
+      ),
+    },
+  })
+}
+
+function isRetryableRecognitionError(error: unknown) {
+  if (error instanceof OpenAI.APIError) {
+    return (
+      error.status === 408 ||
+      error.status === 409 ||
+      error.status === 429 ||
+      (typeof error.status === "number" && error.status >= 500)
+    )
+  }
+
+  // This also covers intermittent SDK / structured-output parsing errors,
+  // including messages such as "The string did not match the expected pattern."
+  return error instanceof Error
+}
 
 export async function POST(request: Request) {
   try {
@@ -78,86 +142,63 @@ export async function POST(request: Request) {
 
     const imageBuffer = Buffer.from(await image.arrayBuffer())
     const base64Image = imageBuffer.toString("base64")
-    const imageDataUrl =
-      `data:${image.type};base64,${base64Image}`
+    const imageDataUrl = `data:${image.type};base64,${base64Image}`
 
-    const response = await openai.responses.parse({
-      model: "gpt-5.6-luna",
-      input: [
-        {
-          role: "system",
-          content:
-            "You identify visible books in photographs. Be conservative and never invent a title.",
-        },
-        {
-          role: "user",
-          content: [
-            {
-              type: "input_text",
-              text: `
-Analyze this image of a bookshelf or Little Free Library.
+    let lastError: unknown = null
 
-Identify every book whose title is sufficiently visible.
+    for (let attempt = 1; attempt <= MAX_RECOGNITION_ATTEMPTS; attempt += 1) {
+      try {
+        const response = await recognizeBooks(imageDataUrl)
 
-Rules:
-- Do not guess a title from color, layout, or vague resemblance alone.
-- Include partially visible books only when enough text is present.
-- Use confidence "high" when the full title is clearly readable.
-- Use confidence "medium" when most of the title is readable.
-- Use confidence "low" when the title is incomplete but still reasonably identifiable.
-- If an author is not visible, return null.
-- In visibleText, record the actual title or spine text you relied on.
-- Ignore magazines, toys, decorations, and other non-book objects.
-- Mention glare, blur, obstruction, or unreadable books in notes.
-              `.trim(),
-            },
-            {
-              type: "input_image",
-              image_url: imageDataUrl,
-              detail: "high",
-            },
-          ],
-        },
-      ],
-      text: {
-        format: zodTextFormat(
-          BookRecognitionSchema,
-          "book_recognition",
-        ),
-      },
-    })
+        if (!response.output_parsed) {
+          throw new Error(
+            "The model did not return a usable recognition result.",
+          )
+        }
 
-    if (!response.output_parsed) {
+        return NextResponse.json(response.output_parsed)
+      } catch (error) {
+        lastError = error
+        console.error(
+          `Book recognition attempt ${attempt} failed:`,
+          error,
+        )
+
+        if (
+          attempt === MAX_RECOGNITION_ATTEMPTS ||
+          !isRetryableRecognitionError(error)
+        ) {
+          break
+        }
+      }
+    }
+
+    if (lastError instanceof OpenAI.APIError) {
       return NextResponse.json(
         {
           error:
-            "The model did not return a usable recognition result.",
+            "We couldn't recognize books in this photo. Please try the photo again.",
+          status: lastError.status,
+          code: lastError.code,
         },
-        { status: 502 },
-      )
-    }
-
-    return NextResponse.json(response.output_parsed)
-  } catch (error) {
-    console.error("Book recognition failed:", error)
-
-    if (error instanceof OpenAI.APIError) {
-      return NextResponse.json(
-        {
-          error: error.message,
-          status: error.status,
-          code: error.code,
-        },
-        { status: error.status ?? 500 },
+        { status: lastError.status ?? 502 },
       )
     }
 
     return NextResponse.json(
       {
         error:
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred.",
+          "We couldn't recognize books in this photo. Please try the photo again.",
+      },
+      { status: 502 },
+    )
+  } catch (error) {
+    console.error("Book recognition request failed:", error)
+
+    return NextResponse.json(
+      {
+        error:
+          "We couldn't process this photo. Please try the photo again.",
       },
       { status: 500 },
     )

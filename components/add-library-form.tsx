@@ -60,13 +60,6 @@ type DuplicateCheckStatus = "idle" | "checking" | "clear" | "duplicate";
 
 type WizardExample = "exterior" | "interior";
 
-type AddSuccessSummary = {
-  totalBoxes: number;
-  totalBooks: number;
-  exteriorPhotoUrl: string | null;
-};
-
-
 type WizardStepHeaderProps = {
   title: string;
   instruction: string;
@@ -103,7 +96,7 @@ function WizardStepHeader({
             className="h-full w-full object-contain"
           />
 
-          <div className="pointer-events-none absolute left-1/2 top-3/4 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-none bg-black/50 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:bg-black/65 sm:px-3 sm:py-1.5">
+          <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-none bg-black/50 px-1.5 py-0.5 text-center sm:inset-x-0 sm:bottom-0 sm:top-auto sm:translate-x-0 sm:translate-y-0 sm:bg-black/65 sm:px-3 sm:py-1.5">
             <p className="text-[7px] font-bold uppercase leading-none tracking-normal text-white sm:text-xs sm:leading-tight sm:tracking-wider">
               <span>Example - Take photo like this</span>
             </p>
@@ -336,25 +329,6 @@ function generateLibraryName(address: string) {
     : "Community Book Box";
 }
 
-function formatOrdinal(value: number) {
-  const lastTwoDigits = value % 100;
-
-  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
-    return `${value}th`;
-  }
-
-  switch (value % 10) {
-    case 1:
-      return `${value}st`;
-    case 2:
-      return `${value}nd`;
-    case 3:
-      return `${value}rd`;
-    default:
-      return `${value}th`;
-  }
-}
-
 function normalizeBookTitle(title: string) {
   return title
     .trim()
@@ -408,12 +382,8 @@ export function AddLibraryForm({
 
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
-  const [geocodingAddress, setGeocodingAddress] = useState(false);
 
   const [message, setMessage] = useState("");
-  const [successSummary, setSuccessSummary] =
-    useState<AddSuccessSummary | null>(null);
-  const [successLibrary, setSuccessLibrary] = useState<Library | null>(null);
   const [error, setError] = useState("");
   const [locationAdjusted, setLocationAdjusted] = useState(false);
 
@@ -634,81 +604,6 @@ export function AddLibraryForm({
     }
   }
 
-  async function useManualAddress() {
-    const manualAddress = address.trim();
-
-    if (!manualAddress) {
-      setError("Enter an address first.");
-      return;
-    }
-
-    setMessage("");
-    setError("");
-    setNearbyLibrary(null);
-    setLocationAdjusted(false);
-    setGeocodingAddress(true);
-
-    try {
-      const response = await fetch("/api/geocode", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address: manualAddress,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error ?? "Could not find this address.");
-      }
-
-      const newLatitude = Number(data.latitude ?? data.lat);
-      const newLongitude = Number(data.longitude ?? data.lng);
-
-      if (
-        !Number.isFinite(newLatitude) ||
-        !Number.isFinite(newLongitude)
-      ) {
-        throw new Error("Could not find coordinates for this address.");
-      }
-
-      const resolvedAddress =
-        typeof data.address === "string" && data.address.trim()
-          ? data.address.trim()
-          : manualAddress;
-      const resolvedNeighborhood =
-        typeof data.neighborhood === "string"
-          ? data.neighborhood.trim()
-          : "";
-
-      setLatitude(newLatitude.toFixed(6));
-      setLongitude(newLongitude.toFixed(6));
-      setAddress(resolvedAddress);
-      setNeighborhood(resolvedNeighborhood);
-      setName(generateLibraryName(resolvedAddress));
-      setMapCenter({
-        lat: newLatitude,
-        lng: newLongitude,
-      });
-      setMapZoom(19);
-    } catch (caughtError) {
-      console.error("Could not locate manual address:", caughtError);
-      setLatitude("");
-      setLongitude("");
-      setDuplicateCheckStatus("idle");
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Could not find this address.",
-      );
-    } finally {
-      setGeocodingAddress(false);
-    }
-  }
-
   function useCurrentLocation() {
     setMessage("");
     setError("");
@@ -891,6 +786,7 @@ export function AddLibraryForm({
 
     if (!selectedPhoto) {
       setPhoto(null);
+      setPhotoPreviewUrl(null);
       return;
     }
 
@@ -991,7 +887,7 @@ export function AddLibraryForm({
     setBookRecognitionError("");
 
     try {
-      const results = await Promise.all(
+      const settledResults = await Promise.allSettled(
         pendingBookPhotos.map(async ({ file }) => {
           const formData = new FormData();
           formData.append("image", file);
@@ -1001,42 +897,94 @@ export function AddLibraryForm({
             method: "POST",
             body: formData,
           });
-          const data = await response.json();
+
+          let data: RecognitionResult | { error?: string };
+
+          try {
+            data = await response.json();
+          } catch {
+            throw new Error("The recognition service returned an invalid response.");
+          }
 
           if (!response.ok) {
-            throw new Error(data.error ?? "Book recognition failed.");
+            throw new Error(
+              "error" in data && data.error
+                ? data.error
+                : "Book recognition failed.",
+            );
           }
 
           return data as RecognitionResult;
         }),
       );
 
-      const combinedBooks = results.reduce<RecognizedBook[]>(
+      const successfulPhotos: PendingBookPhoto[] = [];
+      const failedPhotos: PendingBookPhoto[] = [];
+      const successfulResults: RecognitionResult[] = [];
+
+      settledResults.forEach((result, index) => {
+        const photo = pendingBookPhotos[index];
+
+        if (result.status === "fulfilled") {
+          successfulPhotos.push(photo);
+          successfulResults.push(result.value);
+        } else {
+          failedPhotos.push(photo);
+          console.error(
+            `Book recognition failed for ${photo.name}:`,
+            result.reason,
+          );
+        }
+      });
+
+      const combinedBooks = successfulResults.reduce<RecognizedBook[]>(
         (books, result) => mergeBooks(books, result.books),
         [],
       );
 
-      if (combinedBooks.length === 0) {
+      if (successfulPhotos.length > 0) {
+        setProcessedBookPhotos((current) => [
+          ...current,
+          ...successfulPhotos.map(({ name, url }) => ({ name, url })),
+        ]);
+        setBookPhotosProcessed(
+          (count) => count + successfulPhotos.length,
+        );
+      }
+
+      if (combinedBooks.length > 0) {
+        setRecognizedBooks((current) =>
+          mergeBooks(current, combinedBooks),
+        );
+      }
+
+      // Keep only failed photos pending so the user can tap AI recognition
+      // again without having to re-add them.
+      setPendingBookPhotos(failedPhotos);
+
+      if (failedPhotos.length > 0 && successfulPhotos.length > 0) {
+        setBookRecognitionError(
+          `${failedPhotos.length} photo${
+            failedPhotos.length === 1 ? "" : "s"
+          } could not be recognized. The successful photo${
+            successfulPhotos.length === 1 ? "" : "s"
+          } were kept. Tap AI recognition again to retry.`,
+        );
+      } else if (failedPhotos.length > 0) {
+        setBookRecognitionError(
+          `We couldn't recognize ${
+            failedPhotos.length === 1 ? "this photo" : "these photos"
+          }. Tap AI recognition to try again.`,
+        );
+      } else if (combinedBooks.length === 0) {
         setBookRecognitionError(
           "No books were recognized. Try clearer, closer photos.",
         );
-        return;
       }
-
-      setRecognizedBooks((current) =>
-        mergeBooks(current, combinedBooks),
-      );
-      setProcessedBookPhotos((current) => [
-        ...current,
-        ...pendingBookPhotos.map(({ name, url }) => ({ name, url })),
-      ]);
-      setBookPhotosProcessed((count) => count + pendingBookPhotos.length);
-      setPendingBookPhotos([]);
     } catch (caughtError) {
+      console.error("Book recognition failed:", caughtError);
       setBookRecognitionError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Book recognition failed.",
+        "Book recognition could not be completed. Please try again.",
       );
     } finally {
       setAnalyzingBooks(false);
@@ -1054,7 +1002,6 @@ export function AddLibraryForm({
 
   async function handleSubmit() {
     setMessage("");
-    setSuccessSummary(null);
     setError("");
     setNearbyLibrary(null);
 
@@ -1168,7 +1115,7 @@ export function AddLibraryForm({
 
           books: recognizedBooks,
           bookCount: recognizedBooks.length,
-          recognitionNotes: `Book List created from ${bookPhotosProcessed} box interior photo${
+          recognitionNotes: `Inventory created from ${bookPhotosProcessed} box interior photo${
             bookPhotosProcessed === 1 ? "" : "s"
           }.`,
 
@@ -1207,25 +1154,7 @@ export function AddLibraryForm({
         photoFile,
       };
 
-      const librariesSnapshot = await getDocs(collection(db, "libraries"));
-      const totalBoxes = librariesSnapshot.size;
-      const totalBooks = librariesSnapshot.docs.reduce((sum, snapshot) => {
-        const data = snapshot.data();
-
-        if (typeof data.bookCount === "number") {
-          return sum + data.bookCount;
-        }
-
-        return sum + (Array.isArray(data.books) ? data.books.length : 0);
-      }, 0);
-
-      setSuccessSummary({
-        totalBoxes,
-        totalBooks,
-        exteriorPhotoUrl: photoPreviewUrl,
-      });
       onLibraryAdded?.(newlyAddedLibrary);
-      setSuccessLibrary(newlyAddedLibrary);
 
       setName("");
       setAddress("");
@@ -1236,6 +1165,8 @@ export function AddLibraryForm({
       setCurrentStep(1);
       setPhoto(null);
       setPhotoPreviewUrl(null);
+      setBookPhoto(null);
+      setBookPreviewUrl(null);
       processedBookPhotoUrls.current.forEach((url) =>
         URL.revokeObjectURL(url),
       );
@@ -1254,9 +1185,9 @@ export function AddLibraryForm({
 
       setMapZoom(18);
 
-      setMessage("");
-
-      // Keep the success panel open until the visitor clicks X.
+      setMessage(
+        "Book-sharing location, photo, and book list added successfully.",
+      );
     } catch (caughtError) {
       console.error("Could not add book box:", caughtError);
 
@@ -1306,13 +1237,13 @@ export function AddLibraryForm({
 
           .kbs-add-wizard-nav,
           .kbs-add-wizard-row {
-            background-color: #1e293b !important;
+            background-color: #0f172a !important;
             border-color: #334155 !important;
             color: #f8fafc !important;
           }
 
           .kbs-add-wizard-row[aria-current="step"] {
-            background-color: #1e3a5f !important;
+            background-color: #172554 !important;
             color: #eff6ff !important;
           }
 
@@ -1352,14 +1283,14 @@ export function AddLibraryForm({
           }
 
           .kbs-add-primary:not(:disabled):not([aria-disabled="true"]) {
-            background-color: #2563eb !important;
-            border-color: #3b82f6 !important;
+            background-color: #1e3a8a !important;
+            border-color: #3b5998 !important;
             color: #f8fafc !important;
             box-shadow: 0 3px 10px rgba(2, 6, 23, 0.35) !important;
           }
 
           .kbs-add-primary:not(:disabled):not([aria-disabled="true"]):active {
-            background-color: #1d4ed8 !important;
+            background-color: #1e40af !important;
           }
 
           .kbs-recognize-all:not(:disabled) {
@@ -1389,34 +1320,6 @@ export function AddLibraryForm({
         </div>
 
         <div className="mt-3 grid gap-3">
-          {successSummary ? (
-            <div
-              className="relative overflow-hidden rounded-none border-2 border-green-300 bg-green-50 text-green-950"
-              role="status"
-            >
-              {successSummary.exteriorPhotoUrl && (
-                <img
-                  src={successSummary.exteriorPhotoUrl}
-                  alt="Exterior photo of the book box you added"
-                  className="mt-4 h-52 w-full bg-white object-contain sm:mt-5 sm:h-64"
-                />
-              )}
-
-              <div className="px-4 py-5 text-center">
-                <p className="text-lg font-bold max-sm:!text-lg">
-                  Thank you! 🎉
-                </p>
-                <p className="mt-2 text-base font-semibold leading-relaxed max-sm:!text-base">
-                  You added our {formatOrdinal(successSummary.totalBoxes)} book box!
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-green-800 max-sm:!text-sm">
-                  We now have {successSummary.totalBooks.toLocaleString()}{" "}
-                  {successSummary.totalBooks === 1 ? "book" : "books"} in total.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
           <WizardProgress
             currentStep={currentStep}
             completedSteps={[
@@ -1481,55 +1384,22 @@ export function AddLibraryForm({
 
               <input
                 value={address}
-                onChange={(event) => {
-                  setAddress(event.target.value);
-                  setLatitude("");
-                  setLongitude("");
-                  setName("");
-                  setNeighborhood("");
-                  setNearbyLibrary(null);
-                  setDuplicateCheckStatus("idle");
-                  setMessage("");
-                  setError("");
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    void useManualAddress();
-                  }
-                }}
+                onChange={(event) => setAddress(event.target.value)}
                 className="kbs-add-input h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
                 placeholder="123 Main St, Rockville, MD"
               />
             </label>
 
-            <div className="grid min-w-0 gap-0 sm:gap-1">
-              <span className="hidden text-xs font-medium sm:block">
-                &nbsp;
-              </span>
+            <label className="hidden min-w-0 gap-0 sm:grid sm:gap-1">
+              <span className="text-xs font-medium">Neighborhood</span>
 
-              <button
-                type="button"
-                onClick={useManualAddress}
-                disabled={!address.trim() || geocodingAddress || locating || saving}
-                className="kbs-add-primary hidden h-9 w-full rounded-none border border-blue-700 bg-blue-600 px-3 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 sm:block"
-              >
-                {geocodingAddress ? "Finding Address…" : "Find Address"}
-              </button>
-
-              {address.trim() && !markerPosition && (
-                <div className="flex justify-end sm:hidden">
-                  <button
-                    type="button"
-                    onClick={useManualAddress}
-                    disabled={geocodingAddress || locating || saving}
-                    className="mt-1 border-0 bg-transparent p-0 text-xs font-normal text-blue-600 underline underline-offset-2 transition hover:text-blue-700 disabled:cursor-not-allowed disabled:text-gray-400 dark:text-blue-400 dark:hover:text-blue-300"
-                  >
-                    {geocodingAddress ? "Finding Address…" : "Find Address"}
-                  </button>
-                </div>
-              )}
-            </div>
+              <input
+                value={neighborhood}
+                onChange={(event) => setNeighborhood(event.target.value)}
+                className="kbs-add-input h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
+                placeholder="Town Center"
+              />
+            </label>
           </div>
 
           {duplicateCheckStatus === "checking" && (
@@ -1632,7 +1502,7 @@ export function AddLibraryForm({
             <button
               type="button"
               onClick={() => goToStep(2)}
-              disabled={!stepOneComplete || locating || geocodingAddress || saving}
+              disabled={!stepOneComplete || locating || saving}
               className="kbs-add-next kbs-add-primary h-10 w-fit justify-self-end rounded-none border border-blue-700 bg-blue-600 px-6 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 max-sm:order-5 max-sm:!text-sm"
             >
               Next
@@ -1790,9 +1660,9 @@ export function AddLibraryForm({
                     : "cursor-pointer border-blue-700 bg-blue-600 text-white shadow-md hover:bg-blue-700"
                 }`}
               >
-                📷{" "}
+                📚{" "}
                 {bookPhotosProcessed > 0 || pendingBookPhotos.length > 0
-                  ? "Add More Interior Photos"
+                  ? "Add More Interior Photo"
                   : "Add Interior Photos"}
               </label>
             </div>
@@ -1826,7 +1696,7 @@ export function AddLibraryForm({
                   : pendingBookPhotos.length > 0
                     ? (
                         <span className="inline-flex items-center justify-center">
-                          ✨ AI: Recognize Books in {pendingBookPhotos.length}{" "}
+                          AI: Recognize Books in {pendingBookPhotos.length}{" "}
                           Photo{pendingBookPhotos.length === 1 ? "" : "s"}
                         </span>
                       )
@@ -1870,7 +1740,7 @@ export function AddLibraryForm({
                         <p className="mt-1 font-semibold text-amber-700" role="status">
                           {analyzingBooks
                             ? "AI Recognizing Books…"
-                            : "Ready for Recognition"}
+                            : "Ready for AI book recognition"}
                         </p>
                       </div>
                     </div>
@@ -1915,7 +1785,7 @@ export function AddLibraryForm({
               recognizedBooks.length > 0 ? (
                 <div className="overflow-hidden rounded-none border border-green-200 bg-green-50">
                   <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
-                    Book List
+                    Book Box Inventory
                   </p>
                   <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto text-green-950 sm:max-h-52">
                     {recognizedBooks
@@ -1967,8 +1837,6 @@ export function AddLibraryForm({
           </div>
 
           </section>
-            </>
-          )}
 
           {message && (
             <div
