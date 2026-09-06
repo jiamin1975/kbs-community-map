@@ -843,8 +843,76 @@ export function AddLibraryForm({
     }
   }
 
-  function handleBookPhotoChange(event: ChangeEvent<HTMLInputElement>) {
+  async function normalizeBookPhoto(photo: File) {
+    const sourceUrl = URL.createObjectURL(photo);
+
+    try {
+      const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const sourceImage = new Image();
+        sourceImage.onload = () => resolve(sourceImage);
+        sourceImage.onerror = () =>
+          reject(new Error("The interior photo could not be opened."));
+        sourceImage.src = sourceUrl;
+      });
+
+      const maximumDimension = 2400;
+      const scale = Math.min(
+        1,
+        maximumDimension / Math.max(image.naturalWidth, image.naturalHeight),
+      );
+      const width = Math.max(1, Math.round(image.naturalWidth * scale));
+      const height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+
+      const context = canvas.getContext("2d");
+
+      if (!context) {
+        throw new Error("The interior photo could not be prepared.");
+      }
+
+      // Drawing the selected image onto a canvas and exporting it again
+      // produces a clean, predictable JPEG for AI recognition. This avoids
+      // problems caused by some iPhone Photo Library image encodings/metadata.
+      context.drawImage(image, 0, 0, width, height);
+
+      const normalizedBlob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(
+                new Error("The interior photo could not be prepared."),
+              );
+            }
+          },
+          "image/jpeg",
+          0.9,
+        );
+      });
+
+      const baseName =
+        photo.name.replace(/\.[^.]+$/, "") || "book-box-interior";
+
+      return new File(
+        [normalizedBlob],
+        `${baseName}-normalized.jpg`,
+        {
+          type: "image/jpeg",
+          lastModified: Date.now(),
+        },
+      );
+    } finally {
+      URL.revokeObjectURL(sourceUrl);
+    }
+  }
+
+  async function handleBookPhotoChange(event: ChangeEvent<HTMLInputElement>) {
     const selectedPhoto = event.target.files?.[0] ?? null;
+    event.target.value = "";
 
     setBookRecognitionError("");
 
@@ -853,26 +921,46 @@ export function AddLibraryForm({
     }
 
     if (!selectedPhoto.type.startsWith("image/")) {
-      event.target.value = "";
       setBookRecognitionError("Please choose an image file.");
       return;
     }
 
-    if (selectedPhoto.size > 10 * 1024 * 1024) {
-      event.target.value = "";
+    if (selectedPhoto.size > 20 * 1024 * 1024) {
       setBookRecognitionError(
-        "The box interior photo must be smaller than 10 MB.",
+        "The box interior photo must be smaller than 20 MB.",
       );
       return;
     }
 
-    const previewUrl = URL.createObjectURL(selectedPhoto);
-    processedBookPhotoUrls.current.push(previewUrl);
-    setPendingBookPhotos((currentPhotos) => [
-      ...currentPhotos,
-      { file: selectedPhoto, name: selectedPhoto.name, url: previewUrl },
-    ]);
-    event.target.value = "";
+    try {
+      const preparedPhoto = await normalizeBookPhoto(selectedPhoto);
+
+      if (preparedPhoto.size > 10 * 1024 * 1024) {
+        setBookRecognitionError(
+          "The prepared interior photo is still too large. Please choose a smaller photo.",
+        );
+        return;
+      }
+
+      const previewUrl = URL.createObjectURL(preparedPhoto);
+      processedBookPhotoUrls.current.push(previewUrl);
+
+      setPendingBookPhotos((currentPhotos) => [
+        ...currentPhotos,
+        {
+          file: preparedPhoto,
+          name: selectedPhoto.name,
+          url: previewUrl,
+        },
+      ]);
+    } catch (caughtError) {
+      console.error("Could not prepare interior photo:", caughtError);
+      setBookRecognitionError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "The interior photo could not be prepared.",
+      );
+    }
   }
 
   async function analyzeAllBookPhotos() {
