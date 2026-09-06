@@ -382,6 +382,7 @@ export function AddLibraryForm({
 
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [geocodingAddress, setGeocodingAddress] = useState(false);
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -601,6 +602,81 @@ export function AddLibraryForm({
     if (addressUpdated) {
       setLocationAdjusted(true);
       setMessage("");
+    }
+  }
+
+  async function useManualAddress() {
+    const manualAddress = address.trim();
+
+    if (!manualAddress) {
+      setError("Enter an address first.");
+      return;
+    }
+
+    setMessage("");
+    setError("");
+    setNearbyLibrary(null);
+    setLocationAdjusted(false);
+    setGeocodingAddress(true);
+
+    try {
+      const response = await fetch("/api/geocode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: manualAddress,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not find this address.");
+      }
+
+      const newLatitude = Number(data.latitude ?? data.lat);
+      const newLongitude = Number(data.longitude ?? data.lng);
+
+      if (
+        !Number.isFinite(newLatitude) ||
+        !Number.isFinite(newLongitude)
+      ) {
+        throw new Error("Could not find coordinates for this address.");
+      }
+
+      const resolvedAddress =
+        typeof data.address === "string" && data.address.trim()
+          ? data.address.trim()
+          : manualAddress;
+      const resolvedNeighborhood =
+        typeof data.neighborhood === "string"
+          ? data.neighborhood.trim()
+          : "";
+
+      setLatitude(newLatitude.toFixed(6));
+      setLongitude(newLongitude.toFixed(6));
+      setAddress(resolvedAddress);
+      setNeighborhood(resolvedNeighborhood);
+      setName(generateLibraryName(resolvedAddress));
+      setMapCenter({
+        lat: newLatitude,
+        lng: newLongitude,
+      });
+      setMapZoom(19);
+    } catch (caughtError) {
+      console.error("Could not locate manual address:", caughtError);
+      setLatitude("");
+      setLongitude("");
+      setDuplicateCheckStatus("idle");
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Could not find this address.",
+      );
+    } finally {
+      setGeocodingAddress(false);
     }
   }
 
@@ -1472,22 +1548,55 @@ export function AddLibraryForm({
 
               <input
                 value={address}
-                onChange={(event) => setAddress(event.target.value)}
+                onChange={(event) => {
+                  setAddress(event.target.value);
+                  setLatitude("");
+                  setLongitude("");
+                  setName("");
+                  setNeighborhood("");
+                  setNearbyLibrary(null);
+                  setDuplicateCheckStatus("idle");
+                  setMessage("");
+                  setError("");
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void useManualAddress();
+                  }
+                }}
                 className="kbs-add-input h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
                 placeholder="123 Main St, Rockville, MD"
               />
             </label>
 
-            <label className="hidden min-w-0 gap-0 sm:grid sm:gap-1">
-              <span className="text-xs font-medium">Neighborhood</span>
+            <div className="grid min-w-0 gap-0 sm:gap-1">
+              <span className="hidden text-xs font-medium sm:block">
+                &nbsp;
+              </span>
 
-              <input
-                value={neighborhood}
-                onChange={(event) => setNeighborhood(event.target.value)}
-                className="kbs-add-input h-9 min-w-0 rounded-lg border border-border bg-background px-2 text-base sm:px-2.5 sm:text-xs"
-                placeholder="Town Center"
-              />
-            </label>
+              <button
+                type="button"
+                onClick={useManualAddress}
+                disabled={!address.trim() || geocodingAddress || locating || saving}
+                className="kbs-add-primary hidden h-9 w-full rounded-none border border-blue-700 bg-blue-600 px-3 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 sm:block"
+              >
+                {geocodingAddress ? "Finding Address…" : "Find Address"}
+              </button>
+
+              {address.trim() && !markerPosition && (
+                <div className="flex justify-end sm:hidden">
+                  <button
+                    type="button"
+                    onClick={useManualAddress}
+                    disabled={geocodingAddress || locating || saving}
+                    className="mt-1 border-0 bg-transparent p-0 text-xs font-normal text-blue-600 underline underline-offset-2 transition hover:text-blue-700 disabled:cursor-not-allowed disabled:text-gray-400 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    {geocodingAddress ? "Finding Address…" : "Find Address"}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {duplicateCheckStatus === "checking" && (
@@ -1590,7 +1699,7 @@ export function AddLibraryForm({
             <button
               type="button"
               onClick={() => goToStep(2)}
-              disabled={!stepOneComplete || locating || saving}
+              disabled={!stepOneComplete || locating || geocodingAddress || saving}
               className="kbs-add-next kbs-add-primary h-10 w-fit justify-self-end rounded-none border border-blue-700 bg-blue-600 px-6 text-sm font-normal text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 max-sm:order-5 max-sm:!text-sm"
             >
               Next
