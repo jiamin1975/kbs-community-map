@@ -429,6 +429,7 @@ export function AddLibraryForm({
   const [bookPhotosProcessed, setBookPhotosProcessed] = useState(0);
   const [analyzingBooks, setAnalyzingBooks] = useState(false);
   const [bookRecognitionError, setBookRecognitionError] = useState("");
+  const [successfullyAddedLibrary, setSuccessfullyAddedLibrary] = useState<Library | null>(null);
 
   useEffect(() => {
     return () => {
@@ -1332,37 +1333,9 @@ export function AddLibraryForm({
       };
 
       onLibraryAdded?.(newlyAddedLibrary);
-
-      setName("");
-      setAddress("");
-      setNeighborhood("");
-      setLatitude("");
-      setLongitude("");
-      setVerified(false);
-      setCurrentStep(1);
-      setPhoto(null);
-      setPhotoPreviewUrl(null);
-      processedBookPhotoUrls.current.forEach((url) =>
-        URL.revokeObjectURL(url),
-      );
-      processedBookPhotoUrls.current = [];
-      setProcessedBookPhotos([]);
-      setRecognizedBooks([]);
-      setBookPhotosProcessed(0);
-      setBookRecognitionError("");
-      setLocationAdjusted(false);
-      setPendingLibraryId(doc(collection(db, "libraries")).id);
-      setNearbyLibrary(null);
-      setMapCenter({
-        lat: 39.0458,
-        lng: -77.1224,
-      });
-
-      setMapZoom(18);
-
-      setMessage(
-        "Book-sharing location, photo, and book list added successfully.",
-      );
+      setSuccessfullyAddedLibrary(newlyAddedLibrary);
+      setMessage("");
+      setError("");
     } catch (caughtError) {
       console.error("Could not add book box:", caughtError);
 
@@ -1393,6 +1366,28 @@ export function AddLibraryForm({
             {accessMessage}
           </p>
         )}
+      </div>
+    );
+  }
+
+  if (successfullyAddedLibrary) {
+    return (
+      <div className="kbs-add-form rounded-none border border-green-300 bg-green-50 p-5 text-slate-950">
+        <div className="grid gap-3 text-center">
+          <p className="text-2xl font-bold text-green-900">Thank you! 🎉</p>
+          <p className="text-base font-semibold text-green-900">
+            Your book box was added successfully.
+          </p>
+          <p className="text-sm text-green-800">
+            {successfullyAddedLibrary.name}
+          </p>
+          <p className="text-sm text-green-800">
+            {recognizedBooks.length} book{recognizedBooks.length === 1 ? "" : "s"} added to the Book List.
+          </p>
+          <p className="text-xs text-green-700">
+            Close this window to view the new book box on the map.
+          </p>
+        </div>
       </div>
     );
   }
