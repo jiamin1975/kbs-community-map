@@ -365,6 +365,15 @@ function mergeBooks(existing: RecognizedBook[], incoming: RecognizedBook[]) {
   return Array.from(merged.values());
 }
 
+function formatOrdinal(value: number) {
+  const mod100 = value % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${value}th`;
+  if (value % 10 === 1) return `${value}st`;
+  if (value % 10 === 2) return `${value}nd`;
+  if (value % 10 === 3) return `${value}rd`;
+  return `${value}th`;
+}
+
 export function AddLibraryForm({
   onLibraryAdded,
   onUseExistingLibrary,
@@ -430,6 +439,7 @@ export function AddLibraryForm({
   const [analyzingBooks, setAnalyzingBooks] = useState(false);
   const [bookRecognitionError, setBookRecognitionError] = useState("");
   const [successfullyAddedLibrary, setSuccessfullyAddedLibrary] = useState<Library | null>(null);
+  const [successTotals, setSuccessTotals] = useState<{ totalBoxes: number; totalBooks: number } | null>(null);
 
   useEffect(() => {
     return () => {
@@ -1333,6 +1343,22 @@ export function AddLibraryForm({
       };
 
       onLibraryAdded?.(newlyAddedLibrary);
+
+      try {
+        const librariesSnapshot = await getDocs(collection(db, "libraries"));
+        const totalBoxes = librariesSnapshot.size;
+        const totalBooks = librariesSnapshot.docs.reduce((sum, snapshot) => {
+          const data = snapshot.data();
+          return sum + (typeof data.bookCount === "number"
+            ? data.bookCount
+            : Array.isArray(data.books) ? data.books.length : 0);
+        }, 0);
+        setSuccessTotals({ totalBoxes, totalBooks });
+      } catch (totalsError) {
+        console.error("Could not calculate community totals:", totalsError);
+        setSuccessTotals(null);
+      }
+
       setSuccessfullyAddedLibrary(newlyAddedLibrary);
       setMessage("");
       setError("");
@@ -1375,15 +1401,20 @@ export function AddLibraryForm({
       <div className="kbs-add-form rounded-none border border-green-300 bg-green-50 p-5 text-slate-950">
         <div className="grid gap-3 text-center">
           <p className="text-2xl font-bold text-green-900">Thank you! 🎉</p>
-          <p className="text-base font-semibold text-green-900">
-            Your book box was added successfully.
-          </p>
-          <p className="text-sm text-green-800">
-            {successfullyAddedLibrary.name}
-          </p>
-          <p className="text-sm text-green-800">
-            {recognizedBooks.length} book{recognizedBooks.length === 1 ? "" : "s"} added to the Book List.
-          </p>
+          {successTotals ? (
+            <>
+              <p className="text-base font-semibold text-green-900">
+                You added our {formatOrdinal(successTotals.totalBoxes)} book box!
+              </p>
+              <p className="text-base font-semibold text-green-900">
+                We now have {successTotals.totalBooks.toLocaleString()} books in total.
+              </p>
+            </>
+          ) : (
+            <p className="text-base font-semibold text-green-900">
+              Your book box was added successfully.
+            </p>
+          )}
           <p className="text-xs text-green-700">
             Close this window to view the new book box on the map.
           </p>
