@@ -133,22 +133,27 @@ export function BookPhotoTester({
   function handleFileChange(
     event: ChangeEvent<HTMLInputElement>,
   ) {
-    const selectedFile =
-      event.target.files?.[0] ?? null
+    const selectedFiles = Array.from(event.target.files ?? [])
 
     event.target.value = ""
 
     setError("")
     setSaved(false)
 
-    if (selectedFile) {
-      const nextPreviewUrl = URL.createObjectURL(selectedFile)
-      processedBookPhotoUrls.current.push(nextPreviewUrl)
-      setPendingBookPhotos((currentPhotos) => [
-        ...currentPhotos,
-        { file: selectedFile, url: nextPreviewUrl },
-      ])
+    if (selectedFiles.length === 0) {
+      return
     }
+
+    const nextPhotos = selectedFiles.map((file) => {
+      const url = URL.createObjectURL(file)
+      processedBookPhotoUrls.current.push(url)
+      return { file, url }
+    })
+
+    setPendingBookPhotos((currentPhotos) => [
+      ...currentPhotos,
+      ...nextPhotos,
+    ])
   }
 
   async function analyzeAllPhotos() {
@@ -273,12 +278,6 @@ export function BookPhotoTester({
       )
 
       setSaved(true)
-
-      if (onFinished) {
-        window.setTimeout(() => {
-          onFinished()
-        }, 1000)
-      }
     } catch (caughtError) {
       console.error(
         "Could not save book list:",
@@ -491,6 +490,7 @@ export function BookPhotoTester({
             id="update-book-photo"
             type="file"
             accept="image/jpeg,image/png,image/webp"
+            multiple
             onChange={handleFileChange}
             disabled={loading || saving}
             className="hidden"
@@ -507,7 +507,7 @@ export function BookPhotoTester({
               }`}
             >
               📷 {photosProcessed > 0 || pendingBookPhotos.length > 0
-                ? "Add More Interior Photoss"
+                ? "Add More Interior Photos"
                 : "Add Interior Photos"}
             </label>
           </div>
@@ -537,9 +537,14 @@ export function BookPhotoTester({
                   Saving Book List…
                 </>
               ) : (
-                <span className="whitespace-nowrap">
-                  Update Book Box with {sessionBooks.length} Book
-                  {sessionBooks.length === 1 ? "" : "s"}
+                <span className="inline-flex flex-col items-center justify-center gap-0 leading-[1.05]">
+                  <span className="font-bold">
+                    Update &amp; Save
+                  </span>
+                  <span className="mt-0 text-sm font-normal leading-[1.05] opacity-95 max-sm:!text-sm">
+                    Box with {sessionBooks.length}{" "}
+                    book{sessionBooks.length === 1 ? "" : "s"}
+                  </span>
                 </span>
               )}
             </button>
@@ -686,26 +691,73 @@ export function BookPhotoTester({
 </div>
       )}
 
-      {saved && (
+      {saved && library && (
         <div
-          className="kbs-update-success mt-5 rounded-none border border-green-300 bg-green-50 p-4 text-green-900"
+          className="kbs-update-success flex min-h-[58vh] items-center justify-center rounded-none border border-border bg-card px-4 py-10 text-slate-950 sm:min-h-[420px] sm:px-8"
           role="status"
         >
-          <p className="font-semibold">
-            Book list updated successfully
-          </p>
+          <div className="w-full max-w-md overflow-hidden rounded-none border border-green-200 bg-white shadow-sm">
+            <div className="border-b border-green-100 bg-green-50 px-5 py-7 text-center sm:px-8 sm:py-8">
+              <div
+                className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-green-600 text-2xl font-bold text-white shadow-sm"
+                aria-hidden="true"
+              >
+                ✓
+              </div>
 
-          <p className="mt-1 text-sm">
-            {sessionBooks.length} unique{" "}
-            {sessionBooks.length === 1
-              ? "book was"
-              : "books were"}{" "}
-            saved from{" "}
-            {photosProcessed}{" "}
-            {photosProcessed === 1
-              ? "photo"
-              : "photos"}.
-          </p>
+              <p className="text-2xl font-bold tracking-tight text-slate-950">
+                Thank you!
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                This book box has been updated successfully.
+              </p>
+            </div>
+
+            <div className="border-b border-slate-200 px-5 py-4 sm:px-7">
+              <div className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-left">
+                <div className="flex items-start gap-3">
+                  <span
+                    className="mt-0.5 shrink-0 text-base"
+                    aria-hidden="true"
+                  >
+                    📍
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-slate-500">
+                      Location
+                    </p>
+                    <p className="mt-0.5 text-sm font-medium leading-snug text-slate-900">
+                      {library.address || library.name}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span
+                    className="mt-0.5 flex size-5 shrink-0 items-center justify-center text-lg leading-none"
+                    aria-hidden="true"
+                  >
+                    📖
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-slate-500">
+                      Books
+                    </p>
+                    <p className="mt-0.5 text-sm font-medium leading-snug text-slate-900">
+                      {sessionBooks.length}{" "}
+                      book{sessionBooks.length === 1 ? "" : "s"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 px-5 py-4 text-center">
+              <p className="text-xs leading-relaxed text-slate-500">
+                Close this window to return to the map.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
