@@ -128,6 +128,10 @@ export function CommunityMap({
   const [isMobile, setIsMobile] = useState(false);
   const [bookSearchQuery, setBookSearchQuery] = useState("");
   const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
+  const [searchLibraries, setSearchLibraries] = useState<Library[]>([]);
+  const [bookSearchLoading, setBookSearchLoading] = useState(false);
+  const [bookSearchLoaded, setBookSearchLoaded] = useState(false);
+  const bookSearchRequestRef = useRef<Promise<void> | null>(null);
   const [locatingForBookSearch, setLocatingForBookSearch] = useState(false);
   const [bookSearchLocationError, setBookSearchLocationError] = useState("");
   const bookSearchAreaRef = useRef<HTMLDivElement>(null);
@@ -143,7 +147,7 @@ export function CommunityMap({
       return [];
     }
 
-    return libraries
+    return searchLibraries
       .flatMap((library) =>
         library.books.map((book, index) => {
           const title =
@@ -181,7 +185,7 @@ export function CommunityMap({
       .sort((firstResult, secondResult) =>
         firstResult.title.localeCompare(secondResult.title),
       );
-  }, [bookSearchQuery, libraries]);
+  }, [bookSearchQuery, searchLibraries]);
 
   const bookSearchLibraryResults = useMemo(() => {
     const resultsByLibrary = new globalThis.Map<
@@ -226,6 +230,52 @@ export function CommunityMap({
       return firstResult.library.name.localeCompare(secondResult.library.name);
     });
   }, [bookSearchResults, userLocation]);
+
+  async function loadInventoriesForBookSearch() {
+    if (bookSearchLoaded || bookSearchRequestRef.current) {
+      return bookSearchRequestRef.current ?? Promise.resolve();
+    }
+
+    setBookSearchLoading(true);
+
+    const request = (async () => {
+      try {
+        /*
+         * The map remains fast because inventories are not downloaded at startup.
+         * We only load them when someone actually uses book search.
+         *
+         * getLibraryWithBooks() also keeps older boxes compatible by falling
+         * back to the legacy books field when no inventory/current document exists.
+         */
+        const loadedLibraries = await Promise.all(
+          libraries.map((library) => getLibraryWithBooks(library)),
+        );
+
+        setSearchLibraries(loadedLibraries);
+        setBookSearchLoaded(true);
+      } catch (caughtError) {
+        console.error("Could not load inventories for book search:", caughtError);
+      } finally {
+        setBookSearchLoading(false);
+        bookSearchRequestRef.current = null;
+      }
+    })();
+
+    bookSearchRequestRef.current = request;
+    return request;
+  }
+
+  useEffect(() => {
+    if (!bookSearchQuery.trim() || bookSearchLoaded || libraries.length === 0) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      void loadInventoriesForBookSearch();
+    }, 250);
+
+    return () => window.clearTimeout(timer);
+  }, [bookSearchQuery, bookSearchLoaded, libraries]);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 639px)");
@@ -277,6 +327,19 @@ export function CommunityMap({
 
     return unsubscribe;
   }, []);
+
+  const librarySearchVersion = useMemo(
+    () =>
+      libraries
+        .map((library) => `${library.id}:${library.bookCount}:${library.lastUpdated}`)
+        .join("|"),
+    [libraries],
+  );
+
+  useEffect(() => {
+    setBookSearchLoaded(false);
+    setSearchLibraries([]);
+  }, [librarySearchVersion]);
 
   /*
    * Email notifications link to /?box=<Firestore document ID>.
@@ -822,6 +885,7 @@ export function CommunityMap({
                 onFocus={() => {
                   if (bookSearchQuery.trim()) {
                     setIsBookSearchOpen(true);
+                    void loadInventoriesForBookSearch();
                   }
                 }}
                 onChange={(event) => {
@@ -841,7 +905,11 @@ export function CommunityMap({
 
             {bookSearchQuery.trim() && isBookSearchOpen && (
               <div className="mt-2 max-h-72 overflow-y-auto rounded-xl border border-border bg-background p-2 shadow-sm sm:absolute sm:left-0 sm:right-0 sm:z-20">
-                {bookSearchResults.length === 0 ? (
+                {bookSearchLoading || !bookSearchLoaded ? (
+                  <p className="px-3 py-4 text-base text-muted-foreground">
+                    Searching book lists…
+                  </p>
+                ) : bookSearchResults.length === 0 ? (
                   <p className="px-3 py-4 text-base text-muted-foreground">
                     No matching books found.
                   </p>
