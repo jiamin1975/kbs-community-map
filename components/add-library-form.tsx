@@ -1419,10 +1419,44 @@ export function AddLibraryForm({
             </p>
           </div>
 
+          <div className="border-b border-slate-200 px-5 py-4 sm:px-7">
+            <div className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-left">
+              <div className="flex items-start gap-3">
+                <MapPin
+                  className="mt-0.5 size-5 shrink-0 fill-blue-600 text-blue-600"
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                />
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-500">Location</p>
+                  <p className="mt-0.5 text-sm font-medium leading-snug text-slate-900">
+                    {successfullyAddedLibrary.address}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <span
+                  className="mt-0.5 flex size-5 shrink-0 items-center justify-center text-lg leading-none"
+                  aria-hidden="true"
+                >
+                  📖
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-slate-500">Books</p>
+                  <p className="mt-0.5 text-sm font-medium leading-snug text-slate-900">
+                    {successfullyAddedLibrary.bookCount}{" "}
+                    book{successfullyAddedLibrary.bookCount === 1 ? "" : "s"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {successTotals ? (
             <div className="grid grid-cols-2 divide-x divide-slate-200 border-b border-slate-200">
-              <div className="px-3 py-5 text-center">
-                <p className="text-2xl font-bold text-green-700">
+              <div className="px-3 py-4 text-center">
+                <p className="text-xl font-bold text-green-700">
                   {formatOrdinal(successTotals.totalBoxes)}
                 </p>
                 <p className="mt-1 text-xs font-medium leading-snug text-slate-600">
@@ -1430,8 +1464,8 @@ export function AddLibraryForm({
                 </p>
               </div>
 
-              <div className="px-3 py-5 text-center">
-                <p className="text-2xl font-bold text-green-700">
+              <div className="px-3 py-4 text-center">
+                <p className="text-xl font-bold text-green-700">
                   {successTotals.totalBooks.toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs font-medium leading-snug text-slate-600">
@@ -1439,13 +1473,7 @@ export function AddLibraryForm({
                 </p>
               </div>
             </div>
-          ) : (
-            <div className="border-b border-slate-200 px-5 py-5 text-center">
-              <p className="text-sm font-semibold text-green-700">
-                Book box added successfully.
-              </p>
-            </div>
-          )}
+          ) : null}
 
           <div className="bg-slate-50 px-5 py-4 text-center">
             <p className="text-xs leading-relaxed text-slate-500">
