@@ -431,7 +431,7 @@ export function BookPhotoTester({
         }
       `}</style>
 
-      {library ? (
+      {library && !saved ? (
         <div className="kbs-update-location mt-3 rounded-none border border-border bg-secondary px-4 py-3">
           <div className="mb-3 border-b border-border pb-3">
             <p className="min-w-0 truncate text-xs text-muted-foreground">
@@ -453,13 +453,13 @@ export function BookPhotoTester({
             </div>
           </div>
         </div>
-      ) : (
+      ) : !library ? (
         <div className="rounded-none border border-dashed border-border p-4">
           <p className="text-sm text-muted-foreground">
             Select a library before updating book list.
           </p>
         </div>
-      )}
+      ) : null}
 
       {!saved && (
         <div className="kbs-update-workspace mt-3 grid min-w-0 gap-3 overflow-hidden rounded-none border border-border bg-card p-3">
@@ -537,11 +537,11 @@ export function BookPhotoTester({
                   Saving Book List…
                 </>
               ) : (
-                <span className="inline-flex flex-col items-center justify-center gap-0 leading-[1.05]">
+                <span className="inline-flex flex-col items-center justify-center gap-1 leading-tight">
                   <span className="font-bold">
                     Update &amp; Save
                   </span>
-                  <span className="mt-0 text-sm font-normal leading-[1.05] opacity-95 max-sm:!text-sm">
+                  <span className="text-sm font-normal leading-tight opacity-95 max-sm:!text-sm">
                     Box with {sessionBooks.length}{" "}
                     book{sessionBooks.length === 1 ? "" : "s"}
                   </span>
