@@ -12,7 +12,10 @@ import {
 } from "@vis.gl/react-google-maps";
 import { getDownloadURL, ref } from "firebase/storage";
 
-import { subscribeToLibraries } from "@/lib/firestore-libraries";
+import {
+  getLibraryWithBooks,
+  subscribeToLibraries,
+} from "@/lib/firestore-libraries";
 import { storage } from "@/lib/firebase";
 import type { Library } from "@/lib/libraries";
 
@@ -121,6 +124,7 @@ export function CommunityMap({
   const [libraryPhotoUrl, setLibraryPhotoUrl] = useState<string | null>(null);
 
   const [photoLoading, setPhotoLoading] = useState(false);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [bookSearchQuery, setBookSearchQuery] = useState("");
   const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
@@ -301,7 +305,7 @@ export function CommunityMap({
       return;
     }
 
-    setSelectedLibrary(linkedLibrary);
+    void selectLibraryWithInventory(linkedLibrary);
     setNearbyMatch(null);
     setLocationError("");
     setLibraryPhotoUrl(null);
@@ -335,7 +339,15 @@ export function CommunityMap({
     );
 
     if (updatedLibrary) {
-      setSelectedLibrary(updatedLibrary);
+      setSelectedLibrary((current) =>
+        current && current.id === updatedLibrary.id && current.books.length > 0
+          ? {
+              ...updatedLibrary,
+              books: current.books,
+              bookCount: updatedLibrary.bookCount,
+            }
+          : updatedLibrary,
+      );
     }
   }, [libraries, selectedLibrary?.id]);
 
@@ -350,7 +362,7 @@ export function CommunityMap({
       return;
     }
 
-    setSelectedLibrary(focusedLibrary);
+    void selectLibraryWithInventory(focusedLibrary);
     setNearbyMatch(null);
     setLocationError("");
     setLibraryPhotoUrl(null);
@@ -411,6 +423,23 @@ export function CommunityMap({
       cancelled = true;
     };
   }, [selectedLibrary?.id, selectedLibrary?.photoFile]);
+
+  async function selectLibraryWithInventory(library: Library) {
+    setSelectedLibrary(library);
+    setNearbyMatch(null);
+    setLocationError("");
+    setLibraryPhotoUrl(null);
+    setInventoryLoading(true);
+
+    try {
+      const fullLibrary = await getLibraryWithBooks(library);
+      setSelectedLibrary(fullLibrary);
+    } catch (caughtError) {
+      console.error("Could not load book list:", caughtError);
+    } finally {
+      setInventoryLoading(false);
+    }
+  }
 
   function findNearbyLibrary() {
     setLocationError("");
@@ -570,8 +599,7 @@ export function CommunityMap({
       zoom: 18,
       requestId: Date.now(),
     });
-    setSelectedLibrary(nearbyLibrary);
-    setLibraryPhotoUrl(null);
+    void selectLibraryWithInventory(nearbyLibrary);
     setNearbyMatch(null);
   }
 
@@ -583,10 +611,7 @@ export function CommunityMap({
 
   function openLibraryFromSearch(library: Library) {
     setIsBookSearchOpen(false);
-    setSelectedLibrary(library);
-    setNearbyMatch(null);
-    setLocationError("");
-    setLibraryPhotoUrl(null);
+    void selectLibraryWithInventory(library);
 
     setMapCenter({
       lat: library.latitude,
@@ -974,9 +999,7 @@ export function CommunityMap({
                   }}
                   title={library.name}
                   onClick={() => {
-                    setSelectedLibrary(library);
-                    setNearbyMatch(null);
-                    setLocationError("");
+                    void selectLibraryWithInventory(library);
 
                     setMapCenter({
                       lat: library.latitude,
@@ -1064,7 +1087,11 @@ export function CommunityMap({
                       Book List
                     </p>
 
-                    {selectedLibrary.books.length === 0 ? (
+                    {inventoryLoading ? (
+                      <p className="px-3 py-4 text-xs text-green-800">
+                        Loading book list…
+                      </p>
+                    ) : selectedLibrary.books.length === 0 ? (
                       <p className="px-3 py-4 text-xs text-green-800">
                         No books have been inventoried yet.
                       </p>
@@ -1214,7 +1241,11 @@ export function CommunityMap({
                   Book List
                 </p>
 
-                {selectedLibrary.books.length === 0 ? (
+                {inventoryLoading ? (
+                  <p className="kbs-box-book list-empty px-3 py-4 text-sm text-green-800">
+                    Loading book list…
+                  </p>
+                ) : selectedLibrary.books.length === 0 ? (
                   <p className="kbs-box-book list-empty px-3 py-4 text-sm text-green-800">
                     No books have been inventoried yet.
                   </p>

@@ -1304,11 +1304,7 @@ export function AddLibraryForm({
           latitude: latitudeNumber,
           longitude: longitudeNumber,
 
-          books: recognizedBooks,
           bookCount: recognizedBooks.length,
-          recognitionNotes: `Inventory created from ${bookPhotosProcessed} box interior photo${
-            bookPhotosProcessed === 1 ? "" : "s"
-          }.`,
 
           verified,
           photoFile,
@@ -1320,6 +1316,18 @@ export function AddLibraryForm({
           lastUpdated: serverTimestamp(),
           createdAt: serverTimestamp(),
         });
+
+        await setDoc(
+          doc(db, "libraries", newLibraryReference.id, "inventory", "current"),
+          {
+            books: recognizedBooks,
+            bookCount: recognizedBooks.length,
+            recognitionNotes: `Inventory created from ${bookPhotosProcessed} box interior photo${
+              bookPhotosProcessed === 1 ? "" : "s"
+            }.`,
+            lastUpdated: serverTimestamp(),
+          },
+        );
       } catch (firestoreError) {
         await deleteObject(photoReference).catch((cleanupError) => {
           console.error(

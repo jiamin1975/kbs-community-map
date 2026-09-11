@@ -10,8 +10,10 @@ import {
   LoaderCircle,
 } from "lucide-react"
 import {
+  deleteField,
   doc,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from "firebase/firestore"
 
@@ -260,20 +262,33 @@ export function BookPhotoTester({
           visibleText: book.visibleText,
         }))
 
-      await updateDoc(
-        libraryReference,
+      await setDoc(
+        doc(db, "libraries", library.id, "inventory", "current"),
         {
           books: booksToSave,
           bookCount: booksToSave.length,
-          lastUpdated:
-            serverTimestamp(),
           recognitionNotes:
             `Book List created from ${photosProcessed} photo${
               photosProcessed === 1
                 ? ""
                 : "s"
             }.`,
+          lastUpdated: serverTimestamp(),
+        },
+        { merge: true },
+      )
+
+      await updateDoc(
+        libraryReference,
+        {
+          bookCount: booksToSave.length,
+          lastUpdated: serverTimestamp(),
           updatedBy: updatedBy.trim() || null,
+
+          // If this is an older box, remove the large legacy fields from
+          // the parent document after the new inventory has been saved.
+          books: deleteField(),
+          recognitionNotes: deleteField(),
         },
       )
 
