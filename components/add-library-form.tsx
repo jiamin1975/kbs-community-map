@@ -502,10 +502,13 @@ export function AddLibraryForm({
   const stepOneReady = Boolean(markerPosition && name.trim() && address.trim());
   const stepOneComplete = stepOneReady && duplicateCheckStatus === "clear";
   const stepTwoComplete = stepOneComplete && photo !== null;
-  const stepThreeComplete =
+  const stepThreeReadyToSave =
     stepTwoComplete &&
     recognizedBooks.length > 0 &&
     pendingBookPhotos.length === 0;
+
+  // Step 3 is only complete after the book box has actually been saved.
+  const stepThreeComplete = successfullyAddedLibrary !== null;
 
   const stepOneHeadingRef = useRef<HTMLHeadingElement>(null);
   const stepTwoHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -1913,7 +1916,7 @@ export function AddLibraryForm({
                     : saving ||
                       locating ||
                       analyzingBooks ||
-                      !stepThreeComplete
+                      !stepThreeReadyToSave
                 }
                 className={`h-12 w-full whitespace-nowrap rounded-none border px-3 py-1.5 text-sm font-bold leading-tight text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-50 max-sm:!text-base sm:h-12 ${
                   pendingBookPhotos.length > 0
@@ -1941,7 +1944,7 @@ export function AddLibraryForm({
                         ? "Adding Location…"
                         : (
                             <span className="whitespace-nowrap">
-                              Add This Book Box with {recognizedBooks.length}{" "}
+                              Save This Book Box with {recognizedBooks.length}{" "}
                               Book
                               {recognizedBooks.length === 1 ? "" : "s"}
                             </span>
