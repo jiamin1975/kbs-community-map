@@ -407,7 +407,10 @@ export function CommunityMap({
           ? {
               ...updatedLibrary,
               books: current.books,
-              bookCount: updatedLibrary.bookCount,
+              bookCount:
+                typeof updatedLibrary.bookCount === "number"
+                  ? updatedLibrary.bookCount
+                  : current.books.length,
             }
           : updatedLibrary,
       );
@@ -425,7 +428,13 @@ export function CommunityMap({
       return;
     }
 
-    void selectLibraryWithInventory(focusedLibrary);
+    /*
+     * A newly-added box already contains its recognized books in
+     * focusedLibrary, so show them immediately instead of downloading
+     * inventory/current again from Firestore.
+     */
+    setSelectedLibrary(focusedLibrary);
+    setInventoryLoading(false);
     setNearbyMatch(null);
     setLocationError("");
     setLibraryPhotoUrl(null);
