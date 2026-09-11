@@ -1317,17 +1317,38 @@ export function AddLibraryForm({
           createdAt: serverTimestamp(),
         });
 
-        await setDoc(
-          doc(db, "libraries", newLibraryReference.id, "inventory", "current"),
-          {
-            books: recognizedBooks,
-            bookCount: recognizedBooks.length,
-            recognitionNotes: `Inventory created from ${bookPhotosProcessed} box interior photo${
-              bookPhotosProcessed === 1 ? "" : "s"
-            }.`,
-            lastUpdated: serverTimestamp(),
-          },
-        );
+        try {
+          await setDoc(
+            doc(db, "libraries", newLibraryReference.id, "inventory", "current"),
+            {
+              books: recognizedBooks,
+              bookCount: recognizedBooks.length,
+              recognitionNotes: `Inventory created from ${bookPhotosProcessed} box interior photo${
+                bookPhotosProcessed === 1 ? "" : "s"
+              }.`,
+              lastUpdated: serverTimestamp(),
+            },
+          );
+        } catch (inventoryError) {
+          console.error(
+            "Could not save the separate inventory document. Falling back to the legacy library document:",
+            inventoryError,
+          );
+
+          // Backward-compatible fallback. This keeps Finish & Save working
+          // if the current Firestore security rules do not yet allow writes
+          // to libraries/{libraryId}/inventory/current.
+          await setDoc(
+            newLibraryReference,
+            {
+              books: recognizedBooks,
+              recognitionNotes: `Inventory created from ${bookPhotosProcessed} box interior photo${
+                bookPhotosProcessed === 1 ? "" : "s"
+              }.`,
+            },
+            { merge: true },
+          );
+        }
       } catch (firestoreError) {
         await deleteObject(photoReference).catch((cleanupError) => {
           console.error(
