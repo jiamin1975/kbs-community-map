@@ -1974,10 +1974,14 @@ export function AddLibraryForm({
                       : saving
                         ? "Adding Location…"
                         : (
-                            <span className="whitespace-nowrap">
-                              Save This Book Box with {recognizedBooks.length}{" "}
-                              Book
-                              {recognizedBooks.length === 1 ? "" : "s"}
+                            <span className="inline-flex flex-col items-center justify-center leading-tight">
+                              <span className="font-bold">
+                                ✓ Finish &amp; Save Book Box
+                              </span>
+                              <span className="mt-0.5 text-xs font-normal opacity-90 max-sm:!text-xs">
+                                {recognizedBooks.length}{" "}
+                                book{recognizedBooks.length === 1 ? "" : "s"} will be added
+                              </span>
                             </span>
                           )}
               </button>
