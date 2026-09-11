@@ -1401,26 +1401,57 @@ export function AddLibraryForm({
 
   if (successfullyAddedLibrary) {
     return (
-      <div className="kbs-add-form rounded-none border border-green-300 bg-green-50 p-5 text-slate-950">
-        <div className="grid gap-3 text-center">
-          <p className="text-2xl font-bold text-green-900">Thank you! 🎉</p>
-          {successTotals ? (
-            <>
-              <p className="text-base font-semibold text-green-900">
-                You added our {formatOrdinal(successTotals.totalBoxes)} book box!
-              </p>
-              <p className="text-base font-semibold text-green-900">
-                We now have {successTotals.totalBooks.toLocaleString()} books in total.
-              </p>
-            </>
-          ) : (
-            <p className="text-base font-semibold text-green-900">
-              Your book box was added successfully.
+      <div className="kbs-add-form flex min-h-[58vh] items-center justify-center rounded-none border border-border bg-card px-4 py-10 text-slate-950 sm:min-h-[420px] sm:px-8">
+        <div className="w-full max-w-md overflow-hidden rounded-none border border-green-200 bg-white shadow-sm">
+          <div className="border-b border-green-100 bg-green-50 px-5 py-7 text-center sm:px-8 sm:py-8">
+            <div
+              className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-green-600 text-white shadow-sm"
+              aria-hidden="true"
+            >
+              <Check className="size-7" strokeWidth={3} />
+            </div>
+
+            <p className="text-2xl font-bold tracking-tight text-slate-950">
+              Thank you!
             </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+              Your book box has been added successfully.
+            </p>
+          </div>
+
+          {successTotals ? (
+            <div className="grid grid-cols-2 divide-x divide-slate-200 border-b border-slate-200">
+              <div className="px-3 py-5 text-center">
+                <p className="text-2xl font-bold text-green-700">
+                  {formatOrdinal(successTotals.totalBoxes)}
+                </p>
+                <p className="mt-1 text-xs font-medium leading-snug text-slate-600">
+                  Book Box Added
+                </p>
+              </div>
+
+              <div className="px-3 py-5 text-center">
+                <p className="text-2xl font-bold text-green-700">
+                  {successTotals.totalBooks.toLocaleString()}
+                </p>
+                <p className="mt-1 text-xs font-medium leading-snug text-slate-600">
+                  Books in Our System
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="border-b border-slate-200 px-5 py-5 text-center">
+              <p className="text-sm font-semibold text-green-700">
+                Book box added successfully.
+              </p>
+            </div>
           )}
-          <p className="text-xs text-green-700">
-            Close this window to view the new book box on the map.
-          </p>
+
+          <div className="bg-slate-50 px-5 py-4 text-center">
+            <p className="text-xs leading-relaxed text-slate-500">
+              Close this window to view your new book box on the map.
+            </p>
+          </div>
         </div>
       </div>
     );
