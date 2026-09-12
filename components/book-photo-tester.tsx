@@ -100,6 +100,37 @@ function mergeBooks(
   return Array.from(merged.values())
 }
 
+
+function getBookSearchWords(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase()
+    .match(/[\p{L}\p{N}]+/gu) ?? [];
+}
+
+function buildBookSearchTokens(books: any[]) {
+  return [
+    ...new Set(
+      books.flatMap((book) => {
+        const title =
+          typeof book === "string"
+            ? book
+            : typeof book?.title === "string"
+              ? book.title
+              : "";
+        const author =
+          typeof book === "object" &&
+          book !== null &&
+          typeof book.author === "string"
+            ? book.author
+            : "";
+        return getBookSearchWords(`${title} ${author}`);
+      }),
+    ),
+  ];
+}
+
 export function BookPhotoTester({
   library,
   onFinished,
@@ -277,6 +308,17 @@ export function BookPhotoTester({
         },
         { merge: true },
       )
+
+      await setDoc(
+        doc(db, "bookSearch", library.id),
+        {
+          libraryId: library.id,
+          books: booksToSave,
+          searchTokens: buildBookSearchTokens(booksToSave),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       await updateDoc(
         libraryReference,

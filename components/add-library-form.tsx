@@ -374,6 +374,37 @@ function formatOrdinal(value: number) {
   return `${value}th`;
 }
 
+
+function getBookSearchWords(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase()
+    .match(/[\p{L}\p{N}]+/gu) ?? [];
+}
+
+function buildBookSearchTokens(books: any[]) {
+  return [
+    ...new Set(
+      books.flatMap((book) => {
+        const title =
+          typeof book === "string"
+            ? book
+            : typeof book?.title === "string"
+              ? book.title
+              : "";
+        const author =
+          typeof book === "object" &&
+          book !== null &&
+          typeof book.author === "string"
+            ? book.author
+            : "";
+        return getBookSearchWords(`${title} ${author}`);
+      }),
+    ),
+  ];
+}
+
 export function AddLibraryForm({
   onLibraryAdded,
   onUseExistingLibrary,
@@ -1328,6 +1359,13 @@ export function AddLibraryForm({
             lastUpdated: serverTimestamp(),
           },
         );
+
+        await setDoc(doc(db, "bookSearch", newLibraryReference.id), {
+          libraryId: newLibraryReference.id,
+          books: recognizedBooks,
+          searchTokens: buildBookSearchTokens(recognizedBooks),
+          updatedAt: serverTimestamp(),
+        });
       } catch (firestoreError) {
         await deleteObject(photoReference).catch((cleanupError) => {
           console.error(

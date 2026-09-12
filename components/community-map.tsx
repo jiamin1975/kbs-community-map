@@ -10,13 +10,14 @@ import {
   type MapCameraChangedEvent,
   useMap,
 } from "@vis.gl/react-google-maps";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
 
 import {
   getLibraryWithBooks,
   subscribeToLibraries,
 } from "@/lib/firestore-libraries";
-import { storage } from "@/lib/firebase";
+import { db, storage } from "@/lib/firebase";
 import type { Library } from "@/lib/libraries";
 
 type CommunityMapProps = {
@@ -128,10 +129,15 @@ export function CommunityMap({
   const [isMobile, setIsMobile] = useState(false);
   const [bookSearchQuery, setBookSearchQuery] = useState("");
   const [isBookSearchOpen, setIsBookSearchOpen] = useState(false);
-  const [searchLibraries, setSearchLibraries] = useState<Library[]>([]);
+  const [bookSearchResults, setBookSearchResults] = useState<
+    Array<{
+      library: Library;
+      title: string;
+      author: string | null;
+      key: string;
+    }>
+  >([]);
   const [bookSearchLoading, setBookSearchLoading] = useState(false);
-  const [bookSearchLoaded, setBookSearchLoaded] = useState(false);
-  const bookSearchRequestRef = useRef<Promise<void> | null>(null);
   const [locatingForBookSearch, setLocatingForBookSearch] = useState(false);
   const [bookSearchLocationError, setBookSearchLocationError] = useState("");
   const bookSearchAreaRef = useRef<HTMLDivElement>(null);
@@ -139,53 +145,6 @@ export function CommunityMap({
   const handledEmailLinkRef = useRef(false);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
-  const bookSearchResults = useMemo(() => {
-    const queryWords = getSearchWords(bookSearchQuery);
-
-    if (queryWords.length === 0) {
-      return [];
-    }
-
-    return searchLibraries
-      .flatMap((library) =>
-        library.books.map((book, index) => {
-          const title =
-            typeof book === "string"
-              ? book
-              : typeof book === "object" &&
-                  book !== null &&
-                  "title" in book
-                ? String(book.title)
-                : "Untitled book";
-
-          const author =
-            typeof book === "object" &&
-            book !== null &&
-            "author" in book &&
-            book.author
-              ? String(book.author)
-              : null;
-
-          return {
-            library,
-            title,
-            author,
-            key: `${library.id}-${title}-${index}`,
-          };
-        }),
-      )
-      .filter(({ title, author }) => {
-        const searchableWords = new Set(
-          getSearchWords(`${title} ${author ?? ""}`),
-        );
-
-        return queryWords.every((queryWord) => searchableWords.has(queryWord));
-      })
-      .sort((firstResult, secondResult) =>
-        firstResult.title.localeCompare(secondResult.title),
-      );
-  }, [bookSearchQuery, searchLibraries]);
 
   const bookSearchLibraryResults = useMemo(() => {
     const resultsByLibrary = new globalThis.Map<
@@ -231,51 +190,99 @@ export function CommunityMap({
     });
   }, [bookSearchResults, userLocation]);
 
-  async function loadInventoriesForBookSearch() {
-    if (bookSearchLoaded || bookSearchRequestRef.current) {
-      return bookSearchRequestRef.current ?? Promise.resolve();
-    }
-
-    setBookSearchLoading(true);
-
-    const request = (async () => {
-      try {
-        /*
-         * The map remains fast because inventories are not downloaded at startup.
-         * We only load them when someone actually uses book search.
-         *
-         * getLibraryWithBooks() also keeps older boxes compatible by falling
-         * back to the legacy books field when no inventory/current document exists.
-         */
-        const loadedLibraries = await Promise.all(
-          libraries.map((library) => getLibraryWithBooks(library)),
-        );
-
-        setSearchLibraries(loadedLibraries);
-        setBookSearchLoaded(true);
-      } catch (caughtError) {
-        console.error("Could not load inventories for book search:", caughtError);
-      } finally {
-        setBookSearchLoading(false);
-        bookSearchRequestRef.current = null;
-      }
-    })();
-
-    bookSearchRequestRef.current = request;
-    return request;
-  }
-
   useEffect(() => {
-    if (!bookSearchQuery.trim() || bookSearchLoaded || libraries.length === 0) {
+    const queryWords = getSearchWords(bookSearchQuery);
+
+    if (queryWords.length === 0) {
+      setBookSearchResults([]);
+      setBookSearchLoading(false);
       return;
     }
 
-    const timer = window.setTimeout(() => {
-      void loadInventoriesForBookSearch();
+    let cancelled = false;
+
+    const timer = window.setTimeout(async () => {
+      setBookSearchLoading(true);
+
+      try {
+        const firstWord = queryWords[0];
+
+        const searchSnapshot = await getDocs(
+          query(
+            collection(db, "bookSearch"),
+            where("searchTokens", "array-contains", firstWord),
+          ),
+        );
+
+        const libraryById = new globalThis.Map(
+          libraries.map((library) => [library.id, library]),
+        );
+
+        const matches = searchSnapshot.docs.flatMap((searchDocument) => {
+          const data = searchDocument.data();
+          const libraryId =
+            typeof data.libraryId === "string"
+              ? data.libraryId
+              : searchDocument.id;
+          const library = libraryById.get(libraryId);
+
+          if (!library || !Array.isArray(data.books)) {
+            return [];
+          }
+
+          return data.books.flatMap((book, index) => {
+            const title =
+              typeof book === "string"
+                ? book
+                : typeof book === "object" &&
+                    book !== null &&
+                    "title" in book
+                  ? String(book.title)
+                  : "Untitled book";
+
+            const author =
+              typeof book === "object" &&
+              book !== null &&
+              "author" in book &&
+              book.author
+                ? String(book.author)
+                : null;
+
+            const searchableWords = new Set(
+              getSearchWords(`${title} ${author ?? ""}`),
+            );
+
+            if (!queryWords.every((word) => searchableWords.has(word))) {
+              return [];
+            }
+
+            return [{
+              library,
+              title,
+              author,
+              key: `${library.id}-${title}-${index}`,
+            }];
+          });
+        });
+
+        matches.sort((a, b) => a.title.localeCompare(b.title));
+
+        if (!cancelled) {
+          setBookSearchResults(matches);
+        }
+      } catch (caughtError) {
+        console.error("Could not search books:", caughtError);
+        if (!cancelled) setBookSearchResults([]);
+      } finally {
+        if (!cancelled) setBookSearchLoading(false);
+      }
     }, 250);
 
-    return () => window.clearTimeout(timer);
-  }, [bookSearchQuery, bookSearchLoaded, libraries]);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [bookSearchQuery, libraries]);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 639px)");
@@ -327,19 +334,6 @@ export function CommunityMap({
 
     return unsubscribe;
   }, []);
-
-  const librarySearchVersion = useMemo(
-    () =>
-      libraries
-        .map((library) => `${library.id}:${library.bookCount}:${library.lastUpdated}`)
-        .join("|"),
-    [libraries],
-  );
-
-  useEffect(() => {
-    setBookSearchLoaded(false);
-    setSearchLibraries([]);
-  }, [librarySearchVersion]);
 
   /*
    * Email notifications link to /?box=<Firestore document ID>.
@@ -894,7 +888,6 @@ export function CommunityMap({
                 onFocus={() => {
                   if (bookSearchQuery.trim()) {
                     setIsBookSearchOpen(true);
-                    void loadInventoriesForBookSearch();
                   }
                 }}
                 onChange={(event) => {
@@ -914,7 +907,7 @@ export function CommunityMap({
 
             {bookSearchQuery.trim() && isBookSearchOpen && (
               <div className="mt-2 max-h-72 overflow-y-auto rounded-xl border border-border bg-background p-2 shadow-sm sm:absolute sm:left-0 sm:right-0 sm:z-20">
-                {bookSearchLoading || !bookSearchLoaded ? (
+                {bookSearchLoading ? (
                   <p className="px-3 py-4 text-base text-muted-foreground">
                     Searching book lists…
                   </p>
