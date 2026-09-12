@@ -1,0 +1,137 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function hasApprovedUid() {
+      return request.auth != null
+        && exists(
+          /databases/$(database)/documents/authorizedVolunteers/$(request.auth.uid)
+        )
+        && get(
+          /databases/$(database)/documents/authorizedVolunteers/$(request.auth.uid)
+        ).data.active == true;
+    }
+
+    function hasApprovedEmail() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true
+        && exists(
+          /databases/$(database)/documents/authorizedVolunteerEmails/$(request.auth.token.email)
+        )
+        && get(
+          /databases/$(database)/documents/authorizedVolunteerEmails/$(request.auth.token.email)
+        ).data.active == true;
+    }
+
+    function isApprovedVolunteer() {
+      return hasApprovedUid() || hasApprovedEmail();
+    }
+
+    function isValidPublicBookBoxCreate() {
+      return request.auth != null
+        && request.resource.data.createdByUid == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.address is string
+        && request.resource.data.address.size() > 0
+        && request.resource.data.address.size() <= 300
+        && request.resource.data.latitude is number
+        && request.resource.data.latitude >= -90
+        && request.resource.data.latitude <= 90
+        && request.resource.data.longitude is number
+        && request.resource.data.longitude >= -180
+        && request.resource.data.longitude <= 180
+        && request.resource.data.bookCount is number
+        && request.resource.data.bookCount >= 0
+        && request.resource.data.bookCount <= 250
+        && request.resource.data.photoFile is string;
+    }
+
+    function isValidPublicLibrarySummaryUpdate() {
+      return request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'bookCount',
+          'lastUpdated',
+          'updatedBy',
+          'books',
+          'recognitionNotes'
+        ])
+        && request.resource.data.bookCount is number
+        && request.resource.data.bookCount >= 0
+        && request.resource.data.bookCount <= 250
+        && request.resource.data.lastUpdated is timestamp
+        && (
+          request.resource.data.updatedBy == null
+          || (
+            request.resource.data.updatedBy is string
+            && request.resource.data.updatedBy.size() <= 60
+          )
+        );
+    }
+
+    function isValidInventoryDocument() {
+      return request.auth != null
+        && request.resource.data.books is list
+        && request.resource.data.books.size() <= 250
+        && request.resource.data.bookCount is number
+        && request.resource.data.bookCount == request.resource.data.books.size()
+        && request.resource.data.lastUpdated is timestamp
+        && request.resource.data.recognitionNotes is string
+        && request.resource.data.recognitionNotes.size() <= 300;
+    }
+
+    match /libraries/{libraryId} {
+      allow read: if true;
+      allow create: if isValidPublicBookBoxCreate();
+      allow update: if isApprovedVolunteer()
+        || isValidPublicLibrarySummaryUpdate();
+
+      // Permanent admin-page deletion.
+      allow delete: if isApprovedVolunteer();
+
+      match /inventory/{inventoryId} {
+        allow read: if true;
+        allow create, update: if isApprovedVolunteer()
+          || isValidInventoryDocument();
+        allow delete: if isApprovedVolunteer();
+      }
+
+      match /activity/{activityId} {
+        allow read: if isApprovedVolunteer();
+        allow create, update, delete: if false;
+      }
+    }
+
+    match /bookSearch/{libraryId} {
+      allow read: if true;
+
+      // Keep public authenticated writes so Add/Update can maintain search.
+      allow create, update: if request.auth != null
+        && request.resource.data.libraryId == libraryId
+        && request.resource.data.books is list
+        && request.resource.data.books.size() <= 250
+        && request.resource.data.searchTokens is list
+        && request.resource.data.searchTokens.size() <= 2000
+        && request.resource.data.updatedAt is timestamp;
+
+      // Cleanup/deletion is restricted to approved volunteers.
+      allow delete: if isApprovedVolunteer();
+    }
+
+    match /authorizedVolunteers/{volunteerId} {
+      allow read: if request.auth != null
+        && request.auth.uid == volunteerId;
+      allow write: if false;
+    }
+
+    match /authorizedVolunteerEmails/{volunteerEmail} {
+      allow read: if request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == volunteerEmail;
+      allow write: if false;
+    }
+  }
+}
