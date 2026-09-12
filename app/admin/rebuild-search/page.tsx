@@ -5,13 +5,21 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
 } from "firebase/firestore";
 import {
   deleteObject,
   ref,
 } from "firebase/storage";
-import { db, storage } from "@/lib/firebase";
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+  type User,
+} from "firebase/auth";
+import { auth, db, storage } from "@/lib/firebase";
 import { rebuildBookSearchIndex } from "@/lib/rebuild-book-search-index";
 
 type LibraryRow = {
@@ -30,6 +38,11 @@ type OrphanRow = {
 };
 
 export default function BookBoxAdminPage() {
+  const [authLoading, setAuthLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [approved, setApproved] = useState(false);
+  const [authMessage, setAuthMessage] = useState("");
+
   const [libraries, setLibraries] = useState<LibraryRow[]>([]);
   const [query, setQuery] = useState("");
   const [loadingLibraries, setLoadingLibraries] = useState(true);
@@ -81,8 +94,86 @@ export default function BookBoxAdminPage() {
   }
 
   useEffect(() => {
-    void loadLibraries();
+    const unsubscribe = onAuthStateChanged(auth, async (nextUser) => {
+      setAuthLoading(true);
+      setUser(nextUser);
+      setApproved(false);
+      setAuthMessage("");
+
+      if (!nextUser) {
+        setAuthLoading(false);
+        return;
+      }
+
+      try {
+        const uidApproval = await getDoc(
+          doc(db, "authorizedVolunteers", nextUser.uid),
+        );
+
+        let emailApproved = false;
+        if (nextUser.email && nextUser.emailVerified) {
+          const emailApproval = await getDoc(
+            doc(db, "authorizedVolunteerEmails", nextUser.email),
+          );
+          emailApproved =
+            emailApproval.exists() && emailApproval.data()?.active === true;
+        }
+
+        const uidApproved =
+          uidApproval.exists() && uidApproval.data()?.active === true;
+
+        if (uidApproved || emailApproved) {
+          setApproved(true);
+        } else {
+          setAuthMessage(
+            `Signed in as ${nextUser.email ?? "this account"}, but this account is not an approved volunteer.`,
+          );
+        }
+      } catch (error) {
+        console.error(error);
+        setAuthMessage(
+          error instanceof Error
+            ? `Could not verify admin access: ${error.message}`
+            : "Could not verify admin access.",
+        );
+      } finally {
+        setAuthLoading(false);
+      }
+    });
+
+    return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (approved) {
+      void loadLibraries();
+    } else {
+      setLibraries([]);
+    }
+  }, [approved]);
+
+  async function handleGoogleSignIn() {
+    setAuthMessage("");
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error(error);
+      setAuthMessage(
+        error instanceof Error
+          ? `Sign in failed: ${error.message}`
+          : "Sign in failed.",
+      );
+    }
+  }
+
+  async function handleSignOut() {
+    await signOut(auth);
+    setLibraries([]);
+    setOrphans([]);
+    setMessage("");
+  }
 
   const filteredLibraries = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase();
@@ -264,12 +355,73 @@ export default function BookBoxAdminPage() {
 
   const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
+  if (authLoading) {
+    return (
+      <main className="mx-auto max-w-xl px-5 py-12 sm:px-6">
+        <h1 className="text-2xl font-bold">Book Box Admin</h1>
+        <p className="mt-4 text-sm text-muted-foreground">
+          Checking admin access…
+        </p>
+      </main>
+    );
+  }
+
+  if (!user || !approved) {
+    return (
+      <main className="mx-auto max-w-xl px-5 py-12 sm:px-6">
+        <h1 className="text-2xl font-bold">Book Box Admin</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Sign in with an approved Google account to manage book boxes.
+        </p>
+
+        {authMessage && (
+          <div className="mt-5 rounded-lg border border-border p-4 text-sm">
+            {authMessage}
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => void handleGoogleSignIn()}
+            className="rounded-none bg-blue-600 px-5 py-3 text-sm font-semibold text-white"
+          >
+            Sign in with Google
+          </button>
+
+          {user && (
+            <button
+              type="button"
+              onClick={() => void handleSignOut()}
+              className="rounded-none border border-border px-5 py-3 text-sm font-semibold"
+            >
+              Sign out
+            </button>
+          )}
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-5 py-10 sm:px-6">
       <h1 className="text-2xl font-bold">Book Box Admin</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Manage book boxes and maintain the fast Book List search index.
       </p>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border border-border p-3">
+        <p className="text-sm">
+          Signed in as <span className="font-semibold">{user.email}</span>
+        </p>
+        <button
+          type="button"
+          onClick={() => void handleSignOut()}
+          className="rounded-none border border-border px-3 py-2 text-sm font-semibold"
+        >
+          Sign out
+        </button>
+      </div>
 
       {message && (
         <div className="mt-6 rounded-lg border border-border p-4 text-sm">
