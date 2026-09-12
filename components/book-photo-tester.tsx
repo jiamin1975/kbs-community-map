@@ -43,7 +43,7 @@ type PendingBookPhoto = {
 
 type BookPhotoTesterProps = {
   library: Library | null
-  onFinished?: () => void
+  onFinished?: (updatedLibrary: Library) => void
 }
 
 function normalizeBookTitle(title: string) {
@@ -336,7 +336,15 @@ export function BookPhotoTester({
         },
       )
 
+      const updatedLibrary = {
+        ...library,
+        books: booksToSave,
+        bookCount: booksToSave.length,
+        updatedBy: updatedBy.trim() || null,
+      } as Library
+
       setSaved(true)
+      onFinished?.(updatedLibrary)
     } catch (caughtError) {
       console.error(
         "Could not save book list:",
@@ -601,8 +609,8 @@ export function BookPhotoTester({
                     Update &amp; Save
                   </span>
                   <span className="text-sm font-normal leading-tight opacity-95 max-sm:!text-sm">
-                    (box with {sessionBooks.length}{" "}
-                    book{sessionBooks.length === 1 ? "" : "s"})
+                    Box with {sessionBooks.length}{" "}
+                    book{sessionBooks.length === 1 ? "" : "s"}
                   </span>
                 </span>
               )}

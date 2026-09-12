@@ -32,6 +32,12 @@ export function LibraryMapExperience() {
   const [uploadDialogOpen, setUploadDialogOpen] =
     useState(false)
 
+  // Holds the freshly updated box while the Thank You screen remains open.
+  // When the dialog closes, CommunityMap receives this exact new Book List
+  // instead of continuing to display its previously selected in-memory copy.
+  const [pendingUpdatedLibrary, setPendingUpdatedLibrary] =
+    useState<Library | null>(null)
+
   const [addLibraryDialogOpen, setAddLibraryDialogOpen] =
     useState(false)
 
@@ -44,6 +50,7 @@ export function LibraryMapExperience() {
   }, [])
 
   function handleUploadPhoto(library: Library) {
+    setPendingUpdatedLibrary(null)
     setSelectedLibrary(library)
     setUploadDialogOpen(true)
   }
@@ -52,8 +59,19 @@ export function LibraryMapExperience() {
     setUploadDialogOpen(open)
 
     if (!open) {
+      if (pendingUpdatedLibrary) {
+        setNewlyAddedLibrary({ ...pendingUpdatedLibrary })
+        setPendingUpdatedLibrary(null)
+      }
+
       setSelectedLibrary(null)
     }
+  }
+
+  function handleBookBoxUpdated(updatedLibrary: Library) {
+    // Keep the Thank You screen open. The new Book List is passed to the
+    // main map only when the visitor closes this dialog.
+    setPendingUpdatedLibrary(updatedLibrary)
   }
 
   function handleAddLibrary() {
@@ -131,7 +149,7 @@ export function LibraryMapExperience() {
             <BookPhotoTester
               key={selectedLibrary.id}
               library={selectedLibrary}
-              onFinished={() => handleUploadDialogChange(false)}
+              onFinished={handleBookBoxUpdated}
             />
           )}
         </DialogContent>
