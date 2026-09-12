@@ -2115,22 +2115,24 @@ export function AddLibraryForm({
                         className="h-40 w-full bg-gray-100 object-contain"
                       />
                       <div className="p-2">
-                        <p className="font-semibold">
-                          Interior photo {number}
-                        </p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-semibold">
+                            Interior photo {number}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => removePendingBookPhoto(pendingPhoto.url)}
+                            disabled={analyzingBooks || saving}
+                            className="shrink-0 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
+                          >
+                            Remove
+                          </button>
+                        </div>
                         <p className="mt-1 font-semibold text-amber-700" role="status">
                           {analyzingBooks
                             ? "AI Recognizing Books…"
                             : "Ready for AI book recognition"}
                         </p>
-                        <button
-                          type="button"
-                          onClick={() => removePendingBookPhoto(pendingPhoto.url)}
-                          disabled={analyzingBooks || saving}
-                          className="mt-1 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
-                        >
-                          Remove
-                        </button>
                       </div>
                     </div>
                   ))}
@@ -2152,20 +2154,22 @@ export function AddLibraryForm({
                         className="h-40 w-full bg-gray-100 object-contain"
                       />
                       <div className="p-2">
-                        <p className="font-semibold">
-                          Interior photo {number}
-                        </p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-semibold">
+                            Interior photo {number}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => removeProcessedBookPhoto(bookPhotoPreview.url)}
+                            disabled={analyzingBooks || saving}
+                            className="shrink-0 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
+                          >
+                            Remove
+                          </button>
+                        </div>
                         <p className="mt-1 font-semibold text-green-700">
                           Book Recognition Done
                         </p>
-                        <button
-                          type="button"
-                          onClick={() => removeProcessedBookPhoto(bookPhotoPreview.url)}
-                          disabled={analyzingBooks || saving}
-                          className="mt-1 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
-                        >
-                          Remove
-                        </button>
                       </div>
                     </div>
                   ))}
