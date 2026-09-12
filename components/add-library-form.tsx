@@ -435,6 +435,8 @@ export function AddLibraryForm({
   const [nearbyLibrary, setNearbyLibrary] = useState<NearbyLibrary | null>(
     null,
   );
+  const [nearbyCurrentLocationLibraries, setNearbyCurrentLocationLibraries] =
+    useState<NearbyLibrary[]>([]);
   const [duplicateCheckStatus, setDuplicateCheckStatus] =
     useState<DuplicateCheckStatus>("idle");
 
@@ -665,6 +667,7 @@ export function AddLibraryForm({
     setMessage("");
     setError("");
     setNearbyLibrary(null);
+    setNearbyCurrentLocationLibraries([]);
     setLocationAdjusted(false);
     setGeocodingAddress(true);
 
@@ -733,6 +736,7 @@ export function AddLibraryForm({
     setMessage("");
     setError("");
     setNearbyLibrary(null);
+    setNearbyCurrentLocationLibraries([]);
     setNeighborhood("");
     setLocationAdjusted(false);
 
@@ -758,6 +762,18 @@ export function AddLibraryForm({
         });
 
         setMapZoom(19);
+
+        try {
+          const nearbyBoxes = await findLibrariesWithinDistance(
+            currentLatitude,
+            currentLongitude,
+            50,
+          );
+          setNearbyCurrentLocationLibraries(nearbyBoxes);
+        } catch (nearbyError) {
+          console.error("Could not load nearby existing book boxes:", nearbyError);
+          setNearbyCurrentLocationLibraries([]);
+        }
 
         const addressUpdated = await updateAddressFromCoordinates(
           currentLatitude,
@@ -799,6 +815,46 @@ export function AddLibraryForm({
         maximumAge: 0,
       },
     );
+  }
+
+  async function findLibrariesWithinDistance(
+    latitudeNumber: number,
+    longitudeNumber: number,
+    maximumDistanceMeters: number,
+  ): Promise<NearbyLibrary[]> {
+    const snapshot = await getDocs(collection(db, "libraries"));
+    const matches: NearbyLibrary[] = [];
+
+    for (const documentSnapshot of snapshot.docs) {
+      const data = documentSnapshot.data();
+      const existingLatitude = Number(data.latitude);
+      const existingLongitude = Number(data.longitude);
+      if (!Number.isFinite(existingLatitude) || !Number.isFinite(existingLongitude)) continue;
+
+      const distanceMeters = calculateDistanceMeters(
+        latitudeNumber, longitudeNumber, existingLatitude, existingLongitude,
+      );
+      if (distanceMeters > maximumDistanceMeters) continue;
+
+      matches.push({
+        library: {
+          id: documentSnapshot.id,
+          name: data.name ?? "Unnamed book box",
+          address: data.address ?? "",
+          neighborhood: data.neighborhood ?? "",
+          latitude: existingLatitude,
+          longitude: existingLongitude,
+          books: [],
+          bookCount: typeof data.bookCount === "number" ? data.bookCount : 0,
+          lastUpdated: "Recently updated",
+          verified: data.verified === true,
+          photoFile: typeof data.photoFile === "string" ? data.photoFile : "",
+        } as Library,
+        distanceMeters,
+      });
+    }
+
+    return matches.sort((a, b) => a.distanceMeters - b.distanceMeters);
   }
 
   async function findNearbyLibrary(
@@ -1839,6 +1895,34 @@ export function AddLibraryForm({
                         <div className="h-3 w-3 -translate-y-0.5 rotate-45 bg-red-600" />
                       </div>
                     </AdvancedMarker>
+
+                    {nearbyCurrentLocationLibraries
+                      .filter(
+                        (match) =>
+                          !nearbyLibrary ||
+                          match.library.id !== nearbyLibrary.library.id,
+                      )
+                      .map((match) => (
+                        <AdvancedMarker
+                          key={`nearby-current-${match.library.id}`}
+                          position={{
+                            lat: match.library.latitude,
+                            lng: match.library.longitude,
+                          }}
+                          onClick={() => onUseExistingLibrary?.(match.library)}
+                          title={`${match.library.name} · ${Math.round(match.distanceMeters)} m away`}
+                          zIndex={15}
+                        >
+                          <div className="relative flex size-7 cursor-pointer items-start justify-center">
+                            <MapPin
+                              className="size-7 fill-blue-600 text-blue-700 drop-shadow-md"
+                              strokeWidth={1.75}
+                              aria-hidden="true"
+                            />
+                            <span className="absolute top-[6px] size-2 rounded-full bg-white" aria-hidden="true" />
+                          </div>
+                        </AdvancedMarker>
+                      ))}
 
                     {nearbyLibrary && (
                       <AdvancedMarker
