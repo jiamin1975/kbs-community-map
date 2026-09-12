@@ -1227,7 +1227,9 @@ export function AddLibraryForm({
             failedPhotos.length === 1 ? "this photo" : "these photos"
           }. Tap AI recognition to try again.`,
         );
-      } else if (combinedBooks.length === 0) {
+      } else if (
+        successfulResults.every((result) => result.books.length === 0)
+      ) {
         setBookRecognitionError(
           "No books were recognized. Try clearer, closer photos.",
         );
