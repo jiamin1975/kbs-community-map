@@ -44,6 +44,8 @@ export async function rebuildBookSearchIndex(
     const full = await getLibraryWithBooks(library);
     await setDoc(doc(db, "bookSearch", library.id), {
       libraryId: library.id,
+      name: library.name,
+      address: library.address,
       books: full.books,
       searchTokens: tokens(full.books),
       updatedAt: serverTimestamp(),

@@ -1362,6 +1362,8 @@ export function AddLibraryForm({
 
         await setDoc(doc(db, "bookSearch", newLibraryReference.id), {
           libraryId: newLibraryReference.id,
+          name: libraryName,
+          address: libraryAddress,
           books: recognizedBooks,
           searchTokens: buildBookSearchTokens(recognizedBooks),
           updatedAt: serverTimestamp(),

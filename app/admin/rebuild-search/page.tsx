@@ -24,6 +24,8 @@ type LibraryRow = {
 
 type OrphanRow = {
   id: string;
+  name: string | null;
+  address: string | null;
   bookCount: number;
 };
 
@@ -163,6 +165,14 @@ export default function BookBoxAdminPage() {
           const data = snapshotDoc.data();
           return {
             id: snapshotDoc.id,
+            name:
+              typeof data.name === "string" && data.name.trim()
+                ? data.name
+                : null,
+            address:
+              typeof data.address === "string" && data.address.trim()
+                ? data.address
+                : null,
             bookCount: Array.isArray(data.books) ? data.books.length : 0,
           };
         })
@@ -360,11 +370,29 @@ export default function BookBoxAdminPage() {
                 key={orphan.id}
                 className="border-b border-border p-3 text-sm last:border-b-0"
               >
-                <span className="font-medium">{orphan.id}</span>
-                <span className="ml-2 text-muted-foreground">
-                  {orphan.bookCount} book
-                  {orphan.bookCount === 1 ? "" : "s"}
-                </span>
+                {orphan.name ? (
+                  <>
+                    <p className="font-semibold">{orphan.name}</p>
+                    {orphan.address && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {orphan.address}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {orphan.bookCount} book
+                      {orphan.bookCount === 1 ? "" : "s"} · {orphan.id}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-medium">{orphan.id}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {orphan.bookCount} book
+                      {orphan.bookCount === 1 ? "" : "s"} · address unavailable
+                      (box was deleted before details were stored in the search index)
+                    </p>
+                  </>
+                )}
               </div>
             ))}
           </div>

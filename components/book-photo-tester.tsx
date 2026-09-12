@@ -313,6 +313,8 @@ export function BookPhotoTester({
         doc(db, "bookSearch", library.id),
         {
           libraryId: library.id,
+          name: library.name,
+          address: library.address ?? "",
           books: booksToSave,
           searchTokens: buildBookSearchTokens(booksToSave),
           updatedAt: serverTimestamp(),
