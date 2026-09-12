@@ -34,6 +34,7 @@ type RecognitionResult = {
 
 type ProcessedBookPhoto = {
   url: string
+  books: RecognizedBook[]
 }
 
 type PendingBookPhoto = {
@@ -189,6 +190,31 @@ export function BookPhotoTester({
     ])
   }
 
+  function removePendingBookPhoto(url: string) {
+    setPendingBookPhotos((currentPhotos) =>
+      currentPhotos.filter((photo) => photo.url !== url),
+    )
+    URL.revokeObjectURL(url)
+    processedBookPhotoUrls.current =
+      processedBookPhotoUrls.current.filter((item) => item !== url)
+  }
+
+  function removeProcessedBookPhoto(url: string) {
+    setProcessedBookPhotos((currentPhotos) => {
+      const nextPhotos = currentPhotos.filter((photo) => photo.url !== url)
+      const nextBooks = nextPhotos.reduce<RecognizedBook[]>(
+        (books, photo) => mergeBooks(books, photo.books),
+        [],
+      )
+      setSessionBooks(nextBooks)
+      setPhotosProcessed(nextPhotos.length)
+      return nextPhotos
+    })
+    URL.revokeObjectURL(url)
+    processedBookPhotoUrls.current =
+      processedBookPhotoUrls.current.filter((item) => item !== url)
+  }
+
   async function analyzeAllPhotos() {
     if (!library) {
       setError(
@@ -239,14 +265,22 @@ export function BookPhotoTester({
         return
       }
 
-      setSessionBooks((currentBooks) =>
-        mergeBooks(currentBooks, combinedBooks),
-      )
-      setPhotosProcessed((count) => count + pendingBookPhotos.length)
-      setProcessedBookPhotos((currentPhotos) => [
-        ...currentPhotos,
-        ...pendingBookPhotos.map(({ url }) => ({ url })),
-      ])
+      const newlyProcessed: ProcessedBookPhoto[] =
+        pendingBookPhotos.map((photo, index) => ({
+          url: photo.url,
+          books: results[index]?.books ?? [],
+        }))
+
+      setProcessedBookPhotos((currentPhotos) => {
+        const nextPhotos = [...currentPhotos, ...newlyProcessed]
+        const nextBooks = nextPhotos.reduce<RecognizedBook[]>(
+          (books, photo) => mergeBooks(books, photo.books),
+          [],
+        )
+        setSessionBooks(nextBooks)
+        setPhotosProcessed(nextPhotos.length)
+        return nextPhotos
+      })
       setPendingBookPhotos([])
     } catch (caughtError) {
       setError(
@@ -609,8 +643,8 @@ export function BookPhotoTester({
                     Update &amp; Save
                   </span>
                   <span className="text-sm font-normal leading-tight opacity-95 max-sm:!text-sm">
-                    Box with {sessionBooks.length}{" "}
-                    book{sessionBooks.length === 1 ? "" : "s"}
+                    (box with <strong>{sessionBooks.length}</strong>{" "}
+                    book{sessionBooks.length === 1 ? "" : "s"})
                   </span>
                 </span>
               )}
@@ -643,6 +677,14 @@ export function BookPhotoTester({
                       <p className="kbs-update-recognizing mt-1 font-semibold text-amber-700" role="status">
                         {loading ? "Recognizing Books…" : "Ready to recognize"}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => removePendingBookPhoto(photo.url)}
+                        disabled={loading || saving}
+                        className="mt-1 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -668,6 +710,14 @@ export function BookPhotoTester({
                         <p className="kbs-update-recognized mt-1 font-semibold text-green-700">
                           Recognition Done
                         </p>
+                        <button
+                          type="button"
+                          onClick={() => removeProcessedBookPhoto(photo.url)}
+                          disabled={loading || saving}
+                          className="mt-1 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
+                        >
+                          Remove
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -695,6 +745,14 @@ export function BookPhotoTester({
                       <p className="kbs-update-recognizing mt-1 font-semibold text-amber-700" role="status">
                         {loading ? "Recognizing Books…" : "Ready to recognize"}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => removePendingBookPhoto(photo.url)}
+                        disabled={loading || saving}
+                        className="mt-1 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -717,6 +775,14 @@ export function BookPhotoTester({
                       <p className="kbs-update-recognized mt-1 font-semibold text-green-700">
                         Recognition Done
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => removeProcessedBookPhoto(photo.url)}
+                        disabled={loading || saving}
+                        className="mt-1 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
                     </div>
                   </div>
                 ))}

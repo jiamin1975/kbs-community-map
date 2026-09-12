@@ -44,6 +44,10 @@ type PendingBookPhoto = BookPhotoPreview & {
   file: File;
 };
 
+type ProcessedBookPhoto = BookPhotoPreview & {
+  books: RecognizedBook[];
+};
+
 type RecognizedBook = {
   title: string;
   author: string | null;
@@ -462,7 +466,7 @@ export function AddLibraryForm({
     PendingBookPhoto[]
   >([]);
   const [processedBookPhotos, setProcessedBookPhotos] = useState<
-    BookPhotoPreview[]
+    ProcessedBookPhoto[]
   >([]);
   const processedBookPhotoUrls = useRef<string[]>([]);
   const [recognizedBooks, setRecognizedBooks] = useState<RecognizedBook[]>([]);
@@ -1097,6 +1101,32 @@ export function AddLibraryForm({
     }
   }
 
+  function removePendingBookPhoto(url: string) {
+    setPendingBookPhotos((current) =>
+      current.filter((photo) => photo.url !== url),
+    );
+    URL.revokeObjectURL(url);
+    processedBookPhotoUrls.current =
+      processedBookPhotoUrls.current.filter((item) => item !== url);
+  }
+
+  function removeProcessedBookPhoto(url: string) {
+    setProcessedBookPhotos((current) => {
+      const next = current.filter((photo) => photo.url !== url);
+      const nextBooks = next.reduce<RecognizedBook[]>(
+        (books, photo) => mergeBooks(books, photo.books),
+        [],
+      );
+      setRecognizedBooks(nextBooks);
+      setBookPhotosProcessed(next.length);
+      return next;
+    });
+
+    URL.revokeObjectURL(url);
+    processedBookPhotoUrls.current =
+      processedBookPhotoUrls.current.filter((item) => item !== url);
+  }
+
   async function analyzeAllBookPhotos() {
     if (pendingBookPhotos.length === 0) {
       setBookRecognitionError(
@@ -1159,25 +1189,24 @@ export function AddLibraryForm({
         }
       });
 
-      const combinedBooks = successfulResults.reduce<RecognizedBook[]>(
-        (books, result) => mergeBooks(books, result.books),
-        [],
-      );
-
       if (successfulPhotos.length > 0) {
-        setProcessedBookPhotos((current) => [
-          ...current,
-          ...successfulPhotos.map(({ name, url }) => ({ name, url })),
-        ]);
-        setBookPhotosProcessed(
-          (count) => count + successfulPhotos.length,
-        );
-      }
+        const newlyProcessed: ProcessedBookPhoto[] =
+          successfulPhotos.map((photo, index) => ({
+            name: photo.name,
+            url: photo.url,
+            books: successfulResults[index]?.books ?? [],
+          }));
 
-      if (combinedBooks.length > 0) {
-        setRecognizedBooks((current) =>
-          mergeBooks(current, combinedBooks),
-        );
+        setProcessedBookPhotos((current) => {
+          const next = [...current, ...newlyProcessed];
+          const nextBooks = next.reduce<RecognizedBook[]>(
+            (books, photo) => mergeBooks(books, photo.books),
+            [],
+          );
+          setRecognizedBooks(nextBooks);
+          setBookPhotosProcessed(next.length);
+          return next;
+        });
       }
 
       // Keep only failed photos pending so the user can tap AI recognition
@@ -2055,7 +2084,8 @@ export function AddLibraryForm({
                                 Finish &amp; Save
                               </span>
                               <span className="mt-0 text-sm font-normal leading-[1.05] opacity-95 max-sm:!text-sm">
-                                (add box with {recognizedBooks.length}{" "}
+                                (add box with{" "}
+                                <strong>{recognizedBooks.length}</strong>{" "}
                                 book{recognizedBooks.length === 1 ? "" : "s"})
                               </span>
                             </span>
@@ -2091,6 +2121,14 @@ export function AddLibraryForm({
                             ? "AI Recognizing Books…"
                             : "Ready for AI book recognition"}
                         </p>
+                        <button
+                          type="button"
+                          onClick={() => removePendingBookPhoto(pendingPhoto.url)}
+                          disabled={analyzingBooks || saving}
+                          className="mt-1 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
+                        >
+                          Remove
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -2118,6 +2156,14 @@ export function AddLibraryForm({
                         <p className="mt-1 font-semibold text-green-700">
                           Book Recognition Done
                         </p>
+                        <button
+                          type="button"
+                          onClick={() => removeProcessedBookPhoto(bookPhotoPreview.url)}
+                          disabled={analyzingBooks || saving}
+                          className="mt-1 text-sm font-medium text-muted-foreground underline underline-offset-2 hover:text-red-600 disabled:opacity-50"
+                        >
+                          Remove
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -2134,7 +2180,7 @@ export function AddLibraryForm({
               recognizedBooks.length > 0 ? (
                 <div className="overflow-hidden rounded-none border border-green-200 bg-green-50">
                   <p className="border-b border-green-200 bg-green-100 px-3 py-2 text-base font-bold text-green-950 max-sm:!text-base sm:py-1.5 sm:text-xs sm:font-semibold">
-                    Book Box Inventory
+                    Book List
                   </p>
                   <ul className="max-h-64 divide-y divide-green-200 overflow-y-auto text-green-950 sm:max-h-52">
                     {recognizedBooks
