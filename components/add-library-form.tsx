@@ -2252,7 +2252,7 @@ export function AddLibraryForm({
                                 Finish &amp; Save
                               </span>
                               <span className="mt-0 text-sm font-normal leading-[1.05] opacity-95 max-sm:!text-sm">
-                                (add box with{" "}
+                                (with{" "}
                                 <strong>{recognizedBooks.length}</strong>{" "}
                                 book{recognizedBooks.length === 1 ? "" : "s"})
                               </span>

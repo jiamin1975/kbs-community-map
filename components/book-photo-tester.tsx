@@ -643,7 +643,7 @@ export function BookPhotoTester({
                     Update &amp; Save
                   </span>
                   <span className="text-sm font-normal leading-tight opacity-95 max-sm:!text-sm">
-                    (box with <strong>{sessionBooks.length}</strong>{" "}
+                    (with <strong>{sessionBooks.length}</strong>{" "}
                     book{sessionBooks.length === 1 ? "" : "s"})
                   </span>
                 </span>
