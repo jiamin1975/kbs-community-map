@@ -42,25 +42,6 @@ export function LibraryMapExperience() {
   const [addLibraryDialogOpen, setAddLibraryDialogOpen] =
     useState(false)
 
-  const [challengeMode, setChallengeMode] = useState(false)
-  const [challengeCompleted, setChallengeCompleted] = useState(0)
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-
-    if (params.get("challenge") === "1") {
-      setChallengeMode(true)
-
-      const savedCount = Number(
-        window.sessionStorage.getItem("kbsBookBoxChallengeCount") ?? "0",
-      )
-      setChallengeCompleted(
-        Number.isFinite(savedCount) ? Math.min(Math.max(savedCount, 0), 2) : 0,
-      )
-      setAddLibraryDialogOpen(true)
-    }
-  }, [])
-
   useEffect(() => {
     return () => {
       if (existingBoxFocusTimer.current !== null) {
@@ -95,8 +76,6 @@ export function LibraryMapExperience() {
   }
 
   function handleAddLibrary() {
-    setChallengeMode(false)
-    setChallengeCompleted(0)
     setAddLibraryDialogOpen(true)
   }
 
@@ -104,17 +83,6 @@ export function LibraryMapExperience() {
     // The box has been saved, but keep the Add dialog open
     // so the Thank You screen remains visible.
     setPendingAddedLibrary(library)
-
-    if (challengeMode) {
-      setChallengeCompleted((current) => {
-        const next = Math.min(current + 1, 2)
-        window.sessionStorage.setItem(
-          "kbsBookBoxChallengeCount",
-          String(next),
-        )
-        return next
-      })
-    }
   }
 
   function handleUseExistingLibrary(library: Library) {
@@ -230,8 +198,6 @@ export function LibraryMapExperience() {
           <AddLibraryForm
             onLibraryAdded={handleLibraryAdded}
             onUseExistingLibrary={handleUseExistingLibrary}
-            challengeMode={challengeMode}
-            challengeCompleted={challengeCompleted}
           />
         </DialogContent>
       </Dialog>

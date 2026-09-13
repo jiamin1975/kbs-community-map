@@ -293,8 +293,6 @@ async function createCroppedPhoto(
 type AddLibraryFormProps = {
   onLibraryAdded?: (library: Library) => void;
   onUseExistingLibrary?: (library: Library) => void;
-  challengeMode?: boolean;
-  challengeCompleted?: number;
 };
 
 function calculateDistanceMeters(
@@ -414,8 +412,6 @@ function buildBookSearchTokens(books: any[]) {
 export function AddLibraryForm({
   onLibraryAdded,
   onUseExistingLibrary,
-  challengeMode = false,
-  challengeCompleted = 0,
 }: AddLibraryFormProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -1538,61 +1534,6 @@ export function AddLibraryForm({
     );
   }
 
-  function startSecondChallengeBox() {
-    // Start a completely fresh Add Box submission instead of reopening
-    // the completed first submission at Step 3.
-    setSuccessfullyAddedLibrary(null);
-    setSuccessTotals(null);
-
-    setCurrentStep(1);
-    setName("");
-    setAddress("");
-    setNeighborhood("");
-    setLatitude("");
-    setLongitude("");
-    setVerified(false);
-    setLocationAdjusted(false);
-
-    setMessage("");
-    setError("");
-    setAccessMessage("");
-    setNearbyLibrary(null);
-    setNearbyCurrentLocationLibraries([]);
-    setDuplicateCheckStatus("idle");
-
-    setPhoto(null);
-    setPhotoPreviewUrl(null);
-    setCropSourcePhoto(null);
-    setCropSourceUrl(null);
-    setCropPosition({ x: 0, y: 0 });
-    setCropZoom(1);
-    setCroppedAreaPixels(null);
-
-    processedBookPhotoUrls.current.forEach((url) => URL.revokeObjectURL(url));
-    processedBookPhotoUrls.current = [];
-    setPendingBookPhotos([]);
-    setProcessedBookPhotos([]);
-    setRecognizedBooks([]);
-    setBookPhotosProcessed(0);
-    setBookRecognitionError("");
-
-    setSaving(false);
-    setLocating(false);
-    setGeocodingAddress(false);
-    setProcessingPhoto(false);
-    setUploadingPhoto(false);
-    setAnalyzingBooks(false);
-
-    // The second box needs its own Firestore document/storage ID.
-    setPendingLibraryId(doc(collection(db, "libraries")).id);
-
-    setMapCenter({
-      lat: 39.0458,
-      lng: -77.1224,
-    });
-    setMapZoom(18);
-  }
-
   if (successfullyAddedLibrary) {
     return (
       <div className="kbs-add-form flex min-h-[58vh] items-center justify-center rounded-none border border-border bg-card px-4 py-10 text-slate-950 sm:min-h-[420px] sm:px-8">
@@ -1669,45 +1610,81 @@ export function AddLibraryForm({
             </div>
           ) : null}
 
-          {challengeMode ? (
-            <div className="bg-blue-50 px-5 py-5 text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.12em] text-blue-700">
-                Book Box Challenge
-              </p>
+          <div className="border-t border-blue-100 bg-blue-50 px-5 py-5 text-center">
+            <p className="text-sm font-bold text-blue-800">
+              🎁 Doing the Book Box Challenge?
+            </p>
+            <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-slate-600 sm:text-sm">
+              Save a screenshot of this page. After adding 2 book boxes,
+              send us both screenshots to claim your free SAT or AP study book.
+            </p>
 
-              <p className="mt-1 text-lg font-bold text-slate-950">
-                {Math.min(challengeCompleted, 2)} of 2 boxes completed
-                {challengeCompleted >= 2 ? " ✓" : ""}
-              </p>
+            <button
+              type="button"
+              onClick={() => {
+                setSuccessfullyAddedLibrary(null);
+                setSuccessTotals(null);
 
-              {challengeCompleted < 2 ? (
-                <>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                    Add one more book box to complete the challenge.
-                  </p>
+                setCurrentStep(1);
+                setName("");
+                setAddress("");
+                setNeighborhood("");
+                setLatitude("");
+                setLongitude("");
+                setVerified(false);
+                setLocationAdjusted(false);
 
-                  <button
-                    type="button"
-                    onClick={startSecondChallengeBox}
-                    className="mt-4 rounded-none border border-blue-700 bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
-                  >
-                    Add My Second Book Box
-                  </button>
-                </>
-              ) : (
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                  Challenge complete! Take a screenshot of this page and send it
-                  to Kits Beyond Sound to claim your free SAT or AP study book.
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="bg-slate-50 px-5 py-4 text-center">
-              <p className="text-xs leading-relaxed text-slate-500">
-                Close this window to view your new book box on the map.
-              </p>
-            </div>
-          )}
+                setMessage("");
+                setError("");
+                setAccessMessage("");
+                setNearbyLibrary(null);
+                setNearbyCurrentLocationLibraries([]);
+                setDuplicateCheckStatus("idle");
+
+                setPhoto(null);
+                setPhotoPreviewUrl(null);
+                setCropSourcePhoto(null);
+                setCropSourceUrl(null);
+                setCropPosition({ x: 0, y: 0 });
+                setCropZoom(1);
+                setCroppedAreaPixels(null);
+
+                processedBookPhotoUrls.current.forEach((url) =>
+                  URL.revokeObjectURL(url),
+                );
+                processedBookPhotoUrls.current = [];
+                setPendingBookPhotos([]);
+                setProcessedBookPhotos([]);
+                setRecognizedBooks([]);
+                setBookPhotosProcessed(0);
+                setBookRecognitionError("");
+
+                setSaving(false);
+                setLocating(false);
+                setGeocodingAddress(false);
+                setProcessingPhoto(false);
+                setUploadingPhoto(false);
+                setAnalyzingBooks(false);
+
+                setPendingLibraryId(
+                  doc(collection(db, "libraries")).id,
+                );
+
+                setMapCenter({
+                  lat: 39.0458,
+                  lng: -77.1224,
+                });
+                setMapZoom(18);
+              }}
+              className="mt-4 rounded-none border border-blue-700 bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+            >
+              Add Another Book Box
+            </button>
+
+            <p className="mt-3 text-xs leading-relaxed text-slate-500">
+              Or close this window to view your new book box on the map.
+            </p>
+          </div>
         </div>
       </div>
     );
