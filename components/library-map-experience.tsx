@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
 
 import { AddLibraryForm } from "@/components/add-library-form"
 import { BookPhotoTester } from "@/components/book-photo-tester"
@@ -39,9 +40,6 @@ export function LibraryMapExperience() {
     useState<Library | null>(null)
 
   const [addLibraryDialogOpen, setAddLibraryDialogOpen] =
-    useState(false)
-
-  const [challengeDetailsOpen, setChallengeDetailsOpen] =
     useState(false)
 
   useEffect(() => {
@@ -138,47 +136,20 @@ export function LibraryMapExperience() {
         />
       </section>
 
-      <section id="book-box-challenge" aria-labelledby="book-box-challenge-title" className="border-b border-border bg-background">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Book Box Challenge</p>
-          <div className="mt-2 max-w-3xl">
-            <h2 id="book-box-challenge-title" className="font-display text-2xl font-bold leading-tight text-foreground sm:text-3xl">
-              Add 2 Book Boxes. Get a Free Study Book.
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
-              Help grow our Community Learning Map and make free books easier to find. Add <strong className="text-foreground">2 new book boxes</strong> to the map, and we&apos;ll send you a free SAT or AP prep book.
-            </p>
-          </div>
-
-          <div className="mt-6 grid gap-3 md:grid-cols-3">
-            <div className="border border-border bg-card p-4">
-              <p className="text-sm font-bold text-blue-700">1 — Find &amp; Add</p>
-              <p className="mt-2 text-sm leading-5 text-muted-foreground">Find two community book boxes that aren&apos;t already on our map. Add their locations and photos of the boxes and books inside.</p>
-            </div>
-            <div className="border border-border bg-card p-4">
-              <p className="text-sm font-bold text-blue-700">2 — Send Your Screenshots</p>
-              <p className="mt-2 text-sm leading-5 text-muted-foreground">After adding both boxes, screenshot your successful submissions and email them to Kits Beyond Sound.</p>
-            </div>
-            <div className="border border-border bg-card p-4">
-              <p className="text-sm font-bold text-blue-700">3 — Pick Your Book</p>
-              <p className="mt-2 text-sm leading-5 text-muted-foreground">Once we verify your two boxes, choose from our available SAT or AP prep books. We&apos;ll mail one to you for free.</p>
-            </div>
-          </div>
-
-          <div className="mt-5 flex flex-wrap items-center gap-4">
-            <button type="button" onClick={handleAddLibrary} className="rounded-none border border-blue-700 bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
-              + Add a New Book Box
-            </button>
-            <button type="button" onClick={() => setChallengeDetailsOpen((open) => !open)} aria-expanded={challengeDetailsOpen} className="text-sm font-medium text-muted-foreground underline underline-offset-4 hover:text-foreground">
-              {challengeDetailsOpen ? "Hide reward details & rules" : "View reward details & rules"}
-            </button>
-          </div>
-
-          {challengeDetailsOpen && (
-            <div className="mt-4 max-w-4xl border border-border bg-muted/30 p-4 text-xs leading-5 text-muted-foreground sm:text-sm">
-              Boxes must be real, publicly accessible, and not already listed on the Community Learning Map. Both submissions must be verified. One free book per person while supplies last. Available titles vary. U.S. shipping only.
-            </div>
-          )}
+      <section
+        aria-label="Book Box Challenge"
+        className="border-b border-border bg-background"
+      >
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <p className="text-sm text-muted-foreground">
+            Add 2 book boxes and get a free SAT or AP study book.
+          </p>
+          <Link
+            href="/book-box-challenge"
+            className="shrink-0 rounded-none border border-blue-700 bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+          >
+            Book Box Challenge
+          </Link>
         </div>
       </section>
 
