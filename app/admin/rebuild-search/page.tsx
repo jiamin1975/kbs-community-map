@@ -77,7 +77,7 @@ export default function BookBoxAdminPage() {
   const [savingRewardBooks, setSavingRewardBooks] = useState(false);
   const [rewardBooks, setRewardBooks] = useState<RewardBook[]>([]);
 
-  async function fileToRecognitionDataUrl(file: File): Promise<string> {
+  async function normalizeRewardPhotoForRecognition(file: File): Promise<File> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
@@ -85,7 +85,7 @@ export default function BookBoxAdminPage() {
         const image = new Image();
 
         image.onload = () => {
-          const maxDimension = 2000;
+          const maxDimension = 2400;
           const scale = Math.min(
             1,
             maxDimension / Math.max(image.naturalWidth, image.naturalHeight),
@@ -102,7 +102,23 @@ export default function BookBoxAdminPage() {
           }
 
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL("image/jpeg", 0.9));
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error("Could not prepare the image for recognition."));
+                return;
+              }
+
+              resolve(
+                new File([blob], "challenge-rewards.jpg", {
+                  type: "image/jpeg",
+                }),
+              );
+            },
+            "image/jpeg",
+            0.9,
+          );
         };
 
         image.onerror = () =>
@@ -161,27 +177,27 @@ export default function BookBoxAdminPage() {
     setRecognizingRewardBooks(true);
 
     try {
-      const dataUrl = await fileToRecognitionDataUrl(file);
+      // The existing /api/analyze-books route expects multipart FormData
+      // containing a real File under the "image" field.
+      const normalizedFile = await normalizeRewardPhotoForRecognition(file);
+      const formData = new FormData();
+      formData.append("image", normalizedFile);
+
       const response = await fetch("/api/analyze-books", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: dataUrl, dataUrl }),
+        body: formData,
       });
 
       const result = await response.json().catch(() => null);
 
       if (!response.ok) {
         throw new Error(
-          result?.error || result?.message || "Book recognition failed.",
+          result?.error || "Book recognition failed.",
         );
       }
 
-      const recognized = normalizeRecognizedBooks(
-        result?.books ?? result?.data?.books,
-      );
-
+      const recognized = normalizeRecognizedBooks(result?.books);
       setRewardBooks(recognized);
-
       return recognized;
     } finally {
       setRecognizingRewardBooks(false);
