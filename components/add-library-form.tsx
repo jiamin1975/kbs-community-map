@@ -28,6 +28,7 @@ import {
 import Cropper, { type Area } from "react-easy-crop";
 
 import { auth, db, storage } from "@/lib/firebase";
+import { getLibraryWithBooks } from "@/lib/firestore-libraries";
 import type { Library } from "@/lib/libraries";
 
 type NearbyLibrary = {
@@ -815,6 +816,17 @@ export function AddLibraryForm({
         maximumAge: 0,
       },
     );
+  }
+
+  async function openExistingLibrary(library: Library) {
+    try {
+      const libraryWithBooks = await getLibraryWithBooks(library);
+      onUseExistingLibrary?.(libraryWithBooks);
+    } catch (error) {
+      console.error("Could not load the existing book box:", error);
+      // Still allow the user to open the box if inventory loading fails.
+      onUseExistingLibrary?.(library);
+    }
   }
 
   async function findLibrariesWithinDistance(
@@ -1979,7 +1991,7 @@ export function AddLibraryForm({
                             lat: match.library.latitude,
                             lng: match.library.longitude,
                           }}
-                          onClick={() => onUseExistingLibrary?.(match.library)}
+                          onClick={() => void openExistingLibrary(match.library)}
                           title={`${match.library.name} · ${Math.round(match.distanceMeters)} m away`}
                           zIndex={15}
                         >
@@ -2001,7 +2013,7 @@ export function AddLibraryForm({
                           lng: nearbyLibrary.library.longitude,
                         }}
                         onClick={() =>
-                          onUseExistingLibrary?.(nearbyLibrary.library)
+                          void openExistingLibrary(nearbyLibrary.library)
                         }
                         title="Existing book box"
                         zIndex={20}
