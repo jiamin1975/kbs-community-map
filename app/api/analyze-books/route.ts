@@ -19,6 +19,9 @@ const BookRecognitionSchema = z.object({
     z.object({
       title: z.string(),
       author: z.string().nullable(),
+      publisher: z.string().nullable(),
+      year: z.string().nullable(),
+      edition: z.string().nullable(),
       confidence: z.enum(["high", "medium", "low"]),
       visibleText: z.string().nullable(),
     }),
@@ -37,7 +40,7 @@ async function recognizeBooks(imageDataUrl: string) {
       {
         role: "system",
         content:
-          "You identify visible books in photographs. Be conservative and never invent a title.",
+          "You identify visible books in photographs, especially SAT and AP study/prep books. Be conservative and never invent bibliographic details.",
       },
       {
         role: "user",
@@ -55,7 +58,13 @@ Rules:
 - Use confidence "high" when the full title is clearly readable.
 - Use confidence "medium" when most of the title is readable.
 - Use confidence "low" when the title is incomplete but still reasonably identifiable.
-- If an author is not visible, return null.
+- Preserve useful exam/course details in the title, such as "AP Calculus BC", "AP Biology Premium Prep", or "AP Computer Science A".
+- If an author is clearly visible, return it; otherwise return null.
+- If a publisher or prep-book brand is clearly visible (for example Princeton Review, Barron's, Kaplan, or 5 Steps to a 5), return it in publisher; otherwise return null.
+- If a publication/test-prep year is clearly visible, return it as a string in year; otherwise return null.
+- If an edition is clearly visible (for example "8th Edition" or "Premium Edition"), return it in edition; otherwise return null.
+- Do not infer a year or edition from the cover design or from outside knowledge.
+- Do not put a publisher/brand in author merely because no author is visible.
 - In visibleText, record the actual title or spine text you relied on.
 - Ignore magazines, toys, decorations, and other non-book objects.
 - Mention glare, blur, obstruction, or unreadable books in notes.

@@ -45,7 +45,9 @@ type RewardBook = {
   id: string;
   title: string;
   author: string;
+  publisher: string;
   year: string;
+  edition: string;
   status: "available" | "claimed";
 };
 
@@ -147,26 +149,25 @@ export default function BookBoxAdminPage() {
         if (!title) return null;
 
         const author =
-          typeof book.author === "string"
-            ? book.author.trim()
-            : typeof book.publisher === "string"
-              ? book.publisher.trim()
-              : "";
-
+          typeof book.author === "string" ? book.author.trim() : "";
+        const publisher =
+          typeof book.publisher === "string" ? book.publisher.trim() : "";
         const year =
           typeof book.year === "string"
             ? book.year.trim()
             : typeof book.year === "number"
               ? String(book.year)
-              : typeof book.edition === "string"
-                ? book.edition.trim()
-                : "";
+              : "";
+        const edition =
+          typeof book.edition === "string" ? book.edition.trim() : "";
 
         return {
           id: `${Date.now()}-${index}`,
           title,
           author,
+          publisher,
           year,
+          edition,
           status: "available" as const,
         };
       })
@@ -212,10 +213,12 @@ export default function BookBoxAdminPage() {
       await setDoc(
         doc(db, "siteContent", "bookBoxChallenge"),
         {
-          books: books.map(({ title, author, year, status }) => ({
+          books: books.map(({ title, author, publisher, year, edition, status }) => ({
             title,
             author,
+            publisher,
             year,
+            edition,
             status,
           })),
           booksUpdatedAt: serverTimestamp(),
@@ -262,7 +265,11 @@ export default function BookBoxAdminPage() {
                   title,
                   author:
                     typeof book.author === "string" ? book.author : "",
+                  publisher:
+                    typeof book.publisher === "string" ? book.publisher : "",
                   year: typeof book.year === "string" ? book.year : "",
+                  edition:
+                    typeof book.edition === "string" ? book.edition : "",
                   status:
                     book.status === "claimed" ? "claimed" : "available",
                 } satisfies RewardBook;
@@ -342,10 +349,12 @@ export default function BookBoxAdminPage() {
           rewardPhotoUrl: downloadUrl,
           rewardPhotoFile: photoFile,
           rewardPhotoUpdatedAt: serverTimestamp(),
-          books: recognizedBooks.map(({ title, author, year, status }) => ({
+          books: recognizedBooks.map(({ title, author, publisher, year, edition, status }) => ({
             title,
             author,
+            publisher,
             year,
+            edition,
             status,
           })),
           booksUpdatedAt: serverTimestamp(),
@@ -831,7 +840,9 @@ export default function BookBoxAdminPage() {
                     id: `manual-${Date.now()}`,
                     title: "",
                     author: "",
+                    publisher: "",
                     year: "",
+                    edition: "",
                     status: "available",
                   },
                 ])
@@ -851,7 +862,7 @@ export default function BookBoxAdminPage() {
             <div className="mt-4 space-y-3">
               {rewardBooks.map((book, index) => (
                 <div key={book.id} className="border border-border p-3">
-                  <div className="grid gap-2 sm:grid-cols-[1fr_0.7fr_0.35fr]">
+                  <div className="grid gap-2 sm:grid-cols-2">
                     <input
                       value={book.title}
                       onChange={(event) =>
@@ -864,7 +875,7 @@ export default function BookBoxAdminPage() {
                         )
                       }
                       placeholder="Book title"
-                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
                     />
                     <input
                       value={book.author}
@@ -877,7 +888,21 @@ export default function BookBoxAdminPage() {
                           ),
                         )
                       }
-                      placeholder="Author / publisher"
+                      placeholder="Author"
+                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                    />
+                    <input
+                      value={book.publisher}
+                      onChange={(event) =>
+                        setRewardBooks((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? { ...item, publisher: event.target.value }
+                              : item,
+                          ),
+                        )
+                      }
+                      placeholder="Publisher / prep brand"
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
                     />
                     <input
@@ -892,6 +917,20 @@ export default function BookBoxAdminPage() {
                         )
                       }
                       placeholder="Year"
+                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                    />
+                    <input
+                      value={book.edition}
+                      onChange={(event) =>
+                        setRewardBooks((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? { ...item, edition: event.target.value }
+                              : item,
+                          ),
+                        )
+                      }
+                      placeholder="Edition"
                       className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
                     />
                   </div>
