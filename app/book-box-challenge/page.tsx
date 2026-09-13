@@ -72,7 +72,7 @@ export default function BookBoxChallengePage() {
 
           <div className="mt-7 flex justify-center">
             <Link
-              href="/?challenge=1"
+              href="/?add=1"
               className="rounded-none border border-blue-700 bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
             >
               Find &amp; Add Book Boxes

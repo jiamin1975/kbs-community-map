@@ -43,6 +43,20 @@ export function LibraryMapExperience() {
     useState(false)
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+
+    if (params.get("add") === "1") {
+      setPendingAddedLibrary(null)
+      setAddLibraryDialogOpen(true)
+
+      // Remove the one-time flag so a later refresh does not reopen the form.
+      const url = new URL(window.location.href)
+      url.searchParams.delete("add")
+      window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`)
+    }
+  }, [])
+
+  useEffect(() => {
     return () => {
       if (existingBoxFocusTimer.current !== null) {
         window.clearTimeout(existingBoxFocusTimer.current)
