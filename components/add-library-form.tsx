@@ -1538,6 +1538,61 @@ export function AddLibraryForm({
     );
   }
 
+  function startSecondChallengeBox() {
+    // Start a completely fresh Add Box submission instead of reopening
+    // the completed first submission at Step 3.
+    setSuccessfullyAddedLibrary(null);
+    setSuccessTotals(null);
+
+    setCurrentStep(1);
+    setName("");
+    setAddress("");
+    setNeighborhood("");
+    setLatitude("");
+    setLongitude("");
+    setVerified(false);
+    setLocationAdjusted(false);
+
+    setMessage("");
+    setError("");
+    setAccessMessage("");
+    setNearbyLibrary(null);
+    setNearbyCurrentLocationLibraries([]);
+    setDuplicateCheckStatus("idle");
+
+    setPhoto(null);
+    setPhotoPreviewUrl(null);
+    setCropSourcePhoto(null);
+    setCropSourceUrl(null);
+    setCropPosition({ x: 0, y: 0 });
+    setCropZoom(1);
+    setCroppedAreaPixels(null);
+
+    processedBookPhotoUrls.current.forEach((url) => URL.revokeObjectURL(url));
+    processedBookPhotoUrls.current = [];
+    setPendingBookPhotos([]);
+    setProcessedBookPhotos([]);
+    setRecognizedBooks([]);
+    setBookPhotosProcessed(0);
+    setBookRecognitionError("");
+
+    setSaving(false);
+    setLocating(false);
+    setGeocodingAddress(false);
+    setProcessingPhoto(false);
+    setUploadingPhoto(false);
+    setAnalyzingBooks(false);
+
+    // The second box needs its own Firestore document/storage ID.
+    setPendingLibraryId(doc(collection(db, "libraries")).id);
+
+    setMapCenter({
+      lat: 39.0458,
+      lng: -77.1224,
+    });
+    setMapZoom(18);
+  }
+
   if (successfullyAddedLibrary) {
     return (
       <div className="kbs-add-form flex min-h-[58vh] items-center justify-center rounded-none border border-border bg-card px-4 py-10 text-slate-950 sm:min-h-[420px] sm:px-8">
@@ -1633,10 +1688,7 @@ export function AddLibraryForm({
 
                   <button
                     type="button"
-                    onClick={() => {
-                      setSuccessfullyAddedLibrary(null);
-                      setSuccessTotals(null);
-                    }}
+                    onClick={startSecondChallengeBox}
                     className="mt-4 rounded-none border border-blue-700 bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
                   >
                     Add My Second Book Box
