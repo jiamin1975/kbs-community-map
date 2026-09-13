@@ -10,7 +10,9 @@ import {
 } from "firebase/firestore";
 import {
   deleteObject,
+  getDownloadURL,
   ref,
+  uploadBytes,
 } from "firebase/storage";
 import {
   GoogleAuthProvider,
@@ -56,6 +58,117 @@ export default function BookBoxAdminPage() {
   const [completed, setCompleted] = useState(0);
   const [total, setTotal] = useState(0);
   const [message, setMessage] = useState("");
+
+  const [rewardPhotoUrl, setRewardPhotoUrl] = useState("");
+  const [rewardPhotoUpdatedAt, setRewardPhotoUpdatedAt] = useState("");
+  const [loadingRewardPhoto, setLoadingRewardPhoto] = useState(false);
+  const [uploadingRewardPhoto, setUploadingRewardPhoto] = useState(false);
+
+  async function loadRewardPhoto() {
+    setLoadingRewardPhoto(true);
+    try {
+      const contentSnapshot = await getDoc(
+        doc(db, "siteContent", "bookBoxChallenge"),
+      );
+
+      if (contentSnapshot.exists()) {
+        const data = contentSnapshot.data();
+        setRewardPhotoUrl(
+          typeof data.rewardPhotoUrl === "string" ? data.rewardPhotoUrl : "",
+        );
+
+        const updatedAt = data.rewardPhotoUpdatedAt;
+        setRewardPhotoUpdatedAt(
+          updatedAt?.toDate
+            ? updatedAt.toDate().toLocaleString()
+            : "",
+        );
+      } else {
+        setRewardPhotoUrl("");
+        setRewardPhotoUpdatedAt("");
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage(
+        error instanceof Error
+          ? `Could not load challenge photo: ${error.message}`
+          : "Could not load challenge photo.",
+      );
+    } finally {
+      setLoadingRewardPhoto(false);
+    }
+  }
+
+  async function handleRewardPhotoUpload(
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || uploadingRewardPhoto) return;
+
+    if (!file.type.startsWith("image/")) {
+      setMessage("Please choose an image file.");
+      return;
+    }
+
+    setUploadingRewardPhoto(true);
+    setMessage("");
+
+    try {
+      const extension =
+        file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") ||
+        "jpg";
+      const photoFile = `available-books-${Date.now()}.${extension}`;
+      const photoRef = ref(storage, `challenge-rewards/${photoFile}`);
+
+      await uploadBytes(photoRef, file, {
+        contentType: file.type || "image/jpeg",
+      });
+      const downloadUrl = await getDownloadURL(photoRef);
+
+      const contentRef = doc(db, "siteContent", "bookBoxChallenge");
+      const previousSnapshot = await getDoc(contentRef);
+      const previousFile =
+        previousSnapshot.exists() &&
+        typeof previousSnapshot.data().rewardPhotoFile === "string"
+          ? previousSnapshot.data().rewardPhotoFile
+          : "";
+
+      const { setDoc, serverTimestamp } = await import("firebase/firestore");
+      await setDoc(
+        contentRef,
+        {
+          rewardPhotoUrl: downloadUrl,
+          rewardPhotoFile: photoFile,
+          rewardPhotoUpdatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+
+      if (previousFile && previousFile !== photoFile) {
+        await deleteObject(
+          ref(storage, `challenge-rewards/${previousFile}`),
+        ).catch((error) => {
+          if (error?.code !== "storage/object-not-found") {
+            console.warn("Could not delete previous challenge photo:", error);
+          }
+        });
+      }
+
+      setRewardPhotoUrl(downloadUrl);
+      setRewardPhotoUpdatedAt(new Date().toLocaleString());
+      setMessage("Challenge reward photo updated.");
+    } catch (error) {
+      console.error(error);
+      setMessage(
+        error instanceof Error
+          ? `Photo upload stopped: ${error.message}`
+          : "Photo upload stopped because of an unexpected error.",
+      );
+    } finally {
+      setUploadingRewardPhoto(false);
+    }
+  }
 
   async function loadLibraries() {
     setLoadingLibraries(true);
@@ -147,8 +260,11 @@ export default function BookBoxAdminPage() {
   useEffect(() => {
     if (approved) {
       void loadLibraries();
+      void loadRewardPhoto();
     } else {
       setLibraries([]);
+      setRewardPhotoUrl("");
+      setRewardPhotoUpdatedAt("");
     }
   }, [approved]);
 
@@ -430,6 +546,55 @@ export default function BookBoxAdminPage() {
       )}
 
       <section className="mt-8 border border-border p-5">
+        <h2 className="text-lg font-bold">Challenge Reward Books</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          This photo is shown on the public Book Box Challenge page. Replace it
+          whenever the available study books change.
+        </p>
+
+        <div className="mt-4 border border-border bg-muted/20 p-3">
+          {loadingRewardPhoto ? (
+            <p className="text-sm text-muted-foreground">
+              Loading current photo…
+            </p>
+          ) : rewardPhotoUrl ? (
+            <img
+              src={rewardPhotoUrl}
+              alt="Current available Book Box Challenge study books"
+              className="max-h-[420px] w-full object-contain"
+            />
+          ) : (
+            <div className="flex min-h-40 items-center justify-center text-sm text-muted-foreground">
+              No reward book photo uploaded yet.
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <label className="cursor-pointer rounded-none bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
+            {uploadingRewardPhoto
+              ? "Uploading…"
+              : rewardPhotoUrl
+                ? "Replace Photo"
+                : "Upload Photo"}
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploadingRewardPhoto}
+              onChange={(event) => void handleRewardPhotoUpload(event)}
+              className="hidden"
+            />
+          </label>
+
+          {rewardPhotoUpdatedAt && (
+            <p className="text-xs text-muted-foreground">
+              Last updated: {rewardPhotoUpdatedAt}
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="mt-6 border border-border p-5">
         <h2 className="text-lg font-bold">Book Boxes</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Search by box name, address, or document ID.
