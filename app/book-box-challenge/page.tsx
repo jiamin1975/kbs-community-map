@@ -1,13 +1,87 @@
+"use client"
+
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
+import { doc, getDoc } from "firebase/firestore"
 import {
   BookOpenText,
   Camera,
   Gift,
   MapPinPlus,
-  Send,
+  X,
 } from "lucide-react"
+import { db } from "@/lib/firebase"
+
+type RewardBook = {
+  title: string
+  author: string
+  year: string
+  status: "available" | "claimed"
+}
 
 export default function BookBoxChallengePage() {
+  const [rewardPhotoUrl, setRewardPhotoUrl] = useState("")
+  const [books, setBooks] = useState<RewardBook[]>([])
+  const [loadingRewards, setLoadingRewards] = useState(true)
+  const [photoOpen, setPhotoOpen] = useState(false)
+
+  useEffect(() => {
+    async function loadRewards() {
+      try {
+        const snapshot = await getDoc(
+          doc(db, "siteContent", "bookBoxChallenge"),
+        )
+
+        if (!snapshot.exists()) return
+
+        const data = snapshot.data()
+
+        setRewardPhotoUrl(
+          typeof data.rewardPhotoUrl === "string" ? data.rewardPhotoUrl : "",
+        )
+
+        const nextBooks: RewardBook[] = Array.isArray(data.books)
+          ? data.books
+              .map((item: unknown) => {
+                if (!item || typeof item !== "object") return null
+                const book = item as Record<string, unknown>
+                const title =
+                  typeof book.title === "string" ? book.title.trim() : ""
+                if (!title) return null
+
+                return {
+                  title,
+                  author:
+                    typeof book.author === "string" ? book.author.trim() : "",
+                  year:
+                    typeof book.year === "string" ? book.year.trim() : "",
+                  status:
+                    book.status === "claimed" ? "claimed" : "available",
+                } satisfies RewardBook
+              })
+              .filter((book: RewardBook | null): book is RewardBook => book !== null)
+          : []
+
+        setBooks(nextBooks)
+      } catch (error) {
+        console.error("Could not load challenge rewards:", error)
+      } finally {
+        setLoadingRewards(false)
+      }
+    }
+
+    void loadRewards()
+  }, [])
+
+  const availableBooks = useMemo(
+    () => books.filter((book) => book.status === "available"),
+    [books],
+  )
+  const claimedBooks = useMemo(
+    () => books.filter((book) => book.status === "claimed"),
+    [books],
+  )
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-50 via-violet-50/60 to-amber-50/50">
       <section className="border-b border-blue-100">
@@ -37,10 +111,7 @@ export default function BookBoxChallengePage() {
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <div className="border border-blue-200 bg-blue-50/80 p-5 text-center shadow-sm">
-              <MapPinPlus
-                className="mx-auto size-7 text-violet-700"
-                aria-hidden="true"
-              />
+              <MapPinPlus className="mx-auto size-7 text-violet-700" aria-hidden="true" />
               <p className="mt-3 font-bold text-foreground">Add 2 Boxes</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Add two new book boxes to the map.
@@ -48,10 +119,7 @@ export default function BookBoxChallengePage() {
             </div>
 
             <div className="border border-violet-200 bg-violet-50/80 p-5 text-center shadow-sm">
-              <Camera
-                className="mx-auto size-7 text-amber-700"
-                aria-hidden="true"
-              />
+              <Camera className="mx-auto size-7 text-amber-700" aria-hidden="true" />
               <p className="mt-3 font-bold text-foreground">Send Screenshots</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Send us your two confirmation screenshots.
@@ -59,16 +127,124 @@ export default function BookBoxChallengePage() {
             </div>
 
             <div className="border border-amber-200 bg-amber-50/80 p-5 text-center shadow-sm">
-              <BookOpenText
-                className="mx-auto size-7 text-blue-700"
-                aria-hidden="true"
-              />
+              <BookOpenText className="mx-auto size-7 text-blue-700" aria-hidden="true" />
               <p className="mt-3 font-bold text-foreground">Pick a Book</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Choose an available SAT or AP prep book.
               </p>
             </div>
           </div>
+
+          <section className="mt-8 border border-blue-200 bg-white/80 p-4 shadow-sm sm:p-5">
+            <div className="text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
+                Step 1
+              </p>
+              <h2 className="mt-1 text-xl font-bold text-foreground sm:text-2xl">
+                See Available Study Books
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Tap the photo to enlarge it, then check the list below.
+              </p>
+            </div>
+
+            {loadingRewards ? (
+              <p className="mt-5 text-center text-sm text-muted-foreground">
+                Loading available books…
+              </p>
+            ) : (
+              <>
+                {rewardPhotoUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setPhotoOpen(true)}
+                    className="mt-5 block w-full cursor-zoom-in border border-border bg-white p-2"
+                    aria-label="Enlarge available study books photo"
+                  >
+                    <img
+                      src={rewardPhotoUrl}
+                      alt="Current Book Box Challenge study books"
+                      className="max-h-[520px] w-full object-contain"
+                    />
+                  </button>
+                )}
+
+                <div className="mt-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="font-bold">Available Books</h3>
+                    <span className="text-xs font-semibold text-green-700">
+                      {availableBooks.length} available
+                    </span>
+                  </div>
+
+                  {availableBooks.length === 0 ? (
+                    <p className="mt-3 border border-border p-4 text-sm text-muted-foreground">
+                      No books are currently marked available.
+                    </p>
+                  ) : (
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      {availableBooks.map((book, index) => (
+                        <div
+                          key={`${book.title}-${index}`}
+                          className="flex items-start justify-between gap-3 border border-green-200 bg-green-50/60 p-3"
+                        >
+                          <div className="min-w-0">
+                            <p className="font-semibold text-foreground">
+                              {book.title}
+                            </p>
+                            {(book.author || book.year) && (
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {[book.author, book.year].filter(Boolean).join(" · ")}
+                              </p>
+                            )}
+                          </div>
+                          <span className="shrink-0 text-xs font-bold text-green-700">
+                            Available
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {claimedBooks.length > 0 && (
+                  <div className="mt-6 border-t border-border pt-5">
+                    <h3 className="font-bold text-muted-foreground">
+                      Claimed Books
+                    </h3>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      {claimedBooks.map((book, index) => (
+                        <div
+                          key={`${book.title}-claimed-${index}`}
+                          className="flex items-start justify-between gap-3 border border-border bg-muted/30 p-3 opacity-70"
+                        >
+                          <div className="min-w-0">
+                            <p className="font-semibold text-foreground line-through">
+                              {book.title}
+                            </p>
+                            {(book.author || book.year) && (
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {[book.author, book.year].filter(Boolean).join(" · ")}
+                              </p>
+                            )}
+                          </div>
+                          <span className="shrink-0 text-xs font-bold text-muted-foreground">
+                            Claimed
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <p className="mt-5 text-center text-xs leading-5 text-muted-foreground sm:text-sm">
+                  After adding 2 book boxes, send us your 2 submission screenshots
+                  and the name of the available book you would like. Book selection
+                  is confirmed after we verify your submissions.
+                </p>
+              </>
+            )}
+          </section>
 
           <div className="mt-7 flex justify-center">
             <Link
@@ -87,6 +263,32 @@ export default function BookBoxChallengePage() {
           </div>
         </div>
       </section>
+
+      {photoOpen && rewardPhotoUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Available study books photo"
+          onClick={() => setPhotoOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setPhotoOpen(false)}
+            className="absolute right-4 top-4 flex size-10 items-center justify-center bg-white text-black"
+            aria-label="Close photo"
+          >
+            <X className="size-5" />
+          </button>
+
+          <img
+            src={rewardPhotoUrl}
+            alt="Current Book Box Challenge study books enlarged"
+            className="max-h-full max-w-full object-contain"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
     </main>
   )
 }

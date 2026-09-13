@@ -7,6 +7,8 @@ import {
   doc,
   getDoc,
   getDocs,
+  serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
 import {
   deleteObject,
@@ -39,6 +41,14 @@ type OrphanRow = {
   bookCount: number;
 };
 
+type RewardBook = {
+  id: string;
+  title: string;
+  author: string;
+  year: string;
+  status: "available" | "claimed";
+};
+
 export default function BookBoxAdminPage() {
   const [authLoading, setAuthLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -63,6 +73,151 @@ export default function BookBoxAdminPage() {
   const [rewardPhotoUpdatedAt, setRewardPhotoUpdatedAt] = useState("");
   const [loadingRewardPhoto, setLoadingRewardPhoto] = useState(false);
   const [uploadingRewardPhoto, setUploadingRewardPhoto] = useState(false);
+  const [recognizingRewardBooks, setRecognizingRewardBooks] = useState(false);
+  const [savingRewardBooks, setSavingRewardBooks] = useState(false);
+  const [rewardBooks, setRewardBooks] = useState<RewardBook[]>([]);
+
+  async function fileToRecognitionDataUrl(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const image = new Image();
+
+        image.onload = () => {
+          const maxDimension = 2000;
+          const scale = Math.min(
+            1,
+            maxDimension / Math.max(image.naturalWidth, image.naturalHeight),
+          );
+
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+          const context = canvas.getContext("2d");
+          if (!context) {
+            reject(new Error("Could not prepare the image for recognition."));
+            return;
+          }
+
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.9));
+        };
+
+        image.onerror = () =>
+          reject(new Error("Could not read the selected image."));
+
+        image.src = String(reader.result);
+      };
+
+      reader.onerror = () =>
+        reject(new Error("Could not read the selected image."));
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function normalizeRecognizedBooks(value: unknown): RewardBook[] {
+    if (!Array.isArray(value)) return [];
+
+    return value
+      .map((item, index) => {
+        if (!item || typeof item !== "object") return null;
+        const book = item as Record<string, unknown>;
+
+        const title =
+          typeof book.title === "string" ? book.title.trim() : "";
+        if (!title) return null;
+
+        const author =
+          typeof book.author === "string"
+            ? book.author.trim()
+            : typeof book.publisher === "string"
+              ? book.publisher.trim()
+              : "";
+
+        const year =
+          typeof book.year === "string"
+            ? book.year.trim()
+            : typeof book.year === "number"
+              ? String(book.year)
+              : typeof book.edition === "string"
+                ? book.edition.trim()
+                : "";
+
+        return {
+          id: `${Date.now()}-${index}`,
+          title,
+          author,
+          year,
+          status: "available" as const,
+        };
+      })
+      .filter((book): book is RewardBook => book !== null);
+  }
+
+  async function recognizeRewardBooks(file: File) {
+    setRecognizingRewardBooks(true);
+
+    try {
+      const dataUrl = await fileToRecognitionDataUrl(file);
+      const response = await fetch("/api/analyze-books", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: dataUrl, dataUrl }),
+      });
+
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          result?.error || result?.message || "Book recognition failed.",
+        );
+      }
+
+      const recognized = normalizeRecognizedBooks(
+        result?.books ?? result?.data?.books,
+      );
+
+      setRewardBooks(recognized);
+
+      return recognized;
+    } finally {
+      setRecognizingRewardBooks(false);
+    }
+  }
+
+  async function saveRewardBooks(books: RewardBook[] = rewardBooks) {
+    setSavingRewardBooks(true);
+    setMessage("");
+
+    try {
+      await setDoc(
+        doc(db, "siteContent", "bookBoxChallenge"),
+        {
+          books: books.map(({ title, author, year, status }) => ({
+            title,
+            author,
+            year,
+            status,
+          })),
+          booksUpdatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+      setMessage("Challenge study-book list saved.");
+    } catch (error) {
+      console.error(error);
+      setMessage(
+        error instanceof Error
+          ? `Could not save study books: ${error.message}`
+          : "Could not save study books.",
+      );
+    } finally {
+      setSavingRewardBooks(false);
+    }
+  }
 
   async function loadRewardPhoto() {
     setLoadingRewardPhoto(true);
@@ -77,6 +232,29 @@ export default function BookBoxAdminPage() {
           typeof data.rewardPhotoUrl === "string" ? data.rewardPhotoUrl : "",
         );
 
+        const storedBooks = Array.isArray(data.books)
+          ? data.books
+              .map((item: unknown, index: number) => {
+                if (!item || typeof item !== "object") return null;
+                const book = item as Record<string, unknown>;
+                const title =
+                  typeof book.title === "string" ? book.title : "";
+                if (!title.trim()) return null;
+
+                return {
+                  id: `stored-${index}`,
+                  title,
+                  author:
+                    typeof book.author === "string" ? book.author : "",
+                  year: typeof book.year === "string" ? book.year : "",
+                  status:
+                    book.status === "claimed" ? "claimed" : "available",
+                } satisfies RewardBook;
+              })
+              .filter((book: RewardBook | null): book is RewardBook => book !== null)
+          : [];
+        setRewardBooks(storedBooks);
+
         const updatedAt = data.rewardPhotoUpdatedAt;
         setRewardPhotoUpdatedAt(
           updatedAt?.toDate
@@ -86,6 +264,7 @@ export default function BookBoxAdminPage() {
       } else {
         setRewardPhotoUrl("");
         setRewardPhotoUpdatedAt("");
+        setRewardBooks([]);
       }
     } catch (error) {
       console.error(error);
@@ -134,13 +313,26 @@ export default function BookBoxAdminPage() {
           ? previousSnapshot.data().rewardPhotoFile
           : "";
 
-      const { setDoc, serverTimestamp } = await import("firebase/firestore");
+      let recognizedBooks: RewardBook[] = [];
+      try {
+        recognizedBooks = await recognizeRewardBooks(file);
+      } catch (recognitionError) {
+        console.error(recognitionError);
+      }
+
       await setDoc(
         contentRef,
         {
           rewardPhotoUrl: downloadUrl,
           rewardPhotoFile: photoFile,
           rewardPhotoUpdatedAt: serverTimestamp(),
+          books: recognizedBooks.map(({ title, author, year, status }) => ({
+            title,
+            author,
+            year,
+            status,
+          })),
+          booksUpdatedAt: serverTimestamp(),
         },
         { merge: true },
       );
@@ -157,7 +349,11 @@ export default function BookBoxAdminPage() {
 
       setRewardPhotoUrl(downloadUrl);
       setRewardPhotoUpdatedAt(new Date().toLocaleString());
-      setMessage("Challenge reward photo updated.");
+      setMessage(
+        recognizedBooks.length > 0
+          ? `Challenge photo updated and ${recognizedBooks.length} book${recognizedBooks.length === 1 ? "" : "s"} recognized. Review the list below, then save any edits.`
+          : "Challenge photo updated. No books were recognized automatically; you can add them below.",
+      );
     } catch (error) {
       console.error(error);
       setMessage(
@@ -548,8 +744,8 @@ export default function BookBoxAdminPage() {
       <section className="mt-8 border border-border p-5">
         <h2 className="text-lg font-bold">Challenge Reward Books</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          This photo is shown on the public Book Box Challenge page. Replace it
-          whenever the available study books change.
+          Upload the current reward-book photo. AI will recognize the books,
+          then you can correct the list and mark each book Available or Claimed.
         </p>
 
         <div className="mt-4 border border-border bg-muted/20 p-3">
@@ -579,18 +775,178 @@ export default function BookBoxAdminPage() {
                 : "Upload Photo"}
             <input
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               disabled={uploadingRewardPhoto}
               onChange={(event) => void handleRewardPhotoUpload(event)}
               className="hidden"
             />
           </label>
 
+          {(uploadingRewardPhoto || recognizingRewardBooks) && (
+            <p className="text-sm text-muted-foreground">
+              {recognizingRewardBooks
+                ? "AI is recognizing books…"
+                : "Uploading photo…"}
+            </p>
+          )}
+
           {rewardPhotoUpdatedAt && (
             <p className="text-xs text-muted-foreground">
               Last updated: {rewardPhotoUpdatedAt}
             </p>
           )}
+        </div>
+
+        <div className="mt-6 border-t border-border pt-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 className="font-bold">Recognized Books</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Edit recognition mistakes or change a book's status after it is claimed.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                setRewardBooks((current) => [
+                  ...current,
+                  {
+                    id: `manual-${Date.now()}`,
+                    title: "",
+                    author: "",
+                    year: "",
+                    status: "available",
+                  },
+                ])
+              }
+              className="rounded-none border border-border px-3 py-2 text-sm font-semibold"
+            >
+              + Add Book
+            </button>
+          </div>
+
+          {rewardBooks.length === 0 ? (
+            <p className="mt-4 border border-border p-4 text-sm text-muted-foreground">
+              No books in the list yet. Upload a photo for AI recognition or add
+              a book manually.
+            </p>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {rewardBooks.map((book, index) => (
+                <div key={book.id} className="border border-border p-3">
+                  <div className="grid gap-2 sm:grid-cols-[1fr_0.7fr_0.35fr]">
+                    <input
+                      value={book.title}
+                      onChange={(event) =>
+                        setRewardBooks((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? { ...item, title: event.target.value }
+                              : item,
+                          ),
+                        )
+                      }
+                      placeholder="Book title"
+                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                    />
+                    <input
+                      value={book.author}
+                      onChange={(event) =>
+                        setRewardBooks((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? { ...item, author: event.target.value }
+                              : item,
+                          ),
+                        )
+                      }
+                      placeholder="Author / publisher"
+                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                    />
+                    <input
+                      value={book.year}
+                      onChange={(event) =>
+                        setRewardBooks((current) =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index
+                              ? { ...item, year: event.target.value }
+                              : item,
+                          ),
+                        )
+                      }
+                      placeholder="Year"
+                      className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setRewardBooks((current) =>
+                            current.map((item, itemIndex) =>
+                              itemIndex === index
+                                ? { ...item, status: "available" }
+                                : item,
+                            ),
+                          )
+                        }
+                        className={`rounded-none border px-3 py-1.5 text-xs font-semibold ${
+                          book.status === "available"
+                            ? "border-green-600 bg-green-600 text-white"
+                            : "border-border"
+                        }`}
+                      >
+                        Available
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setRewardBooks((current) =>
+                            current.map((item, itemIndex) =>
+                              itemIndex === index
+                                ? { ...item, status: "claimed" }
+                                : item,
+                            ),
+                          )
+                        }
+                        className={`rounded-none border px-3 py-1.5 text-xs font-semibold ${
+                          book.status === "claimed"
+                            ? "border-gray-600 bg-gray-600 text-white"
+                            : "border-border"
+                        }`}
+                      >
+                        Claimed
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setRewardBooks((current) =>
+                          current.filter((_, itemIndex) => itemIndex !== index),
+                        )
+                      }
+                      className="text-xs font-semibold text-red-600"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => void saveRewardBooks()}
+            disabled={savingRewardBooks || recognizingRewardBooks}
+            className="mt-4 rounded-none bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            {savingRewardBooks ? "Saving…" : "Save Book List"}
+          </button>
         </div>
       </section>
 
