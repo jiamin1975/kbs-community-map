@@ -293,6 +293,8 @@ async function createCroppedPhoto(
 type AddLibraryFormProps = {
   onLibraryAdded?: (library: Library) => void;
   onUseExistingLibrary?: (library: Library) => void;
+  challengeMode?: boolean;
+  challengeCompleted?: number;
 };
 
 function calculateDistanceMeters(
@@ -412,6 +414,8 @@ function buildBookSearchTokens(books: any[]) {
 export function AddLibraryForm({
   onLibraryAdded,
   onUseExistingLibrary,
+  challengeMode = false,
+  challengeCompleted = 0,
 }: AddLibraryFormProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -1610,11 +1614,48 @@ export function AddLibraryForm({
             </div>
           ) : null}
 
-          <div className="bg-slate-50 px-5 py-4 text-center">
-            <p className="text-xs leading-relaxed text-slate-500">
-              Close this window to view your new book box on the map.
-            </p>
-          </div>
+          {challengeMode ? (
+            <div className="bg-blue-50 px-5 py-5 text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-blue-700">
+                Book Box Challenge
+              </p>
+
+              <p className="mt-1 text-lg font-bold text-slate-950">
+                {Math.min(challengeCompleted, 2)} of 2 boxes completed
+                {challengeCompleted >= 2 ? " ✓" : ""}
+              </p>
+
+              {challengeCompleted < 2 ? (
+                <>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                    Add one more book box to complete the challenge.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSuccessfullyAddedLibrary(null);
+                      setSuccessTotals(null);
+                    }}
+                    className="mt-4 rounded-none border border-blue-700 bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                  >
+                    Add My Second Book Box
+                  </button>
+                </>
+              ) : (
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  Challenge complete! Take a screenshot of this page and send it
+                  to Kits Beyond Sound to claim your free SAT or AP study book.
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="bg-slate-50 px-5 py-4 text-center">
+              <p className="text-xs leading-relaxed text-slate-500">
+                Close this window to view your new book box on the map.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );
