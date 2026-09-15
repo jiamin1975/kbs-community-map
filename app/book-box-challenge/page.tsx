@@ -20,10 +20,10 @@ type RewardBook = {
 }
 
 export default function BookBoxChallengePage() {
-  const [rewardPhotoUrl, setRewardPhotoUrl] = useState("")
+  const [rewardPhotoUrls, setRewardPhotoUrls] = useState<string[]>([])
   const [books, setBooks] = useState<RewardBook[]>([])
   const [loadingRewards, setLoadingRewards] = useState(true)
-  const [photoOpen, setPhotoOpen] = useState(false)
+  const [photoOpen, setPhotoOpen] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadRewards() {
@@ -36,8 +36,22 @@ export default function BookBoxChallengePage() {
 
         const data = snapshot.data()
 
-        setRewardPhotoUrl(
-          typeof data.rewardPhotoUrl === "string" ? data.rewardPhotoUrl : "",
+        const photoUrls = Array.isArray(data.rewardPhotos)
+          ? data.rewardPhotos
+              .map((item: unknown) => {
+                if (!item || typeof item !== "object") return ""
+                const photo = item as Record<string, unknown>
+                return typeof photo.url === "string" ? photo.url : ""
+              })
+              .filter(Boolean)
+          : []
+
+        setRewardPhotoUrls(
+          photoUrls.length > 0
+            ? photoUrls
+            : typeof data.rewardPhotoUrl === "string" && data.rewardPhotoUrl
+              ? [data.rewardPhotoUrl]
+              : [],
         )
 
         const nextBooks: RewardBook[] = Array.isArray(data.books)
@@ -154,19 +168,24 @@ export default function BookBoxChallengePage() {
               </p>
             ) : (
               <>
-                {rewardPhotoUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setPhotoOpen(true)}
-                    className="mt-5 block w-full cursor-zoom-in border border-border bg-white p-2"
-                    aria-label="Enlarge available study books photo"
-                  >
-                    <img
-                      src={rewardPhotoUrl}
-                      alt="Current Book Box Challenge study books"
-                      className="max-h-[520px] w-full object-contain"
-                    />
-                  </button>
+                {rewardPhotoUrls.length > 0 && (
+                  <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {rewardPhotoUrls.map((photoUrl, index) => (
+                      <button
+                        key={`${photoUrl}-${index}`}
+                        type="button"
+                        onClick={() => setPhotoOpen(photoUrl)}
+                        className="block cursor-zoom-in border border-border bg-white p-2"
+                        aria-label={`Enlarge available study books photo ${index + 1}`}
+                      >
+                        <img
+                          src={photoUrl}
+                          alt={`Current Book Box Challenge study books ${index + 1}`}
+                          className="h-48 w-full object-cover sm:h-56"
+                        />
+                      </button>
+                    ))}
+                  </div>
                 )}
 
                 <div className="mt-5">
@@ -264,17 +283,17 @@ export default function BookBoxChallengePage() {
         </div>
       </section>
 
-      {photoOpen && rewardPhotoUrl && (
+      {photoOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-6"
           role="dialog"
           aria-modal="true"
           aria-label="Available study books photo"
-          onClick={() => setPhotoOpen(false)}
+          onClick={() => setPhotoOpen(null)}
         >
           <button
             type="button"
-            onClick={() => setPhotoOpen(false)}
+            onClick={() => setPhotoOpen(null)}
             className="absolute right-4 top-4 flex size-10 items-center justify-center bg-white text-black"
             aria-label="Close photo"
           >
@@ -282,7 +301,7 @@ export default function BookBoxChallengePage() {
           </button>
 
           <img
-            src={rewardPhotoUrl}
+            src={photoOpen}
             alt="Current Book Box Challenge study books enlarged"
             className="max-h-full max-w-full object-contain"
             onClick={(event) => event.stopPropagation()}

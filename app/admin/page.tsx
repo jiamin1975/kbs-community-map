@@ -71,7 +71,9 @@ export default function BookBoxAdminPage() {
   const [total, setTotal] = useState(0);
   const [message, setMessage] = useState("");
 
-  const [rewardPhotoUrl, setRewardPhotoUrl] = useState("");
+  const [rewardPhotos, setRewardPhotos] = useState<
+    Array<{ url: string; file: string }>
+  >([]);
   const [rewardPhotoUpdatedAt, setRewardPhotoUpdatedAt] = useState("");
   const [loadingRewardPhoto, setLoadingRewardPhoto] = useState(false);
   const [uploadingRewardPhoto, setUploadingRewardPhoto] = useState(false);
@@ -247,8 +249,35 @@ export default function BookBoxAdminPage() {
 
       if (contentSnapshot.exists()) {
         const data = contentSnapshot.data();
-        setRewardPhotoUrl(
-          typeof data.rewardPhotoUrl === "string" ? data.rewardPhotoUrl : "",
+        const storedPhotos = Array.isArray(data.rewardPhotos)
+          ? data.rewardPhotos
+              .map((item: unknown) => {
+                if (!item || typeof item !== "object") return null;
+                const photo = item as Record<string, unknown>;
+                const url = typeof photo.url === "string" ? photo.url : "";
+                if (!url) return null;
+                return {
+                  url,
+                  file: typeof photo.file === "string" ? photo.file : "",
+                };
+              })
+              .filter(
+                (photo: { url: string; file: string } | null):
+                  photo is { url: string; file: string } => photo !== null,
+              )
+          : [];
+
+        setRewardPhotos(
+          storedPhotos.length > 0
+            ? storedPhotos
+            : typeof data.rewardPhotoUrl === "string" && data.rewardPhotoUrl
+              ? [{
+                  url: data.rewardPhotoUrl,
+                  file: typeof data.rewardPhotoFile === "string"
+                    ? data.rewardPhotoFile
+                    : "",
+                }]
+              : [],
         );
 
         const storedBooks = Array.isArray(data.books)
@@ -285,7 +314,7 @@ export default function BookBoxAdminPage() {
             : "",
         );
       } else {
-        setRewardPhotoUrl("");
+        setRewardPhotos([]);
         setRewardPhotoUpdatedAt("");
         setRewardBooks([]);
       }
@@ -304,88 +333,121 @@ export default function BookBoxAdminPage() {
   async function handleRewardPhotoUpload(
     event: React.ChangeEvent<HTMLInputElement>,
   ) {
-    const file = event.target.files?.[0];
+    const files = Array.from(event.target.files ?? []);
     event.target.value = "";
-    if (!file || uploadingRewardPhoto) return;
-
-    if (!file.type.startsWith("image/")) {
-      setMessage("Please choose an image file.");
-      return;
-    }
+    if (files.length === 0 || uploadingRewardPhoto) return;
 
     setUploadingRewardPhoto(true);
     setMessage("");
 
     try {
-      const extension =
-        file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") ||
-        "jpg";
-      const photoFile = `available-books-${Date.now()}.${extension}`;
-      const photoRef = ref(storage, `challenge-rewards/${photoFile}`);
+      const newPhotos: Array<{ url: string; file: string }> = [];
+      const newBooks: RewardBook[] = [];
 
-      await uploadBytes(photoRef, file, {
-        contentType: file.type || "image/jpeg",
-      });
-      const downloadUrl = await getDownloadURL(photoRef);
+      for (const file of files) {
+        if (!file.type.startsWith("image/")) continue;
 
-      const contentRef = doc(db, "siteContent", "bookBoxChallenge");
-      const previousSnapshot = await getDoc(contentRef);
-      const previousFile =
-        previousSnapshot.exists() &&
-        typeof previousSnapshot.data().rewardPhotoFile === "string"
-          ? previousSnapshot.data().rewardPhotoFile
-          : "";
+        const extension =
+          file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") ||
+          "jpg";
+        const photoFile = `available-books-${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2, 8)}.${extension}`;
 
-      let recognizedBooks: RewardBook[] = [];
-      try {
-        recognizedBooks = await recognizeRewardBooks(file);
-      } catch (recognitionError) {
-        console.error(recognitionError);
+        await uploadBytes(ref(storage, `challenge-rewards/${photoFile}`), file, {
+          contentType: file.type || "image/jpeg",
+        });
+        const url = await getDownloadURL(
+          ref(storage, `challenge-rewards/${photoFile}`),
+        );
+        newPhotos.push({ url, file: photoFile });
+
+        try {
+          const recognized = await recognizeRewardBooks(file);
+          newBooks.push(
+            ...recognized.map((book, index) => ({
+              ...book,
+              id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${index}`,
+            })),
+          );
+        } catch (error) {
+          console.error("Reward-book recognition failed:", error);
+        }
       }
 
+      const nextPhotos = [...rewardPhotos, ...newPhotos];
+      const nextBooks = [...rewardBooks, ...newBooks];
+
       await setDoc(
-        contentRef,
+        doc(db, "siteContent", "bookBoxChallenge"),
         {
-          rewardPhotoUrl: downloadUrl,
-          rewardPhotoFile: photoFile,
+          rewardPhotos: nextPhotos,
+          rewardPhotoUrl: nextPhotos[0]?.url ?? "",
+          rewardPhotoFile: nextPhotos[0]?.file ?? "",
           rewardPhotoUpdatedAt: serverTimestamp(),
-          books: recognizedBooks.map(({ title, author, publisher, year, edition, status }) => ({
-            title,
-            author,
-            publisher,
-            year,
-            edition,
-            status,
-          })),
+          books: nextBooks.map(
+            ({ title, author, publisher, year, edition, status }) => ({
+              title, author, publisher, year, edition, status,
+            }),
+          ),
           booksUpdatedAt: serverTimestamp(),
         },
         { merge: true },
       );
 
-      if (previousFile && previousFile !== photoFile) {
-        await deleteObject(
-          ref(storage, `challenge-rewards/${previousFile}`),
-        ).catch((error) => {
-          if (error?.code !== "storage/object-not-found") {
-            console.warn("Could not delete previous challenge photo:", error);
-          }
-        });
-      }
-
-      setRewardPhotoUrl(downloadUrl);
+      setRewardPhotos(nextPhotos);
+      setRewardBooks(nextBooks);
       setRewardPhotoUpdatedAt(new Date().toLocaleString());
       setMessage(
-        recognizedBooks.length > 0
-          ? `Challenge photo updated and ${recognizedBooks.length} book${recognizedBooks.length === 1 ? "" : "s"} recognized. Review the list below, then save any edits.`
-          : "Challenge photo updated. No books were recognized automatically; you can add them below.",
+        `Added ${newPhotos.length} photo${newPhotos.length === 1 ? "" : "s"} and recognized ${newBooks.length} book${newBooks.length === 1 ? "" : "s"}. Review the combined list below.`,
       );
     } catch (error) {
       console.error(error);
       setMessage(
         error instanceof Error
-          ? `Photo upload stopped: ${error.message}`
-          : "Photo upload stopped because of an unexpected error.",
+          ? `Could not add reward photos: ${error.message}`
+          : "Could not add reward photos.",
       );
+    } finally {
+      setUploadingRewardPhoto(false);
+    }
+  }
+
+  async function removeRewardPhoto(index: number) {
+    const photo = rewardPhotos[index];
+    if (!photo || uploadingRewardPhoto) return;
+
+    setUploadingRewardPhoto(true);
+    setMessage("");
+
+    try {
+      if (photo.file) {
+        await deleteObject(
+          ref(storage, `challenge-rewards/${photo.file}`),
+        ).catch((error) => {
+          if (error?.code !== "storage/object-not-found") throw error;
+        });
+      }
+
+      const nextPhotos = rewardPhotos.filter((_, i) => i !== index);
+
+      await setDoc(
+        doc(db, "siteContent", "bookBoxChallenge"),
+        {
+          rewardPhotos: nextPhotos,
+          rewardPhotoUrl: nextPhotos[0]?.url ?? "",
+          rewardPhotoFile: nextPhotos[0]?.file ?? "",
+          rewardPhotoUpdatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+
+      setRewardPhotos(nextPhotos);
+      setRewardPhotoUpdatedAt(new Date().toLocaleString());
+      setMessage("Reward photo removed.");
+    } catch (error) {
+      console.error(error);
+      setMessage("Could not remove reward photo.");
     } finally {
       setUploadingRewardPhoto(false);
     }
@@ -484,7 +546,7 @@ export default function BookBoxAdminPage() {
       void loadRewardPhoto();
     } else {
       setLibraries([]);
-      setRewardPhotoUrl("");
+      setRewardPhotos([]);
       setRewardPhotoUpdatedAt("");
     }
   }, [approved]);
@@ -769,8 +831,8 @@ export default function BookBoxAdminPage() {
       <section className="mt-8 border border-border p-5">
         <h2 className="text-lg font-bold">Challenge Reward Books</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Upload the current reward-book photo. AI will recognize the books,
-          then you can correct the list and mark each book Available or Claimed.
+          Add one or more reward-book photos. AI will recognize books from each
+          photo and combine them into one editable list below.
         </p>
 
         <div className="mt-4 border border-border bg-muted/20 p-3">
@@ -778,12 +840,26 @@ export default function BookBoxAdminPage() {
             <p className="text-sm text-muted-foreground">
               Loading current photo…
             </p>
-          ) : rewardPhotoUrl ? (
-            <img
-              src={rewardPhotoUrl}
-              alt="Current available Book Box Challenge study books"
-              className="max-h-[420px] w-full object-contain"
-            />
+          ) : rewardPhotos.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {rewardPhotos.map((photo, index) => (
+                <div key={`${photo.url}-${index}`}>
+                  <img
+                    src={photo.url}
+                    alt={`Book Box Challenge reward books ${index + 1}`}
+                    className="h-44 w-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void removeRewardPhoto(index)}
+                    disabled={uploadingRewardPhoto}
+                    className="mt-2 text-xs text-red-600 underline disabled:opacity-50"
+                  >
+                    Remove photo
+                  </button>
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="flex min-h-40 items-center justify-center text-sm text-muted-foreground">
               No reward book photo uploaded yet.
@@ -793,14 +869,11 @@ export default function BookBoxAdminPage() {
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <label className="cursor-pointer rounded-none bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
-            {uploadingRewardPhoto
-              ? "Uploading…"
-              : rewardPhotoUrl
-                ? "Replace Photo"
-                : "Upload Photo"}
+            {uploadingRewardPhoto ? "Uploading…" : "Add Reward Photos"}
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
+              multiple
               disabled={uploadingRewardPhoto}
               onChange={(event) => void handleRewardPhotoUpload(event)}
               className="hidden"
