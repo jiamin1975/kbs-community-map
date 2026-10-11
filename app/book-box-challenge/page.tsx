@@ -280,14 +280,12 @@ export default function BookBoxChallengePage() {
             </div>
 
             <p className="mt-5 text-sm text-muted-foreground">
-              Already added 2 boxes?
+              Already added 2 boxes? Send your 2 confirmation screenshots and
+              the name of one available study book to:
             </p>
-            <a
-              href="mailto:kitsbeyondsound@gmail.com?subject=Book%20Box%20Challenge%20-%20Reward%20Claim&body=Hi%20Kits%20Beyond%20Sound%2C%0A%0AI%20completed%20the%20Book%20Box%20Challenge!%0A%0AStudy%20book%20I%20would%20like%3A%20%0A%0AI%20have%20attached%20my%202%20book%20box%20confirmation%20screenshots.%0A%0AThank%20you!"
-              className="mt-1 inline-flex text-sm font-semibold text-violet-700 underline underline-offset-4 hover:text-violet-800"
-            >
-              Email 2 Screenshots &amp; Pick a Book →
-            </a>
+            <p className="mt-1 text-sm font-semibold text-violet-700">
+              kitsbeyondsound@gmail.com
+            </p>
           </div>
 
           <div className="mx-auto mt-7 max-w-2xl border-t border-blue-200/70 pt-5 text-center">
