@@ -256,42 +256,38 @@ export default function BookBoxChallengePage() {
                   </div>
                 )}
 
-                <div className="mt-7 border-t border-violet-200 pt-6 text-center">
-                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-violet-700">
-                    Final Step
-                  </p>
-                  <h3 className="mt-1 text-xl font-bold text-foreground">
-                    Send Your 2 Screenshots &amp; Pick a Book
-                  </h3>
-                  <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-                    After adding 2 book boxes, email both confirmation screenshots
-                    and the name of one available study book you would like to
-                    kitsbeyondsound@gmail.com.
-                  </p>
 
-                  <a
-                    href="mailto:kitsbeyondsound@gmail.com?subject=Book%20Box%20Challenge%20-%20Reward%20Claim&body=Hi%20Kits%20Beyond%20Sound%2C%0A%0AI%20completed%20the%20Book%20Box%20Challenge!%0A%0AStudy%20book%20I%20would%20like%3A%20%0A%0AI%20have%20attached%20my%202%20book%20box%20confirmation%20screenshots.%0A%0AThank%20you!"
-                    className="mt-4 inline-flex rounded-none border border-violet-700 bg-violet-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-violet-700"
-                  >
-                    Email 2 Screenshots &amp; Pick a Book
-                  </a>
-
-                  <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                    We&apos;ll verify both submissions and confirm your book selection
-                    by email.
-                  </p>
-                </div>
               </>
             )}
           </section>
 
-          <div className="mt-7 flex justify-center">
-            <Link
-              href="/?add=1"
-              className="rounded-none border border-blue-700 bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+          <div className="mx-auto mt-7 max-w-2xl text-center">
+            <h2 className="text-lg font-bold text-foreground">
+              Ready to participate?
+            </h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+              Add two new book boxes and save the confirmation screenshot after
+              each submission.
+            </p>
+
+            <div className="mt-4">
+              <Link
+                href="/?add=1"
+                className="inline-flex rounded-none border border-blue-700 bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+              >
+                Find &amp; Add Book Boxes
+              </Link>
+            </div>
+
+            <p className="mt-5 text-sm text-muted-foreground">
+              Already added 2 boxes?
+            </p>
+            <a
+              href="mailto:kitsbeyondsound@gmail.com?subject=Book%20Box%20Challenge%20-%20Reward%20Claim&body=Hi%20Kits%20Beyond%20Sound%2C%0A%0AI%20completed%20the%20Book%20Box%20Challenge!%0A%0AStudy%20book%20I%20would%20like%3A%20%0A%0AI%20have%20attached%20my%202%20book%20box%20confirmation%20screenshots.%0A%0AThank%20you!"
+              className="mt-1 inline-flex text-sm font-semibold text-violet-700 underline underline-offset-4 hover:text-violet-800"
             >
-              Find &amp; Add Book Boxes
-            </Link>
+              Email 2 Screenshots &amp; Pick a Book →
+            </a>
           </div>
 
           <div className="mx-auto mt-7 max-w-2xl border-t border-blue-200/70 pt-5 text-center">
